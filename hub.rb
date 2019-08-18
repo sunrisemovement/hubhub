@@ -20,4 +20,29 @@ end
 hubs = Hub.all
 leaders = Leader.all
 
+leaders_by_id = leaders.each_with_object({}) do |leader, h|
+  h[leader.id] = leader
+end
+
+hub_json = hubs.map { |hub|
+  {
+    name: hub.fields['Name'],
+    city: hub.fields['City'],
+    state: hub.fields['State'],
+    email: hub.fields['Email'],
+    website: hub.fields['Website'],
+    instagram: hub.fields['Instagram Handle'],
+    facebook: hub.fields['Facebook Handle'],
+    twitter: hub.fields['Twitter Handle'],
+    leaders: (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }.map { |lead|
+      {
+        first_name: lead.fields['First Name'],
+        last_name: lead.fields['Last Name'],
+        pronouns: lead.fields['Pronouns'],
+        email: lead.fields['Email']
+      }
+    }
+  }
+}
+
 binding.pry
