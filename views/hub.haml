@@ -1,0 +1,57 @@
+%h2 Edit #{@hub.fields['City']}, #{@hub.fields['State']} Hub Info
+
+%p
+  On this page, you can edit all of the information that appears about your hub on the
+  %a{href: 'https://sunrisemovement.org/hubs'} Sunrise movement hub map!
+
+%form{action: '/hub', method: 'POST'}
+  %h3 Map Information
+  %ul
+  - ['Name', 'Email', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
+    %li
+      %label
+        = field
+        %input{name: field, value: @hub.fields[field]}
+
+  %li
+    %label
+      Latitude
+      %input{name: 'Latitude'}
+  %li
+    %label
+      Longitude
+      %input{name: 'Longitude'}
+  %li
+    %label
+      Hide from map?
+      %input{name: 'Inactive', type: 'checkbox'}
+
+
+  %h3 Coordinators
+  %ul
+    - @leaders.each do |leader, i|
+      %li
+        %ul
+          - ['Email', 'First Name', 'Last Name'].each do |field|
+            %li
+              %label
+                = field
+                %input{name: "leaders[#{i}][#{field}]", value: leader.fields[field]}
+          %li
+            %label
+              Hide email from map?
+              %input{name: "leaders[#{i}][Hide email from map?]", type: 'checkbox'}
+          %li
+            %label
+              Hide name from map?
+              %input{name: "leaders[#{i}][Hide name from map?]", type: 'checkbox'}
+          %li
+            %button
+              Remove Coordinator
+
+    %li
+      %button
+        Add New Coordinator
+
+  %input{type: 'submit'}
+  

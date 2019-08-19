@@ -1,0 +1,17 @@
+!!!5
+%html
+  %head
+    %title Sunrise Hubhub
+    %meta{charset: 'utf-8'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '/style.css'}
+    %link{rel: 'stylesheet', href: "https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" }
+  %body
+    %nav
+      %ul
+        %li
+          %a{href: '/'}
+            %h1 Hubhub
+        %li
+          %a{href: '/logout'} Log Out
+    .page
+      = yield

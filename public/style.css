@@ -1,0 +1,34 @@
+body {
+  margin: 0;
+  box-sizing: border-box;
+  color: var(--color-willow);
+  background-color: var(--color-charcoal);
+}
+
+* {
+  box-sizing: inherit;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+nav, nav a {
+  color: var(--color-yellow);
+}
+
+nav {
+  border-bottom: 2px solid;
+}
+
+.page {
+  padding: 1rem;
+}
+
+/* Variables */
+
+:root {
+  --color-charcoal: #33342E;
+  --color-yellow: #FFDE16;
+  --color-willow: #E3EDDF;
+}
