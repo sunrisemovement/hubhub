@@ -37,10 +37,9 @@ class Hub < Airrecord::Table
         twitter: hub.fields['Twitter Handle'],
         leaders: (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }.map { |lead|
           {
-            first_name: lead.fields['First Name'],
-            last_name: lead.fields['Last Name'],
-            pronouns: lead.fields['Pronouns'],
-            email: lead.fields['Email']
+            first_name: "Private", #lead.fields['First Name'],
+            last_name: "For Now", #lead.fields['Last Name'],
+            email: "email@addr.es" #lead.fields['Email']
           }
         }
       }
