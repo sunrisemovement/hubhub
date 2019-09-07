@@ -1,0 +1,511 @@
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+
+<style>
+
+/* Fixes issue on mobile */
+[class*=sqs-col] .sqs-block {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#hub-map {
+  height: 400px;
+  color: #000;
+}
+
+#hub-map *::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+}
+
+#hub-map .sidebar {
+  position:absolute;
+  width:33.3333%;
+  height: 328px; /*100%*/
+  top:0;left:0;
+  /*overflow:hidden;*/
+  /*border-right:1px solid rgba(0,0,0,0.25);*/
+  z-index: 9999;
+  background: #fff;
+}
+#hub-map .pad2 {
+  padding:20px;
+}
+
+#hub-map .map {
+  position:absolute;
+  width:100%;
+  top:0;bottom:0;
+}
+
+#hub-map h2 {
+  font-size:22px;
+  margin:0;
+  font-weight:400;
+  line-height: 20px;
+  padding: 20px 2px;
+  color:#222;
+}
+
+#hub-map a {
+  color:#000;
+  text-decoration:none;
+  cursor: pointer;
+}
+
+#hub-map a:hover {
+  color: #404040;
+}
+
+#hub-map .heading {
+  border-bottom:1px solid #eee;
+  min-height:60px;
+  padding:0 10px;
+  background-color: #fdde33;
+  color: #000;
+  border-right: 1px solid #ccc;
+}
+
+#hub-map input.search {
+  width: 100%;
+  font-size: 0.9em;
+  padding: 10px;
+  margin: 0;
+  margin-top: -1px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+}
+
+#hub-map .listings {
+  height:100%;
+  overflow:auto;
+  background-color: white;
+  border-right: 1px solid #ccc;
+}
+
+#hub-map .listings .item {
+  display:block;
+  border-bottom:1px solid #eee;
+  padding:10px;
+  text-decoration:none;
+  font-size: 0.9em;
+}
+
+#hub-map .listings .item:last-child { border-bottom:none; }
+#hub-map .listings .item .title {
+  display:block;
+  color:#000;
+  font-weight:700;
+}
+
+#hub-map .listings .item .title small { font-weight:400; }
+#hub-map .listings .item.active .title,
+#hub-map .listings .item .title:hover { color:#9e9e9e; }
+#hub-map .listings .item.active {
+  background-color: #fdde33;
+  color: #000;
+}
+#hub-map ::-webkit-scrollbar {
+  width:3px;
+  height:3px;
+  border-left:0;
+  background:rgba(0,0,0,0.1);
+}
+#hub-map ::-webkit-scrollbar-track {
+  background:none;
+}
+#hub-map ::-webkit-scrollbar-thumb {
+  background:#000;
+  border-radius:0;
+}
+
+#hub-map .marker {
+  border: none;
+  cursor: pointer;
+  height: 56px;
+  width: 56px;
+  background-image: url(/s/map_icon.jpg);
+  background-color: rgba(0, 0, 0, 0);
+}
+
+#hub-map .clearfix { display:block; }
+#hub-map .clearfix:after {
+  content:'.';
+  display:block;
+  height:0;
+  clear:both;
+  visibility:hidden;
+}
+
+/* Marker tweaks */
+.mapboxgl-popup {
+  padding-bottom: 50px;
+}
+
+.mapboxgl-popup-close-button {
+  display:none;
+}
+.mapboxgl-popup-content {
+  font:400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  padding:0;
+  max-width: 300px;
+}
+.mapboxgl-popup-content-wrapper {
+  padding:1%;
+}
+#hub-map .mapboxgl-popup-content h3 {
+  background-color: #fdde33;
+  color: #000;
+  margin:0;
+  display:block;
+  padding: 10px;
+  border-radius:3px 3px 0 0;
+  font-weight:700;
+  margin-top:-15px;
+  font-size: 1.1em;
+}
+
+#hub-map .mapboxgl-popup-content h4 {
+  margin:0;
+  display:block;
+  padding: 10px;
+  font-weight: 100;
+}
+
+#hub-map .mapboxgl-popup-content h4 p {
+  margin: 10px 0;
+}
+
+#hub-map .mapboxgl-popup-content h4 p:last-child {
+  margin-bottom: 0;
+}
+
+#hub-map .mapboxgl-popup-content h4 p:first-child {
+  margin-top: 0;
+}
+
+.mapboxgl-popup-content div {
+  padding:10px;
+}
+
+.mapboxgl-container .leaflet-marker-icon {
+  cursor:pointer;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-content {
+  margin-top: 15px;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
+  border-bottom-color: #fdde33;
+}
+
+#hub-map .toggle-div {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    top: 10px;
+    right: 10px;
+}
+
+#hub-map button.toggle {
+    font-size: 13px;
+    color: #000;
+    background: #fff;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.4);
+}
+#hub-map #show-map {
+  margin-bottom: 8px;
+}
+
+#hub-map button.toggle:hover {
+    background-color: #f8f8f8;
+    color: #404040;
+}
+
+@media (max-width: 768px) {
+  #hub-map h2 {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  #hub-map .sidebar {
+    width: 100%;
+  }
+
+  #hub-map .heading {
+    padding-top: 10px;
+  }
+}
+
+@media (min-width: 420px) {
+  #hub-map button.toggle {
+    display: none;
+  }
+  #hub-map .coordinators-mobile {
+    display: none;
+  }
+}
+</style>
+
+<div id="hub-map">
+    <div class='sidebar' id='hub-list-sidebar'>
+      <div class='heading'>
+        <h2>Sunrise Hubs</h2>
+        <button id="show-map" class="toggle">Show Map</button>
+      </div>
+      <input class='search' type='search' placeholder='Search for a hub...'>
+      <div id='listings' class='listings'>
+      </div>
+    </div>
+    <nav class="toggle-div">
+      <button id="show-list" class="toggle">Show List</button>
+    </nav>
+    <div id='map' class='map'> </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+
+<script>
+if (typeof(String.prototype.trim) === "undefined") {
+  String.prototype.trim = function() {
+    return String(this).replace(/^\s+|\s+$/g, '');
+  };
+}
+
+if (typeof(Array.prototype.unique) === "undefined") {
+  Array.prototype.unique = function() {
+    return this.filter(function (value, index, self) {
+      return self.indexOf(value) === index;
+    });
+  }
+}
+
+function emailLink(email) {
+  return "<a href='mailto:" + email + "'>" + email + "</a>";
+}
+
+function hubName(hub) {
+  return hub.name || hub.city + ", " + hub.state;
+}
+
+function socialLink(prefix, value, title) {
+  let href;
+  if (value.search(".com") >= 0) {
+    href = value.trim();
+  } else {
+    href = prefix + "/" + value.replace("@", "").trim();
+  }
+  return '<a href="'+href+'" target="_blank" style="text-decoration:underline;">'+title+'</a>';
+}
+
+function socialP(prefix, value, title) {
+  if (value) {
+    return '<p>' + socialLink(prefix, value, title) + '</p>';
+  } else {
+    return '';
+  }
+}
+
+function hubLinks(hub) {
+  var html = '';
+  html += socialP("https://facebook.com", hub.facebook, "Facebook Page");
+  html += socialP("https://twitter.com", hub.twitter, "Twitter Page");
+  html += socialP("https://instagram.com", hub.instagram, "Instagram Page");
+  if (hub.website) {
+    html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">Hub Website</a></p>';
+  }
+  if (hub.email) {
+    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
+  } else if (hub.leaders.length) {
+    html += "<span style='font-size: 16px'>Hub Contact";
+    if (hub.leaders.length > 1) html += "s";
+    html += ":</span><p>";
+    for (var i=0; i < hub.leaders.length; i++) {
+      var lead = hub.leaders[i];
+      html += "<strong>" + lead.first_name + " " + lead.last_name + "</strong>: ";
+      html += emailLink(lead.email) + "<br>";
+    }
+    html += "</p>";
+  }
+  return html;
+}
+
+function geoJSONFeature(hub) {
+  return {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [hub.longitude, hub.latitude]
+    },
+    "properties": hub
+  }
+}
+
+function showMapMobile() {
+  $(".sidebar").css({"z-index": "0"});
+}
+
+function showListMobile() {
+  $(".sidebar").css({"z-index": "9999"});
+}
+
+$(document).ready(function() {
+  $("#show-map").click(function(){
+    showMapMobile();
+  });
+
+  $("#show-list").click(function(){
+    showListMobile();
+  });
+
+  $('#hub-map').closest('.code-block').css('max-width', 'calc(100% - 1em)');
+
+  $.ajax({
+      type: "GET",
+      url: "https://sunrise-hub-json.s3.amazonaws.com/hubs.json",
+      dataType: "json",
+      success: function(data) {
+        var features = [];
+        for (var i=0; i < data.map_data.length; i++)
+          features.push(geoJSONFeature(data.map_data[i]));
+        initMap({
+          "type": "FeatureCollection",
+          "features": features
+        });
+      }
+   });
+});
+
+
+function initMap(hubs) {
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYWxhdXJlbnppIiwiYSI6ImNqdDlna2o5ZTA0M2gzeW8zcWQwN3hnNDAifQ.uAXKXOB2I-G3gBXrkXWOrw';
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-112.030293, 39.585733],
+    zoom: 2.5
+    //scrollZoom: false
+  });
+  // Add zoom and rotation controls to the map.
+  map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+  map.on('load', function (e) {
+    map.addSource("places", {
+      "type": "geojson",
+      "data": hubs
+    });
+
+    buildLocationList(hubs);
+
+    var hubList = new List('hub-list-sidebar', {
+      listClass: 'listings',
+      valueNames: ['title']
+    });
+
+    // If mobile show map intially
+    if($(window).width() < 420) {
+      showMapMobile();
+      map.setZoom(1.5);
+      map.setCenter([-97.862265, 38.705787]);
+
+      $("#hub-map .sidebar").css({height: "320px"});
+    }
+  });
+
+  // This is where your interactions with the symbol layer used to be
+  // Now you have interactions with DOM markers instead
+  hubs.features.forEach(function(marker, i) {
+    // Create an img element for the marker
+    var el = document.createElement('div');
+    el.id = "marker-" + i;
+    el.className = 'marker';
+    // Add markers to the map at all points
+    new mapboxgl.Marker(el, {offset: [0, -23]})
+        .setLngLat(marker.geometry.coordinates)
+        .addTo(map);
+
+    el.addEventListener('click', function(e){
+        // 1. Fly to the point
+        flyToStore(marker);
+
+        // 2. Close all other popups and display popup for clicked store
+        createPopUp(marker);
+
+        // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+        e.stopPropagation();
+        $('#hub-map .active').removeClass('active');
+        var link = $('#listing-'+ i);
+        if (link.length) {
+          link.addClass('active');
+          link[0].scrollIntoView({ block: 'nearest', inline: 'start' });
+        }
+    });
+  });
+
+  function flyToStore(currentFeature) {
+    map.flyTo({ center: currentFeature.geometry.coordinates });
+  }
+
+  function createPopUp(currentFeature) {
+    var popUps = document.getElementsByClassName('mapboxgl-popup');
+    if (popUps[0]) popUps[0].remove();
+
+    var hub = currentFeature.properties;
+
+    var popupHtml = (
+      "<h3>" + hubName(hub) + "</h3>" +
+      "<h4>" + hubLinks(hub) + "</h4>"
+    );
+
+    var popup = new mapboxgl.Popup({ closeOnClick: true, anchor: "left" })
+      .on('close', function() { $('#hub-map .item').removeClass('active'); })
+      .setLngLat(currentFeature.geometry.coordinates)
+      .setHTML(popupHtml)
+      .addTo(map);
+  }
+
+  function buildLocationList(data) {
+    for (i = 0; i < data.features.length; i++) {
+      var currentFeature = data.features[i];
+      var hub = currentFeature.properties;
+
+      var listings = document.getElementById('listings');
+      var listing = listings.appendChild(document.createElement('div'));
+      listing.className = 'item';
+      listing.id = "listing-" + i;
+
+      var link = listing.appendChild(document.createElement('a'));
+      link.className = 'title';
+      link.dataPosition = i;
+      link.innerHTML = hubName(hub);
+
+      var coordinatorsDivMobile = listing.appendChild(document.createElement('div'));
+      coordinatorsDivMobile.className = 'coordinators-mobile';
+      coordinatorsDivMobile.innerHTML = hubLinks(hub);
+
+      link.addEventListener('click', function(e){
+        // Update the currentFeature to the store associated with the clicked link
+        var clickedListing = data.features[this.dataPosition];
+
+        // 1. Fly to the point
+        flyToStore(clickedListing);
+
+        // 2. Close all other popups and display popup for clicked store
+        createPopUp(clickedListing);
+
+        // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+        $('#hub-map .active').removeClass('active');
+        $(this.parentNode).addClass('active');
+      });
+    }
+  }
+}
+</script>
