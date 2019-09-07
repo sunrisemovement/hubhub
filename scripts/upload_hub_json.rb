@@ -1,6 +1,6 @@
 require 'json'
 require 'aws-sdk-s3'
-require_relative 'airtable'
+require_relative '../airtable'
 
 s3 = Aws::S3::Client.new(
   access_key_id: ENV['AWS_ACCESS_KEY_ID'],

@@ -28,6 +28,8 @@ class Hub < Airrecord::Table
         name: hub.fields['Name'],
         city: hub.fields['City'],
         state: hub.fields['State'],
+        latitude: hub.fields['Latitude'],
+        longitude: hub.fields['Longitude'],
         email: hub.fields['Email'],
         website: hub.fields['Website'],
         instagram: hub.fields['Instagram Handle'],
