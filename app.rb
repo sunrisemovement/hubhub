@@ -4,32 +4,44 @@ require 'haml'
 require 'pry'
 require_relative 'airtable'
 
-class EmailLogin < Sinatra::Base
+TIMEOUT = 10 * 60
+
+class MagicLink < Sinatra::Base
   @@store = {}
 
   enable :sessions
   set :haml, :format => :html5
 
   helpers do
-    def ensure_current(o)
-      o[:email] if o && Time.now - o[:time] <= 10 * 60
+    def ensure_current_key(o)
+      o[:email] if o && Time.now - o[:time] <= TIMEOUT
+    end
+
+    def ensure_valid_email(s)
+      s if s && s =~ URI::MailTo::EMAIL_REGEXP
     end
   end
 
-  get('/login') { haml :login }
+  get('/login') do
+    @@store.each { |k, o| @@store.delete(k) if Time.now - o[:time] > TIMEOUT }
+
+    haml :login
+  end
 
   post('/login')  do
-    if @email = params['email']
+    if @email = ensure_valid_email(params['email'])
       key = SecureRandom.urlsafe_base64(32)
       href = url("/login/#{key}")
       time = Time.now
       @@store[key] = { email: @email, time: time }
-      logger.info href
-      puts href
-      Pony.mail(to: @email,
-                from: "noreply@sunrisehubhub.com",
-                subject: 'Sunrise Hubhub login link!',
-                body: "Here's your magic link to log into Sunrise Hubhub: #{href}")
+      if ENV['DEBUG'] == 'DEBUG'
+        puts "DEBUG: #{href}"
+      else
+        Pony.mail(to: @email,
+                  from: 'noreply@sunrisemovement.org',
+                  subject: 'Sunrise Hubhub login link!',
+                  body: "Here's your magic link to log into Sunrise Hubhub: #{href}")
+      end
       haml :email
     else
       redirect '/login'
@@ -42,7 +54,7 @@ class EmailLogin < Sinatra::Base
   end
 
   get('/login/:key') do |key|
-    if email = ensure_current(@@store.delete(key))
+    if email = ensure_current_key(@@store.delete(key))
       session[:user_email] = email
       redirect '/'
     else
@@ -52,7 +64,7 @@ class EmailLogin < Sinatra::Base
 end
 
 class Hubhub < Sinatra::Base
-  use EmailLogin
+  use MagicLink
 
   before do
     unless session[:user_email]

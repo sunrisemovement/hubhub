@@ -6,12 +6,12 @@ Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
 class Leader < Airrecord::Table
   self.base_key = ENV['AIRTABLE_APP_KEY']
-  self.table_name = "Hub Leaders"
+  self.table_name = 'Hub Leaders'
 end
 
 class Hub < Airrecord::Table
   self.base_key = ENV['AIRTABLE_APP_KEY']
-  self.table_name = "Hubs"
+  self.table_name = 'Hubs'
 
   has_many :leaders, class: 'Leader', column: 'Hub Leaders'
 
