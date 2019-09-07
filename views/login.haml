@@ -1,6 +1,11 @@
-%h2 Log In
+%h1.title Log In
 %form{method: 'POST'}
-  %label
-    Email address:
-    %input{name: 'email'}
-  %input{type: 'submit'}
+  .field
+    .control
+      %label.label Email address
+      %input.input{name: 'email', type: 'email'}
+      %p.help
+        Enter the email associated with your hub to edit it!
+  .field
+    .control
+      %input.button.is-primary{type: 'submit'}

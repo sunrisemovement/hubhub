@@ -1,57 +1,100 @@
-%h2 Edit #{@hub.fields['City']}, #{@hub.fields['State']} Hub Info
+%h1.title Edit #{@hub.fields['City']}, #{@hub.fields['State']} Hub Info
 
-%p
-  On this page, you can edit all of the information that appears about your hub on the
-  %a{href: 'https://sunrisemovement.org/hubs'} Sunrise movement hub map!
+%article.message.is-warning
+  %p.message-body
+    On this page, you can edit all of the information that appears about your hub on the
+    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
 
 %form{action: '/hub', method: 'POST'}
-  %h3 Map Information
-  %ul
-  - ['Name', 'Email', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
-    %li
-      %label
-        = field
-        %input{name: field, value: @hub.fields[field]}
+  %fieldset
+    .columns
+      .column
+        %h2.subtitle Card Links and Title
+        - ['Name', 'Email', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
+          .field
+            %label.label= field
+            .control
+              %input.input{name: field, value: @hub.fields[field]}
+      .column
+        %h2.subtitle Pin Location
+        - ['Latitude', 'Longitude'].each do |field|
+          .field
+            %label.label= field
+            .control
+              %input.input{name: field, placeholder: field, id: field, value: @hub.fields[field]}
+        %p.help
+          Google has
+          %a{href: 'https://support.google.com/maps/answer/18539', target: '_blank'}
+            helpful instructions
+          for finding these!
 
-  %li
-    %label
-      Latitude
-      %input{name: 'Latitude'}
-  %li
-    %label
-      Longitude
-      %input{name: 'Longitude'}
-  %li
-    %label
-      Hide from map?
-      %input{name: 'Inactive', type: 'checkbox'}
+        .field
+          %label.label
+            How that looks
+          .control
+            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 250px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
+      .column
+        %h2.subtitle Hub Visibility
+        .field
+          %label.label Show hub on map?
+          .control
+            .select
+              %select
+                %option Yes, let folks find us!
+                %option Nope, hide us for now
+        .field
+          %label.label Is your hub active?
+          .control
+            .select
+              %select
+                %option Yes, we're going strong!
+                %option Yes, though we could use some help...
+                %option Nope, this hub is not active.
+
+  %br
+
+  %h2.subtitle Coordinators
+  - @leaders.each.with_index do |leader, i|
+    .columns
+      - ['First Name', 'Last Name', 'Email'].each do |field|
+        .column
+          .field
+            %label.label= field
+            .control
+              %input.input{name: "leaders[#{i}][#{field}]", placeholder: field, value: leader.fields[field]}
+      .column
+        .field
+          %label.label Show on map?
+          .control
+            .select
+              %select
+                %option Yes, list this coordinator's name!
+                %option No, hide their name plz.
+      .column
+        .field
+          %label.label Active?
+          .control
+            .select
+              %select
+                %option Yes, active!
+                %option Nope, inactive rn.
+
+  %button.button.is-info
+    Add New Coordinator
 
 
-  %h3 Coordinators
-  %ul
-    - @leaders.each do |leader, i|
-      %li
-        %ul
-          - ['Email', 'First Name', 'Last Name'].each do |field|
-            %li
-              %label
-                = field
-                %input{name: "leaders[#{i}][#{field}]", value: leader.fields[field]}
-          %li
-            %label
-              Hide email from map?
-              %input{name: "leaders[#{i}][Hide email from map?]", type: 'checkbox'}
-          %li
-            %label
-              Hide name from map?
-              %input{name: "leaders[#{i}][Hide name from map?]", type: 'checkbox'}
-          %li
-            %button
-              Remove Coordinator
+  %input.button.is-primary{type: 'submit'}
 
-    %li
-      %button
-        Add New Coordinator
+:javascript
+  const latInput = document.getElementById('Latitude')
+  const lngInput = document.getElementById('Longitude')
+  const mapIframe = document.getElementById('map-iframe')
+  const reloadBtn = document.getElementById('reload-map')
+  const key = mapIframe.attributes['data-key'].value;
 
-  %input{type: 'submit'}
-  
+  const resetMap = () => {
+    mapIframe.setAttribute("src", `https://maps.google.com/maps/embed/v1/place?q=${latInput.value},${lngInput.value}&key=${key}`);
+  };
+
+  latInput.oninput = resetMap;
+  lngInput.oninput = resetMap;
