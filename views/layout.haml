@@ -15,7 +15,8 @@
           Sunrise Hubhub
       .navbar-start
         %a.navbar-item{href: '/map'} Hub Map Preview
-        %a.navbar-item{href: '/logout'} Log Out
+        - if session[:user_email]
+          %a.navbar-item{href: '/logout'} Log Out
     %main
       %section.section
         .container

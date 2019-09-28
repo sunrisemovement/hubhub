@@ -1,4 +1,4 @@
-%h1.title Edit #{@hub.fields['City']}, #{@hub.fields['State']} Hub Info
+%h1.title Edit #{@hub.fields['City']}, #{@hub.fields['State']} Sunrise Hub Map Card
 
 %article.message.is-warning
   %p.message-body
@@ -19,10 +19,9 @@
           %label.label Is your hub active?
           .control
             .select
-              %select
-                %option Yes, we're going strong!
-                %option Yes, though we could use some help...
-                %option Nope, this hub is not active. Don't list us :(
+              %select{name: "Activity?"}
+                - [["Active", "Yes, we're going strong!"],["Semi-Active","We're only semi-active right now..."],["Inactive","Nope, this hub is not active. Don't list us :("]].each do |value,label|
+                  %option{value: value, selected: @hub.fields["Activity?"]==value}= label
       .column
         %h2.subtitle Pin Location
         - ['Latitude', 'Longitude'].each do |field|
@@ -38,7 +37,7 @@
                 for finding these!
         .field
           %label.label
-            How that looks
+            Where that is
           .control
             %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 250px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
