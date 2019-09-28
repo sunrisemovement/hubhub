@@ -292,7 +292,7 @@ function emailLink(email) {
 }
 
 function hubName(hub) {
-  return hub.city + ", " + hub.state;
+  return hub.name + "<br/><small>"+hub.city + ", " + hub.state+"</small>";
 }
 
 function socialLink(prefix, value, title) {
@@ -463,7 +463,7 @@ function initMap(hubs) {
     var hub = currentFeature.properties;
 
     var popupHtml = (
-      "<h3>" + hub.name + "<br/><small>" + hubName(hub) + "</small></h3>" +
+      "<h3>" + hubName(hub) + "</h3>" +
       "<h4>" + hubLinks(hub) + "</h4>"
     );
 
@@ -487,7 +487,7 @@ function initMap(hubs) {
       var link = listing.appendChild(document.createElement('a'));
       link.className = 'title';
       link.dataPosition = i;
-      link.innerHTML = hub.name + " <small>"+hubName(hub)+"</small>";
+      link.innerHTML = hubName(hub);
 
       var coordinatorsDivMobile = listing.appendChild(document.createElement('div'));
       coordinatorsDivMobile.className = 'coordinators-mobile';
