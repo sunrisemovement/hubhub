@@ -73,11 +73,11 @@ class Hubhub < Sinatra::Base
   end
 
   get('/') do
-    if @hub = Hub.all(filter: %|{Email} = "#{session[:user_email]}"|).first
-      @leaders = @hub.leaders
+    @email = session[:user_email]
+    if @hub = Hub.all(filter: %|{Email} = "#{@email}"|).first
       haml :hub
     else
-      "Couldn't find a hub matching #{session[:user_email]}"
+      haml :notfound
     end
   end
 

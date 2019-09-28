@@ -9,39 +9,12 @@
   %fieldset
     .columns
       .column
-        %h2.subtitle Card Links and Title
-        - ['Name', 'Email', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
+        %h2.subtitle Map Information
+        - ['Name', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
           .field
             %label.label= field
             .control
               %input.input{name: field, value: @hub.fields[field]}
-      .column
-        %h2.subtitle Pin Location
-        - ['Latitude', 'Longitude'].each do |field|
-          .field
-            %label.label= field
-            .control
-              %input.input{name: field, placeholder: field, id: field, value: @hub.fields[field]}
-        %p.help
-          Google has
-          %a{href: 'https://support.google.com/maps/answer/18539', target: '_blank'}
-            helpful instructions
-          for finding these!
-
-        .field
-          %label.label
-            How that looks
-          .control
-            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 250px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
-      .column
-        %h2.subtitle Hub Visibility
-        .field
-          %label.label Show hub on map?
-          .control
-            .select
-              %select
-                %option Yes, let folks find us!
-                %option Nope, hide us for now
         .field
           %label.label Is your hub active?
           .control
@@ -49,41 +22,28 @@
               %select
                 %option Yes, we're going strong!
                 %option Yes, though we could use some help...
-                %option Nope, this hub is not active.
-
-  %br
-
-  %h2.subtitle Coordinators
-  - @leaders.each.with_index do |leader, i|
-    .columns
-      - ['First Name', 'Last Name', 'Email'].each do |field|
-        .column
+                %option Nope, this hub is not active. Don't list us :(
+      .column
+        %h2.subtitle Pin Location
+        - ['Latitude', 'Longitude'].each do |field|
           .field
             %label.label= field
             .control
-              %input.input{name: "leaders[#{i}][#{field}]", placeholder: field, value: leader.fields[field]}
-      .column
+              %input.input{name: field, placeholder: field, id: field, value: @hub.fields[field]}
+            - if field == 'Longitude'
+              %p.help
+                Google has
+                %a{href: 'https://support.google.com/maps/answer/18539', target: '_blank'}
+                  helpful instructions
+                for finding these!
         .field
-          %label.label Show on map?
+          %label.label
+            How that looks
           .control
-            .select
-              %select
-                %option Yes, list this coordinator's name!
-                %option No, hide their name plz.
-      .column
-        .field
-          %label.label Active?
-          .control
-            .select
-              %select
-                %option Yes, active!
-                %option Nope, inactive rn.
+            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 250px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
-  %button.button.is-info
-    Add New Coordinator
-
-
-  %input.button.is-primary{type: 'submit'}
+  %br
+  %input.button.is-primary{type: 'submit', value: 'Update Hub Map Information'}
 
 :javascript
   const latInput = document.getElementById('Latitude')
