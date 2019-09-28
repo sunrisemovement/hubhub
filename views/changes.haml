@@ -1,0 +1,28 @@
+- if @changes.keys.size > 0
+  %h1.title Hub Map Information Updated!
+
+  %p
+    You made the following updates:
+
+  %table.table.is-bordered.is-striped
+    %thead
+      %th Attribute
+      %th Old Value
+      %th New Value
+    %tbody
+      - @changes.each do |k, (old, new)|
+        %tr
+          %td= k
+          %td= old
+          %td= new
+
+  %p
+    Feel free to
+    %a{href: '/'} edit more!
+
+- else
+  %h1.title Form submitted, but you didn't update anything!
+
+  %p
+    That's a bit strange... maybe
+    %a{href: '/'} try again?
