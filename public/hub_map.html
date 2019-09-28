@@ -292,7 +292,7 @@ function emailLink(email) {
 }
 
 function hubName(hub) {
-  return hub.name || hub.city + ", " + hub.state;
+  return hub.city + ", " + hub.state;
 }
 
 function socialLink(prefix, value, title) {
@@ -321,18 +321,20 @@ function hubLinks(hub) {
   if (hub.website) {
     html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">Hub Website</a></p>';
   }
-  if (hub.email) {
-    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
+  if (hub.map_email && !Array.isArray(hub.map_email)) {
+    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.map_email);
   } else if (hub.leaders.length) {
     html += "<span style='font-size: 16px'>Hub Contact";
     if (hub.leaders.length > 1) html += "s";
     html += ":</span><p>";
     for (var i=0; i < hub.leaders.length; i++) {
       var lead = hub.leaders[i];
-      html += "<strong>" + lead.first_name + " " + lead.last_name + "</strong>: ";
+      html += "<strong>" + lead.first_name + " " + lead.last_name + ":</strong> ";
       html += emailLink(lead.email) + "<br>";
     }
     html += "</p>";
+  } else if (hub.email) {
+    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
   }
   return html;
 }
@@ -461,7 +463,7 @@ function initMap(hubs) {
     var hub = currentFeature.properties;
 
     var popupHtml = (
-      "<h3>" + hubName(hub) + "</h3>" +
+      "<h3>" + hub.name + "<br/><small>" + hubName(hub) + "</small></h3>" +
       "<h4>" + hubLinks(hub) + "</h4>"
     );
 
@@ -485,7 +487,7 @@ function initMap(hubs) {
       var link = listing.appendChild(document.createElement('a'));
       link.className = 'title';
       link.dataPosition = i;
-      link.innerHTML = hubName(hub);
+      link.innerHTML = hub.name + " <small>"+hubName(hub)+"</small>";
 
       var coordinatorsDivMobile = listing.appendChild(document.createElement('div'));
       coordinatorsDivMobile.className = 'coordinators-mobile';

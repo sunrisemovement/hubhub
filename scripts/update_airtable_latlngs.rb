@@ -23,6 +23,8 @@ hub_csv.each do |row|
 
   google_hubs[state] ||= {}
   google_hubs[state][city] ||= {}
+  google_hubs[state][city]['state'] ||= state
+  google_hubs[state][city]['city'] ||= city
   google_hubs[state][city]['lat'] ||= lat
   google_hubs[state][city]['lng'] ||= lng
 
@@ -46,6 +48,13 @@ hub_csv.each do |row|
   }
 end
 
+inactive_ghubs = []
+google_hubs.each do |state, chubs|
+  chubs.each do |city, ghub|
+    inactive_ghubs << ghub
+  end
+end
+
 airtable_hubs = Hub.all
 airtable_leaders = Leader.all
 
@@ -53,7 +62,26 @@ leaders_by_id = airtable_leaders.each_with_object({}) do |leader, h|
   h[leader.id] = leader
 end
 
-updates = []
+social = {
+  'facebook': {
+    'airtable': 'Facebook Handle',
+    'google': 'fb'
+  },
+  'twitter': {
+    'airtable': 'Twitter Handle',
+    'google': 'tw'
+  },
+  'instagram': {
+    'airtable': 'Instagram Handle',
+    'google': 'ig'
+  },
+  'website': {
+    'airtable': 'Website',
+    'google': 'web'
+  }
+}
+
+active_ghubs = []
 matches = 0
 airtable_hubs.each do |hub|
   state = [hub['State'], STATE_ABBR_TO_NAME[hub['State']]].detect{|s| google_hubs.key?(s)}
@@ -84,17 +112,24 @@ airtable_hubs.each do |hub|
   elsif ghub = shubs[name.sub(/\s*Sunrise$/, '')]
     puts name
     matches += 1
+  elsif city == 'Bozeman' && ghub = shubs['Gallatin County']
+    puts name
+    matches += 1
   elsif hub["Activity?"] == "Inactive"
     puts "skipping #{name}, #{city} because it's inactive"
   end
 
-  #if ghub
-  #  puts "Updating #{city}, #{state} to #{ghub['lat']}, #{ghub['lng']}"
-  #  hub["Latitude"] = ghub['lat']
-  #  hub["Longitude"] = ghub['lng']
-  #  hub.save
-  #  sleep 0.2
-  #end
+  if ghub
+    active_ghubs << ghub
+    inactive_ghubs.delete(ghub)
+  end
 end
 
 puts matches, airtable_hubs.size
+
+CSV.open("inactive_hubs.csv", "wb") do |csv|
+  csv << ['City', 'State', 'FB', 'TW', 'IG', 'Emails']
+  inactive_ghubs.each do |ghub|
+    csv << [ghub['city'], ghub['state'], ghub['fb'], ghub['tw'], ghub['ig'], ghub['emails'].to_a.join("; ")]
+  end
+end

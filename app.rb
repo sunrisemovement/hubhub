@@ -7,6 +7,8 @@ require_relative 'airtable'
 TIMEOUT = 10 * 60
 
 class MagicLink < Sinatra::Base
+  enable :logging
+
   @@store = {}
 
   enable :sessions
@@ -33,10 +35,11 @@ class MagicLink < Sinatra::Base
       key = SecureRandom.urlsafe_base64(32)
       href = url("/login/#{key}")
       time = Time.now
+      logger.info "Login requested: #{@email}"
       @@store[key] = { email: @email, time: time }
       if ENV['DEBUG'] == 'DEBUG'
         puts "DEBUG: #{href}"
-      else
+      elsif ENV['FEATURE_EMAIL']
         Pony.mail(to: @email,
                   from: 'noreply@sunrisemovement.org',
                   subject: 'Sunrise Hubhub login link!',
@@ -55,6 +58,7 @@ class MagicLink < Sinatra::Base
 
   get('/login/:key') do |key|
     if email = ensure_current_key(@@store.delete(key))
+      logger.info "Login successful: #{@email}"
       session[:user_email] = email
       redirect '/'
     else
@@ -63,8 +67,15 @@ class MagicLink < Sinatra::Base
   end
 end
 
+class MapPreview < Sinatra::Base
+  get '/map' do
+    haml :map
+  end
+end
+
 class Hubhub < Sinatra::Base
   use MagicLink
+  use MapPreview
 
   before do
     unless session[:user_email]

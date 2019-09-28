@@ -1,5 +1,6 @@
 require 'airrecord'
 require 'dotenv'
+require_relative 'scripts/state_abbr_to_name'
 
 Dotenv.load
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
@@ -23,26 +24,45 @@ class Hub < Airrecord::Table
       h[leader.id] = leader
     end
 
-    hubs.map { |hub|
-      {
+    json = []
+    hubs.each do |hub|
+      next if hub.fields['Activity?'] == 'Inactive'
+      next unless hub.fields['Map?'] == true
+      unless hub.fields['Latitude'] && hub.fields['Longitude']
+        puts "Skipping #{hub.fields['Name']} because no lat/lng"
+        next
+      end
+
+      leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }
+      leaders = leaders.select{|l| hub.fields['Coordinator email'].include?(l.fields['Email'])}
+      if hub.fields['Email']
+        leaders = leaders.map { |l| {
+          first_name: l.fields['First Name'],
+          last_name: l.fields['Last Name'],
+        }}
+      else
+        leaders = leaders.map { |l| {
+          first_name: l.fields['First Name'],
+          last_name: l.fields['Last Name'],
+          email: l.fields['Email']
+        }}
+      end
+      entry = {
         name: hub.fields['Name'],
-        city: hub.fields['City'],
-        state: hub.fields['State'],
+        city: hub.fields['City'].strip,
+        state: STATE_ABBR_TO_NAME[hub.fields['State']],
         latitude: hub.fields['Latitude'],
         longitude: hub.fields['Longitude'],
         email: hub.fields['Email'],
+        map_email: hub.fields['Map Email'],
         website: hub.fields['Website'],
         instagram: hub.fields['Instagram Handle'],
         facebook: hub.fields['Facebook Handle'],
         twitter: hub.fields['Twitter Handle'],
-        leaders: (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }.map { |lead|
-          {
-            first_name: "Private", #lead.fields['First Name'],
-            last_name: "For Now", #lead.fields['Last Name'],
-            email: "email@addr.es" #lead.fields['Email']
-          }
-        }
+        leaders: leaders
       }
-    }
+      json << entry
+    end
+    json.sort_by { |e| e[:state] }
   end
 end
