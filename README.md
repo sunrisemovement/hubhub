@@ -20,6 +20,10 @@ This repo also contains a small [sinatra](http://sinatrarb.com/)-based web appli
 
 Authentication is currently inspired by Slack's "magic link" method, where you click on a link that gets sent to your email address instead of entering a password. This is convenient because it means we don't have to manage user accounts, and because we can simultaneously implement authorization -- that is, you would have authority to edit hubs if you have access to the hub email address (or are listed as a coordinator on Airtable). This is currently implemented (but just for the hub email); however, we definitely might want extra layers of security.
 
+### Diagram (updated Sep. 29, 2019)
+
+![diagram](./infra-diagram.png)
+
 ## Where this is going
 
 This is still definitely a work in progress, and when/whether we roll it out will be a group decision. However, feel free to message `@asross` if this is exciting to you or if you want to help out!
