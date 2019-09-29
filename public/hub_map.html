@@ -357,9 +357,15 @@ function hubLinks(hub) {
   html += socialP("https://twitter.com", hub.twitter, "Twitter Page");
   html += socialP("https://instagram.com", hub.instagram, "Instagram Page");
   if (hub.website) {
-    html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">Hub Website</a></p>';
+    var linkText = hub.custom_weblink_text || "Hub Website";
+    html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">' + linkText + '</a></p>';
   }
-  if (hub.email) {
+  if (hub.custom_coord_text) {
+    html += "<span style='font-size: 16px'>Hub Contact";
+    html += ":</span><p>";
+    html += hub.custom_coord_text;
+    html += "</p>";
+  } else if (hub.email && !Array.isArray(hub.email)) {
     html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
   } else if (hub.leaders.length) {
     html += "<span style='font-size: 16px'>Hub Contact";
@@ -371,14 +377,10 @@ function hubLinks(hub) {
       html += emailLink(lead.email) + "<br>";
     }
     html += "</p>";
-  } else if (hub.map_email) {
-    if (Array.isArray(hub.map_email)) {
-      html += "<strong>Hub Contact Emails:</strong>";
-      for (var j = 0; j < hub.map_email.length; j++) {
-        html += "<br/>"+emailLink(hub.map_email[j]);
-      }
-    } else {
-      html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.map_email);
+  } else if (Array.isArray(hub.email)) {
+    html += "<strong>Hub Contact Emails:</strong>";
+    for (var j = 0; j < hub.map_email.length; j++) {
+      html += "<br/>"+emailLink(hub.email[j]);
     }
   }
   return html;
