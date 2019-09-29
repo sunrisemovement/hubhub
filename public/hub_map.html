@@ -359,8 +359,8 @@ function hubLinks(hub) {
   if (hub.website) {
     html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">Hub Website</a></p>';
   }
-  if (hub.map_email && !Array.isArray(hub.map_email)) {
-    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.map_email);
+  if (hub.email) {
+    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
   } else if (hub.leaders.length) {
     html += "<span style='font-size: 16px'>Hub Contact";
     if (hub.leaders.length > 1) html += "s";
@@ -371,8 +371,15 @@ function hubLinks(hub) {
       html += emailLink(lead.email) + "<br>";
     }
     html += "</p>";
-  } else if (hub.email) {
-    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
+  } else if (hub.map_email) {
+    if (Array.isArray(hub.map_email)) {
+      html += "<strong>Hub Contact Emails:</strong>";
+      for (var j = 0; j < hub.map_email.length; j++) {
+        html += "<br/>"+emailLink(hub.map_email[j]);
+      }
+    } else {
+      html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.map_email);
+    }
   }
   return html;
 }
