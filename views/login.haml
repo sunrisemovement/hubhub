@@ -1,11 +1,17 @@
-%h1.title Log In
-%form{method: 'POST'}
-  .field
-    .control
-      %label.label Email address
-      %input.input{name: 'email', type: 'email'}
-      %p.help
-        Enter the email associated with your hub!
-  .field
-    .control
-      %input.button.is-primary{type: 'submit', value: 'Send Magic Link'}
+- if ENV['FEATURE_EMAIL']
+  %h1.title Log In
+  %form{method: 'POST'}
+    .field
+      .control
+        %label.label Email address
+        %input.input{name: 'email', type: 'email'}
+        %p.help
+          Enter the email associated with your hub!
+    .field
+      .control
+        %input.button.is-primary{type: 'submit', value: 'Send Magic Link'}
+- else
+  %h1.title Sunrise Hubhub
+
+  %p
+    Features potentially coming soon.
