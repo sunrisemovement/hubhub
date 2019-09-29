@@ -1,3 +1,37 @@
+<!-- Include some styles from the main site (don't copy these) -->
+
+<link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:700,600,700i&display=swap"/>
+<link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600,700,700i&display=swap"/>
+<style>
+body {
+  font-weight: 400;
+  font-size: 18px;
+  font-family: source-serif-pro,'Source Serif Pro',serif;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  line-height: 1.5em;
+  -moz-osx-font-smoothing: auto;
+}
+b, strong {
+  font-weight: bold;
+}
+h2 {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+}
+h3 {
+  line-height: 1.25em;
+  text-transform: none;
+  letter-spacing: 0.05em;
+  font-style: normal;
+  font-family: source-serif-pro,'Source Serif Pro',serif;
+}
+</style>
+
+<!-- Copy from here down -->
+
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
 
 <style>
@@ -95,9 +129,12 @@
   display:block;
   color:#000;
   font-weight:700;
+  line-height:1.25em;
 }
 
-#hub-map .listings .item .title small { font-weight:400; }
+#hub-map .listings .item .title small {
+  font-weight:400;
+}
 #hub-map .listings .item.active .title,
 #hub-map .listings .item .title:hover { color:#9e9e9e; }
 #hub-map .listings .item.active {
@@ -148,6 +185,7 @@
   font:400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding:0;
   max-width: 300px;
+  width: 300px;
 }
 .mapboxgl-popup-content-wrapper {
   padding:1%;
