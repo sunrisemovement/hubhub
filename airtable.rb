@@ -35,6 +35,7 @@ class Hub < Airrecord::Table
 
       leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }
       leaders = leaders.select{|l| hub.fields['Coordinator email'].include?(l.fields['Email'])}
+
       if hub.fields['Email']
         leaders = leaders.map { |l| {
           first_name: l.fields['First Name'],
@@ -47,6 +48,7 @@ class Hub < Airrecord::Table
           email: l.fields['Email']
         }}
       end
+
       entry = {
         name: hub.fields['Name'],
         city: hub.fields['City'].strip,
@@ -63,6 +65,6 @@ class Hub < Airrecord::Table
       }
       json << entry
     end
-    json.sort_by { |e| e[:state] }
+    json.sort_by { |e| [e[:state], e[:name]] }
   end
 end
