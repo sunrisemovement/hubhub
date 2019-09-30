@@ -33,37 +33,34 @@ class Hub < Airrecord::Table
         next
       end
 
-      leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }
-      leaders = leaders.select{|l| hub.fields['Coordinator email'].include?(l.fields['Email'])}
-
-      if hub.fields['Email']
-        leaders = leaders.map { |l| {
-          first_name: l.fields['First Name'],
-          last_name: l.fields['Last Name'],
-        }}
-      else
-        leaders = leaders.map { |l| {
-          first_name: l.fields['First Name'],
-          last_name: l.fields['Last Name'],
-          email: l.fields['Email']
-        }}
-      end
-
       entry = {
         name: hub.fields['Name'],
         city: hub.fields['City'].strip,
         state: STATE_ABBR_TO_NAME[hub.fields['State']],
         latitude: hub.fields['Latitude'],
         longitude: hub.fields['Longitude'],
-        email: hub.fields['Map Email'],
+        email: hub.fields['Email'],
         custom_coord_text: hub.fields['Custom Map Contact Text'],
         custom_weblink_text: hub.fields['Custom Website Link Text'],
         website: hub.fields['Website'],
         instagram: hub.fields['Instagram Handle'],
         facebook: hub.fields['Facebook Handle'],
         twitter: hub.fields['Twitter Handle'],
-        leaders: leaders
+        leaders: []
       }
+
+      if hub['Email'].nil? || hub['Always Show Coordinators?'] == true
+        leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }
+        leaders = leaders.select do |l|
+          l['Role'].include?('Coordinator') && l['Map?'] == true
+        end
+        entry[:leaders] = leaders.map { |l| {
+          first_name: l['First Name'],
+          last_name: l['Last Name'],
+          email: l['Email']
+        }}
+      end
+
       json << entry
     end
     json.sort_by { |e| [e[:state], e[:name]] }

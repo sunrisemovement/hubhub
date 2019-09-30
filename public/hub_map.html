@@ -184,8 +184,7 @@ h3 {
 .mapboxgl-popup-content {
   font:400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding:0;
-  max-width: 300px;
-  width: 300px;
+  min-width: 300px;
 }
 .mapboxgl-popup-content-wrapper {
   padding:1%;
@@ -361,26 +360,20 @@ function hubLinks(hub) {
     html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">' + linkText + '</a></p>';
   }
   if (hub.custom_coord_text) {
-    html += "<span style='font-size: 16px'>Hub Contact";
-    html += ":</span><p>";
+    html += "<strong>Hub Contact:</strong><br>";
     html += hub.custom_coord_text;
-    html += "</p>";
-  } else if (hub.email && !Array.isArray(hub.email)) {
+  } else if (hub.email && !hub.leaders.length) {
     html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
   } else if (hub.leaders.length) {
-    html += "<span style='font-size: 16px'>Hub Contact";
-    if (hub.leaders.length > 1) html += "s";
-    html += ":</span><p>";
+    html += "<strong>Hub Contact"
+    if (hub.leaders.length > 1 || hub.email) html += "s";
+    html += ":</strong><br>";
+    if (hub.email)
+      html += "<span>Hub Contact Email:</span> " + emailLink(hub.email) + "<br>";
     for (var i=0; i < hub.leaders.length; i++) {
       var lead = hub.leaders[i];
-      html += "<strong>" + lead.first_name + " " + lead.last_name + ":</strong> ";
+      html += "<span>"+lead.first_name + " " + lead.last_name + ":</span> ";
       html += emailLink(lead.email) + "<br>";
-    }
-    html += "</p>";
-  } else if (Array.isArray(hub.email)) {
-    html += "<strong>Hub Contact Emails:</strong>";
-    for (var j = 0; j < hub.map_email.length; j++) {
-      html += "<br/>"+emailLink(hub.email[j]);
     }
   }
   return html;
