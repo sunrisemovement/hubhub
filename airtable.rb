@@ -39,7 +39,7 @@ class Hub < Airrecord::Table
         state: STATE_ABBR_TO_NAME[hub.fields['State']],
         latitude: hub.fields['Latitude'],
         longitude: hub.fields['Longitude'],
-        email: hub.fields['Email'],
+        email: hub.fields['Custom Map Email'] || hub.fields['Email'],
         custom_coord_text: hub.fields['Custom Map Contact Text'],
         custom_weblink_text: hub.fields['Custom Website Link Text'],
         website: hub.fields['Website'],
