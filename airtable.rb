@@ -52,7 +52,7 @@ class Hub < Airrecord::Table
       if hub['Email'].nil? || hub['Always Show Coordinators?'] == true
         leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }
         leaders = leaders.select do |l|
-          l['Role'].include?('Coordinator') && l['Map?'] == true
+          l['Role'].to_s =~ /coordinator/i && l['Map?'] == true
         end
         entry[:leaders] = leaders.map { |l| {
           first_name: l['First Name'],
