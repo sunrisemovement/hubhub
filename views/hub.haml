@@ -1,4 +1,4 @@
-%h1.title Edit #{@hub.fields['City']}, #{@hub.fields['State']} Sunrise Hub Map Card
+%h1.title Edit Hub Map Information for #{@hub.fields['City']}, #{@hub.fields['State']}
 
 %article.message.is-warning
   %p.message-body
@@ -9,19 +9,54 @@
   %fieldset
     .columns
       .column
-        %h2.subtitle Map Information
-        - ['Name', 'Website', 'Facebook Handle', 'Twitter Handle', 'Instagram Handle'].each do |field|
-          .field
-            %label.label= field
-            .control
-              %input.input{name: field, value: @hub.fields[field]}
+        %h2.subtitle Name and Contact Info
+        .field
+          %label.label Hub Name
+          .control
+            %input.input{name: 'Name', value: @hub['Name']}
+
         .field
           %label.label Is your hub active?
           .control
             .select
               %select{name: "Activity?"}
-                - [["Active", "Yes, we're going strong!"],["Semi-Active","We're only semi-active right now..."],["Inactive","Nope, this hub is not active. Don't list us :("]].each do |value,label|
+                - [["Active", "Yes, we're going strong!"],["Semi-Active","Yes, but we could use some help..."],["Inactive","Nope, not right now. Hide us from the map :("]].each do |value,label|
                   %option{value: value, selected: @hub.fields["Activity?"]==value}= label
+
+        .field
+          %label.label What contact info should we show on the map?
+          .control
+            .select
+              %select{name: "Display Email Source", id: 'display-email-src'}
+                %option{value: 'Hub'} Hub email!
+                %option{value: 'Coordinators'} Coordinator names and emails!
+                %option{value: 'Hub and Coordinators'} Both hub email *and* coordinators!
+                %option{value: 'Custom Text'} Custom text (enter below).
+                %option{value: 'None'} Nothing; don't show any contact info.
+        .field{id: 'cust-contact-text'}
+          %label.label Custom contact info text
+          .control
+            %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text']}
+        .field
+          %label.label Custom email 
+          .control
+            %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email'], placeholder: @hub['Email']}
+            %p.help By default, we normally display hubs' main contact emails, but if you have a special welcome email for newcomers, we can display that instead.
+
+      .column
+        %h2.subtitle Links
+        .field
+
+        - ['Facebook Handle', 'Twitter Handle', 'Instagram Handle', 'Website'].each do |field|
+          .field
+            %label.label= field
+            .control
+              %input.input{name: field, value: @hub[field]}
+        .field
+          %label.label Website Link Text
+          .control
+            %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: 'Hub Website'}
+            %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map.
       .column
         %h2.subtitle Pin Location
         - ['Latitude', 'Longitude'].each do |field|
@@ -39,16 +74,61 @@
           %label.label
             Where that is
           .control
-            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 250px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
+            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 200px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
   %br
   %input.button.is-primary{type: 'submit', value: 'Update Hub Map Information'}
 
+  %hr
+
+%form{action: '/coordinators', method: 'POST'}
+  %fieldset
+    .columns
+      .column
+        %h2.subtitle Manage Coordinators
+        %p
+          In this section, you can see everyone we have listed as a coordinator or leader for your hub.
+          If someone doesn't appear here, please have them fill out the
+          %a{href: 'https://airtable.com/shrbUfAwCCOOQKHam', target: '_blank'} hub leader form.
+          If you need to make specific changes to a particular leader's contact information, please email TODO, though we hope to support self-editing soon!
+        %br
+        %table.table.is-striped
+          %thead
+            %tr
+              %th Leader Name
+              %th Email
+              %th Status
+              %th Allowed to be shown on map?
+          %tbody
+            - @hub.leaders.each do |lead|
+              %tr
+                %td= lead['Name']
+                %td= lead['Email']
+                %th
+                  .select
+                    %select{name: "leaders[#{lead.id}][Membership Status]"}
+                      %option Active leader
+                      %option Inactive
+                      %option Not part of hub
+                %td
+                  %label.checkbox
+                    %input{type: 'checkbox', name: "leaders[#{lead.id}][Map?]", checked: lead['Map?']}
+                    Yes, that's ok
+
+  %br
+  %input.button.is-primary{type: 'submit', value: 'Update Coordinator Preferences'}
+
+:css
+  .hidden { display: none; }
+
 :javascript
-  const latInput = document.getElementById('Latitude')
-  const lngInput = document.getElementById('Longitude')
-  const mapIframe = document.getElementById('map-iframe')
-  const reloadBtn = document.getElementById('reload-map')
+  const latInput = document.getElementById('Latitude');
+  const lngInput = document.getElementById('Longitude');
+  const mapIframe = document.getElementById('map-iframe');
+  const reloadBtn = document.getElementById('reload-map');
+  const displaySrc = document.getElementById('display-email-src');
+  const custText = document.getElementById('cust-contact-text');
+
   const key = mapIframe.attributes['data-key'].value;
 
   const resetMap = () => {
@@ -57,3 +137,15 @@
 
   latInput.oninput = resetMap;
   lngInput.oninput = resetMap;
+
+  const showHideCustText = () => {
+    if (displaySrc.value == 'Custom Text') {
+      custText.classList.remove('hidden');
+    } else {
+      custText.classList.add('hidden');
+    }
+  };
+
+  displaySrc.onchange = showHideCustText;
+  showHideCustText();
+
