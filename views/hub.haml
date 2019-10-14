@@ -77,7 +77,7 @@
             %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 200px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
   %br
-  %input.button.is-primary{type: 'submit', value: 'Update Hub Map Information'}
+  %input.button.is-warning{type: 'submit', value: 'Update Hub Map Information'}
 
   %hr
 
@@ -116,7 +116,7 @@
                     Yes, that's ok
 
   %br
-  %input.button.is-primary{type: 'submit', value: 'Update Coordinator Preferences'}
+  %input.button.is-warning{type: 'submit', value: 'Update Coordinator Preferences'}
 
 :css
   .hidden { display: none; }
