@@ -92,7 +92,7 @@
           %a{href: 'https://airtable.com/shrbUfAwCCOOQKHam', target: '_blank'} hub leader form.
           If you need to make specific changes to a particular leader's contact information, please email TODO, though we hope to support self-editing soon!
         %br
-        %table.table.is-striped
+        %table.table.is-striped.is-fullwidth.is-responsive
           %thead
             %tr
               %th Leader Name
@@ -104,7 +104,7 @@
               %tr
                 %td= lead['Name']
                 %td= lead['Email']
-                %th
+                %td
                   .select
                     %select{name: "leaders[#{lead.id}][Membership Status]"}
                       %option Active leader
