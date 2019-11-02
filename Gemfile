@@ -7,4 +7,7 @@ gem 'dotenv'
 gem 'sinatra'
 gem 'haml'
 gem 'pony'
+
+gem 'rake'
 gem 'pry'
+gem 'minitest'
