@@ -1,15 +1,15 @@
-%h1.title Edit Hub Map Information for #{@hub.fields['City']}, #{@hub.fields['State']}
-
 %article.message.is-warning
   %p.message-body
     On this page, you can edit all of the information that appears about your hub on the
     %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
 
+%h1.title Edit Hub Map Information for #{@hub.fields['City']}, #{@hub.fields['State']}
+
 %form{action: '/hub', method: 'POST'}
   %fieldset
     .columns
       .column
-        %h2.subtitle Name and Contact Info
+        %h2.subtitle Basic Info
         .field
           %label.label Hub Name
           .control
@@ -44,7 +44,7 @@
             %p.help By default, we normally display hubs' main contact emails, but if you have a special welcome email for newcomers, we can display that instead.
 
       .column
-        %h2.subtitle Links
+        %h2.subtitle Map Links
         .field
 
         - ['Facebook Handle', 'Twitter Handle', 'Instagram Handle', 'Website'].each do |field|
@@ -90,7 +90,7 @@
           In this section, you can see everyone we have listed as a coordinator or leader for your hub.
           If someone doesn't appear here, please have them fill out the
           %a{href: 'https://airtable.com/shrbUfAwCCOOQKHam', target: '_blank'} hub leader form.
-          If you need to make specific changes to a particular leader's contact information, please email TODO, though we hope to support self-editing soon!
+          If you need to make specific changes to a particular leader's contact information, please email <strong>TODO</strong>, though we hope to support self-editing soon!
         %br
         %table.table.is-striped.is-fullwidth.is-responsive
           %thead
