@@ -324,12 +324,34 @@ if (typeof(Array.prototype.unique) === "undefined") {
   }
 }
 
+function htmlEscape(s) {
+  return s.
+    replace(/&/g, "&amp;").
+    replace(/</g, "&lt;").
+    replace(/>/g, "&gt;").
+    replace(/"/g, "&quot;").
+    replace(/'/g, "&#x27;").
+    replace(/\//g, "&#x2F;");
+}
+
+function linkEscape(s) {
+  const escaped = s.trim().
+    replace(/</g, "&lt;").
+    replace(/>/g, "&gt;").
+    replace(/"/g, "&quot;").
+    replace(/'/g, "&#x27;");
+  if (escaped.match(/^\s*javascript/i))
+    return '';
+  else
+    return escaped;
+}
+
 function emailLink(email) {
-  return "<a href='mailto:" + email + "'>" + email + "</a>";
+  return `<a href="mailto:${htmlEscape(email)}">${htmlEscape(email)}</a>`;
 }
 
 function hubName(hub) {
-  return hub.name + "<br/><small>"+hub.city + ", " + hub.state+"</small>";
+  return `${htmlEscape(hub.name)}<br/><small>${htmlEscape(hub.city)}, ${htmlEscape(hub.state)}</small>`;
 }
 
 function socialLink(prefix, value, title) {
@@ -339,7 +361,7 @@ function socialLink(prefix, value, title) {
   } else {
     href = prefix + "/" + value.replace("@", "").trim();
   }
-  return '<a href="'+href+'" target="_blank" style="text-decoration:underline;">'+title+'</a>';
+  return `<a href="${linkEscape(href)}" target="_blank" style="text-decoration:underline;">${htmlEscape(title)}</a>`;
 }
 
 function socialP(prefix, value, title) {
@@ -357,22 +379,21 @@ function hubLinks(hub) {
   html += socialP("https://instagram.com", hub.instagram, "Instagram Page");
   if (hub.website) {
     var linkText = hub.custom_weblink_text || "Hub Website";
-    html += '<p><a href="'+ hub.website.trim() + '" target="_blank" style="text-decoration:underline;">' + linkText + '</a></p>';
+    html += `<p><a href="${linkEscape(hub.website)}" target="_blank" style="text-decoration:underline;">${htmlEscape(linkText)}</a></p>`;
   }
   if (hub.custom_coord_text) {
-    html += "<strong>Hub Contact:</strong><br>";
-    html += hub.custom_coord_text;
+    html += `<strong>Hub Contact:</strong><br>${htmlEscape(hub.custom_coord_text)}`;
   } else if (hub.email && !hub.leaders.length) {
-    html += "<strong>Hub Contact Email:</strong><br>" + emailLink(hub.email);
+    html += `<strong>Hub Contact Email:</strong><br>${emailLink(hub.email)}`;
   } else if (hub.leaders.length) {
     html += "<strong>Hub Contact"
     if (hub.leaders.length > 1 || hub.email) html += "s";
     html += ":</strong><br>";
     if (hub.email)
-      html += "<span>Hub Contact Email:</span> " + emailLink(hub.email) + "<br>";
+      html += `<span>Hub Contact Email:</span> ${emailLink(hub.email)}<br>`;
     for (var i=0; i < hub.leaders.length; i++) {
       var lead = hub.leaders[i];
-      html += "<span>"+lead.first_name + " " + lead.last_name + ":</span> ";
+      html += `<span>${htmlEscape(lead.first_name)} ${htmlEscape(lead.last_name)}:</span> `;
       html += emailLink(lead.email) + "<br>";
     }
   }
