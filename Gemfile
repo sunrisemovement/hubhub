@@ -3,11 +3,16 @@ ruby '2.6.3'
 
 gem 'airrecord'
 gem 'aws-sdk-s3'
-gem 'dotenv'
 gem 'sinatra'
 gem 'haml'
 gem 'pony'
+gem 'dotenv'
 
-gem 'rake'
-gem 'pry'
-gem 'minitest'
+group :development do
+  gem 'rake'
+  gem 'minitest'
+  gem 'capybara'
+  gem 'timecop'
+  gem 'pry'
+  gem 'rb-readline'
+end

@@ -1,9 +1,16 @@
+ENV['APP_ENV'] = 'test'
+
 require_relative '../airtable'
+require_relative '../app'
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'capybara/minitest'
+require 'capybara/minitest/spec'
 require 'securerandom'
 require 'erb'
 require 'pry'
+require 'rb-readline'
+require 'timecop'
 
 class Minitest::Test
   def setup
@@ -50,14 +57,20 @@ class Minitest::Test
         }
       },
       offset: offset,
-    }.to_json
+    }
 
     hub_stubs.get(hub_url) do |env|
-      [status, headers, body]
+      [status, headers, body.to_json]
+    end
+
+    body[:records].each do |record|
+      hub_stubs.get("#{hub_url}/#{record[:id]}") do
+        [status, headers, record.to_json]
+      end
     end
   end
 
-  def stub_leaders(records, status: 200, headers: {}, offset: nil, clear: true)
+  def stub_leaders(records, status: 200, headers: {}, offset: nil)
     body = {
       records: records.map { |record|
         {
@@ -67,10 +80,28 @@ class Minitest::Test
         }
       },
       offset: offset,
-    }.to_json
+    }
 
     ldr_stubs.get(ldr_url) do |env|
-      [status, headers, body]
+      [status, headers, body.to_json]
+    end
+
+    body[:records].each do |record|
+      ldr_stubs.get("#{ldr_url}/#{record[:id]}") do
+        [status, headers, record.to_json]
+      end
     end
   end
 end
+
+class CapybaraTest < Minitest::Test
+  include Capybara::DSL
+  include Capybara::Minitest::Assertions
+
+  def teardown
+    Capybara.reset_sessions!
+    Capybara.use_default_driver
+  end
+end
+
+Capybara.app = Hubhub

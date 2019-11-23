@@ -16,6 +16,25 @@ class Hub < Airrecord::Table
 
   has_many :leaders, class: 'Leader', column: 'Hub Leaders'
 
+  def self.editable_by_coordinators
+    hubs = self.all.select(&:editable_by_coordinators?)
+    hubs = hubs.sort_by { |h| [h['State'], h['Name']] }
+    if ENV['HUB_BETA_TESTERS']
+      hubs = hubs.select { |h| ENV['HUB_BETA_TESTERS'].include?(h.id) }
+    end
+    hubs
+  end
+
+  def login_email
+    self['Email'] || self['Verified Coordinator Emails']
+  end
+
+  def editable_by_coordinators?
+    return false unless self['Map?'] == true
+    return false if self['Email'].nil? && (self['Verified Coordinator Emails'] || []).length == 0
+    true
+  end
+
   def should_appear_on_map?
     return false if self['Activity?'] == 'Inactive'
     return false unless self['Map?'] == true
