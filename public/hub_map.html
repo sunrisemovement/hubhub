@@ -484,11 +484,6 @@ function initMap(hubs) {
     }
   });
 
-  map.on('moveend', function() {
-    var my = $('#hub-map .mapboxgl-popup')[0];
-    my.style.transform = my.style.transform.replace("-50%", "calc(-50% - 0.5px)");
-  });
-
   // This is where your interactions with the symbol layer used to be
   // Now you have interactions with DOM markers instead
   hubs.features.forEach(function(marker, i) {
