@@ -3,7 +3,7 @@
     On this page, you can edit all of the information that appears about your hub on the
     %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
 
-%h1.title Edit Hub Map Information for #{@hub.fields['City']}, #{@hub.fields['State']}
+%h1.title Edit Hub Information for #{@hub.fields['City']}, #{@hub.fields['State']}
 
 %form{action: '/hub', method: 'POST'}
   %fieldset
@@ -77,28 +77,31 @@
             %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 200px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
   %br
-  %input.button.is-warning{type: 'submit', value: 'Update Hub Map Information'}
+  %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
 
   %hr
 
-%form{action: '/coordinators', method: 'POST'}
+%form{action: '/leaders', method: 'POST'}
   %fieldset
     .columns
       .column
-        %h2.subtitle Manage Coordinators
+        %h2.subtitle Manage Leaders
         %p
-          In this section, you can see everyone we have listed as a coordinator or leader for your hub.
-          If someone doesn't appear here, please have them fill out the
-          %a{href: 'https://airtable.com/shrbUfAwCCOOQKHam', target: '_blank'} hub leader form.
-          If you need to make specific changes to a particular leader's contact information, please email <strong>TODO</strong>, though we hope to support self-editing soon!
+          In this section, you can manage information for everyone who has filled out the 
+          %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
+          for #{@hub['Name']}&mdash;in particular, you can confirm leaders' membership and activity in the hub
+          and decide who should be shown on the map (if you are not just displaying the hub contact email).
+        %br
+        %p
+          For our initial beta-test of this system, we are not yet supporting fully featured editing (e.g. of names, pronouns, and contact information). If you need to make edits, you can either contact us in #hubtalk or you can mark the leader as "entered in error" and have them fill out a second copy of the leader form.
         %br
         %table.table.is-striped.is-fullwidth.is-responsive
           %thead
             %tr
               %th Leader Name
               %th Email
-              %th Status
-              %th Allowed to be shown on map?
+              %th Activity Status
+              %th Map Visibility
           %tbody
             - @hub.leaders.each do |lead|
               %tr
@@ -107,16 +110,17 @@
                 %td
                   .select
                     %select{name: "leaders[#{lead.id}][Membership Status]"}
-                      %option Active leader
-                      %option Inactive
-                      %option Not part of hub
+                      %option{value: 'Active'} Active
+                      %option{value: 'Inactive'} Inactive
+                      %option{value: 'Entered in error'} Entered in error
+                      %option{value: 'Not part of hub'} Not part of hub
                 %td
                   %label.checkbox
                     %input{type: 'checkbox', name: "leaders[#{lead.id}][Map?]", checked: lead['Map?']}
-                    Yes, that's ok
+                    Show on map
 
   %br
-  %input.button.is-warning{type: 'submit', value: 'Update Coordinator Preferences'}
+  %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
 
 :css
   .hidden { display: none; }

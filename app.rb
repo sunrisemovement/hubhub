@@ -4,6 +4,9 @@ require 'haml'
 require_relative 'airtable'
 require_relative 'magic_link'
 
+require 'pry'
+require 'rb-readline'
+
 class MapPreview < Sinatra::Base
   get '/map' do
     haml :map
@@ -15,9 +18,14 @@ class Hubhub < Sinatra::Base
   use MapPreview
   enable :logging
 
-  ALLOWED_EDIT_FIELDS = ['Name', 'Website', 'Facebook Handle',
-                         'Twitter Handle', 'Instagram Handle', 'Latitude', 'Longitude',
-                         'Activity?']
+  EDITABLE_HUB_FIELDS = [
+    'Name', 'Website', 'Latitude', 'Longitude', 'Activity?',
+    'Facebook Handle', 'Twitter Handle', 'Instagram Handle'
+  ]
+
+  EDITABLE_LEADER_FIELDS = [
+    'Map?', 'Activity?'
+  ]
 
   before do
     unless session[:hub_id]
@@ -35,9 +43,22 @@ class Hubhub < Sinatra::Base
     end
   end
 
+  post('/leaders') do
+    if @hub
+      leaders_by_id = @hub.leaders.each_with_object({}) do |leader, h|
+        h[leader.id] = leader
+      end
+
+      params['leaders'].each do |id, attrs|
+        attrs = attrs.slice(*EDITABLE_LEADER_FIELDS)
+        binding.pry
+      end
+    end
+  end
+
   post('/hub') do
     if @hub
-      attrs = params.slice(*ALLOWED_EDIT_FIELDS)
+      attrs = params.slice(*EDITABLE_HUB_FIELDS)
       attrs['Latitude'] = attrs['Latitude'].to_f
       attrs['Longitude'] = attrs['Longitude'].to_f
       attrs.keys.each do |k|
