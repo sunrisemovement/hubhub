@@ -1,18 +1,5 @@
 require 'sinatra/base'
-require 'pony'
-
-Pony.options = {
-  :via => :smtp,
-  :via_options => {
-    :address              => 'smtp.gmail.com',
-    :port                 => '587',
-    :enable_starttls_auto => true,
-    :user_name            => ENV['GMAIL_USER'],
-    :password             => ENV['GMAIL_PASS'],
-    :authentication       => :plain,
-    :domain               => "localhost.localdomain"
-  }
-}
+require_relative 'emailer'
 
 class Keypad
   @store = {}
@@ -23,6 +10,10 @@ class Keypad
     attr_reader :store
 
     def generate_key(hub)
+      old_keys = @store.keys.select{ |k| @store[k][:hub_id] == hub.id }
+      old_keys.each do |key|
+        @store.delete(key)
+      end
       SecureRandom.urlsafe_base64(32).tap do |key|
         @store[key] = { hub_id: hub.id, time: Time.now }
       end
@@ -31,24 +22,6 @@ class Keypad
     def enter_key(key)
       @store.each { |k, o| @store.delete(k) if Time.now - o[:time] > TIMEOUT }
       @store.delete(key)
-    end
-  end
-end
-
-class Emailer
-  @last_email = nil
-
-  class << self
-    attr_reader :last_email
-
-    def send_email(to, subject, body)
-      if ENV['APP_ENV'] == 'test'
-        @last_email = { to: to, subject: subject, body: body }
-      elsif ENV['APP_ENV'] == 'development'
-        puts to, subject, body
-      else
-        Pony.mail(to: to, subject: subject, body: body)
-      end
     end
   end
 end
@@ -68,10 +41,21 @@ class MagicLink < Sinatra::Base
     if @hub = Hub.find(params['hub'])
       link = url("/login/#{Keypad.generate_key(@hub)}")
 
+      email_lines = [
+        "Hi #{@hub['Name']}!",
+        "",
+        "Here's a magic link for signing into the Sunrise Hubhub beta test, where you can control how your hub appears on the Sunrise hub map: #{link}",
+        "",
+        "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, or if you have any questions, please email paul@sunrisemovement.org or message us in #hubtalk.",
+        "",
+        "Best,",
+        "The Hub Support Team"
+      ]
+
       Emailer.send_email(
         @hub.login_email,
         "Sunrise Hubhub login link!",
-        "Hi #{@hub['Name']}! Here's your magic link to log into Sunrise Hubhub: #{link}"
+        email_lines.join("\n")
       )
 
       haml :email

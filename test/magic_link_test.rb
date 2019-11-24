@@ -30,10 +30,10 @@ class MagicLinkTest < CapybaraTest
     assert_equal email[:to], 'frodo@bagg.ins'
     assert_equal email[:subject], "Sunrise Hubhub login link!"
 
-    magic_link = email[:body].split(": ").last
+    magic_link = email[:body][/https?:\/\/[\S]+/]
     visit magic_link
 
-    assert_content 'Edit Hub Map Information for Hobbiton, MA'
+    assert_content 'Edit Hub Information for Hobbiton, MA'
   end
 
   def test_leader_happy_path
@@ -58,10 +58,10 @@ class MagicLinkTest < CapybaraTest
     assert_equal e2, 'nob@fastmail.fm'
     assert_equal email[:subject], "Sunrise Hubhub login link!"
 
-    magic_link = email[:body].split(": ").last
+    magic_link = email[:body][/https?:\/\/[\S]+/]
     visit magic_link
 
-    assert_content 'Edit Hub Map Information for Bree, NH'
+    assert_content 'Edit Hub Information for Bree, NH'
   end
 
   def test_link_timeout
@@ -78,18 +78,48 @@ class MagicLinkTest < CapybaraTest
     click_button 'Send Magic Link'
 
     email = Emailer.last_email
-    magic_link = email[:body].split(": ").last
+    magic_link = email[:body][/https?:\/\/[\S]+/]
 
     Timecop.freeze(Date.today + 1) do
       visit magic_link
-      assert_no_content 'Edit Hub Map'
+      assert_no_content 'Edit Hub'
     end
+  end
+
+  def test_double_link
+    stub_hubs([{
+      'Name' => 'Sunrise Minas Tirith',
+      'City' => 'Minas Tirith',
+      'State' => 'GA',
+      'Email' => 'f4r4m1r@citadel.org',
+      'Map?' => true
+    }])
+
+    visit '/'
+    select 'Sunrise Minas Tirith', from: 'hub'
+    click_button 'Send Magic Link'
+
+    email = Emailer.last_email
+    magic_link1 = email[:body][/https?:\/\/[\S]+/]
+
+    visit '/'
+    select 'Sunrise Minas Tirith', from: 'hub'
+    click_button 'Send Magic Link'
+
+    email = Emailer.last_email
+    magic_link2 = email[:body][/https?:\/\/[\S]+/]
+
+    visit magic_link1
+    assert_no_content 'Edit Hub'
+
+    visit magic_link2
+    assert_content 'Edit Hub Information for Minas Tirith, GA'
   end
 
   def test_bad_link
     stub_hubs([])
     visit '/login/fgsfgsfgdgdsfdfgsdfg'
-    assert_no_content 'Edit Hub Map'
+    assert_no_content 'Edit Hub'
   end
 
   def test_only_verified_hubs_with_emails

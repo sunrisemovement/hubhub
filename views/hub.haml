@@ -3,7 +3,7 @@
     On this page, you can edit all of the information that appears about your hub on the
     %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
 
-%h1.title Edit Hub Information for #{@hub.fields['City']}, #{@hub.fields['State']}
+%h1.title Edit Hub Information for #{@hub['City']}, #{@hub['State']}
 
 %form{action: '/hub', method: 'POST'}
   %fieldset

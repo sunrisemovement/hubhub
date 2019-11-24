@@ -10,7 +10,7 @@
               - @hubs.select { |h| h['State'] == s }.each do |h|
                 %option{value: h.id}= h['Name']
       %p.help
-        Select your hub from the dropdown list, and we'll send an login link to the email we have associated with the hub. If your hub doesn't appear here, contact us in #hubtalk.
+        Select your hub from the dropdown list, and we'll send a login link to its associated email. If your hub isn't appearing, contact us in #hubtalk.
   .field
     .control
       %input.button.is-warning{type: 'submit', value: 'Send Magic Link'}

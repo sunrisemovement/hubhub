@@ -19,8 +19,8 @@
         %a.navbar-item{href: '/'}
           %img{src: '/s/map_icon.jpg'}
       .navbar-start
-        %a.navbar-item{href: '/map'} Hub Map Preview
-        - if session[:user_email]
+        %a.navbar-item{href: '/map'} Map Preview
+        - if session[:hub_id]
           %a.navbar-item{href: '/logout'} Log Out
     %main
       %section.section
