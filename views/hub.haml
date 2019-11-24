@@ -20,25 +20,24 @@
           .control
             .select
               %select{name: "Activity?"}
-                - [["Active", "Yes, we're going strong!"],["Semi-Active","Yes, but we could use some help..."],["Inactive","Nope, not right now. Hide us from the map :("]].each do |value,label|
+                - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive currently :("]].each do |value,label|
                   %option{value: value, selected: @hub.fields["Activity?"]==value}= label
 
         .field
           %label.label What contact info should we show on the map?
           .control
             .select
-              %select{name: "Display Email Source", id: 'display-email-src'}
-                %option{value: 'Hub'} Hub email!
-                %option{value: 'Coordinators'} Coordinator names and emails!
-                %option{value: 'Hub and Coordinators'} Both hub email *and* coordinators!
+              %select{name: "Contact Type", id: 'contact-type'}
+                %option{value: 'Hub Email'} Hub email!
+                %option{value: 'Coordinator Emails'} Coordinator emails!
+                %option{value: 'Hub Email + Coordinator Emails'} Both hub *and* coordinator emails!
                 %option{value: 'Custom Text'} Custom text (enter below).
-                %option{value: 'None'} Nothing; don't show any contact info.
         .field{id: 'cust-contact-text'}
-          %label.label Custom contact info text
+          %label.label Custom contact text
           .control
             %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text']}
         .field
-          %label.label Custom email 
+          %label.label Custom email
           .control
             %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email'], placeholder: @hub['Email']}
             %p.help By default, we normally display hubs' main contact emails, but if you have a special welcome email for newcomers, we can display that instead.
@@ -87,20 +86,21 @@
       .column
         %h2.subtitle Manage Leaders
         %p
-          In this section, you can manage information for everyone who has filled out the 
+          In this section, you can manage information for everyone who has filled out the
           %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
-          for #{@hub['Name']}&mdash;in particular, you can confirm leaders' membership and activity in the hub
+          for #{@hub['Name']}&mdash;in particular, you can confirm leaders' activity in the hub
           and decide who should be shown on the map (if you are not just displaying the hub contact email).
         %br
         %p
-          For our initial beta-test of this system, we are not yet supporting fully featured editing (e.g. of names, pronouns, and contact information). If you need to make edits, you can either contact us in #hubtalk or you can mark the leader as "entered in error" and have them fill out a second copy of the leader form.
+          For our initial beta-test of this system, we are not yet supporting fully featured editing (e.g. of names, roles, and contact information). If you need to make those kinds of edits, you can either contact us in #hubtalk or you can mark the leader as inactive and have them fill out a second copy of the leader form.
         %br
         %table.table.is-striped.is-fullwidth.is-responsive
           %thead
             %tr
               %th Leader Name
               %th Email
-              %th Activity Status
+              %th Roles
+              %th Activity
               %th Map Visibility
           %tbody
             - @hub.leaders.each do |lead|
@@ -108,16 +108,16 @@
                 %td= lead['Name']
                 %td= lead['Email']
                 %td
-                  .select
-                    %select{name: "leaders[#{lead.id}][Membership Status]"}
-                      %option{value: 'Active'} Active
-                      %option{value: 'Inactive'} Inactive
-                      %option{value: 'Entered in error'} Entered in error
-                      %option{value: 'Not part of hub'} Not part of hub
+                  - lead['Role'].each do |role|
+                    %span.tag= role.gsub(' - Self Describe In Next Field', '')
+                %td
+                  %label.checkbox
+                    %input{type: 'checkbox', name: "leaders[#{lead.id}][Activity?]", checked: lead['Activity?']}
+                    Active member
                 %td
                   %label.checkbox
                     %input{type: 'checkbox', name: "leaders[#{lead.id}][Map?]", checked: lead['Map?']}
-                    Show on map
+                    Allow on map
 
   %br
   %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
@@ -130,7 +130,7 @@
   const lngInput = document.getElementById('Longitude');
   const mapIframe = document.getElementById('map-iframe');
   const reloadBtn = document.getElementById('reload-map');
-  const displaySrc = document.getElementById('display-email-src');
+  const contType = document.getElementById('contact-type');
   const custText = document.getElementById('cust-contact-text');
 
   const key = mapIframe.attributes['data-key'].value;
@@ -143,13 +143,13 @@
   lngInput.oninput = resetMap;
 
   const showHideCustText = () => {
-    if (displaySrc.value == 'Custom Text') {
+    if (contType.value == 'Custom Text') {
       custText.classList.remove('hidden');
     } else {
       custText.classList.add('hidden');
     }
   };
 
-  displaySrc.onchange = showHideCustText;
+  contType.onchange = showHideCustText;
   showHideCustText();
 

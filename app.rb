@@ -28,11 +28,9 @@ class Hubhub < Sinatra::Base
 
   EDITABLE_HUB_FIELDS = [
     'Name', 'Website', 'Latitude', 'Longitude', 'Activity?',
-    'Facebook Handle', 'Twitter Handle', 'Instagram Handle'
-  ]
-
-  EDITABLE_LEADER_FIELDS = [
-    'Map?', 'Activity?'
+    'Facebook Handle', 'Twitter Handle', 'Instagram Handle',
+    'Custom Website Link Text', 'Contact Type',
+    'Custom Map Email', 'Custom Map Contact Text'
   ]
 
   before do
@@ -66,10 +64,27 @@ class Hubhub < Sinatra::Base
         h[leader.id] = leader
       end
 
+      @diffs = {}
       params['leaders'].each do |id, attrs|
-        attrs = attrs.slice(*EDITABLE_LEADER_FIELDS)
-        binding.pry
+        changed = false
+        lead = leaders_by_id[id]
+        diff = {}
+        ['Map?', 'Activity?'].each do |attr|
+          old_value = lead[attr]
+          new_value = attrs[attr]
+          new_value = true if new_value == 'on'
+          if old_value != new_value
+            diff[attr] = [old_value || false, new_value]
+            lead[attr] = new_value
+            changed = true
+          end
+        end
+        if changed && ENV['FEATURE_UPDATE']
+          #lead.save
+        end
+        @diffs[lead['Name']] = diff
       end
+      haml :leader_changes
     end
   end
 
@@ -81,18 +96,19 @@ class Hubhub < Sinatra::Base
       attrs.keys.each do |k|
         attrs[k] = nil if attrs[k] == ""
       end
-      @changes = {}
+      @diff = {}
+      changed = false
       attrs.each do |attr, value|
         if @hub[attr] != value
-          @changes[attr] = [@hub[attr], value]
+          @diff[attr] = [@hub[attr], value]
           @hub[attr] = value
         end
       end
-      logger.info "Hub update: #{@email} #{@changes}"
+      logger.info "Hub update: #{@hub['Name']} #{@diff}"
       if ENV['FEATURE_UPDATE']
-        @hub.save
+        #@hub.save
       end
-      haml :changes
+      haml :hub_changes
     end
   end
 

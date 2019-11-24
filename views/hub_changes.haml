@@ -1,0 +1,23 @@
+%h1.title Update Summary
+%p
+  You edited the following information about the #{@hub['City']}, #{@hub['State']} hub:
+
+%br
+
+%table.table.is-striped.is-bordered.is-fullwidth.is-responsive
+  %thead
+    %th Field
+    %th Old Value
+    %th New Value
+  %tbody
+    - if @diff.size > 0
+      - @diff.each do |attr, (old, new)|
+        %tr
+          %td= attr
+          %td= old
+          %td= new
+    - else
+      %tr
+        %td.has-text-centered{colspan: 3} No changes to show
+
+%a.button.is-link{href: '/'} Back to Hub Edit Page

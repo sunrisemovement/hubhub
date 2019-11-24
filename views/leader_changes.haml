@@ -1,0 +1,23 @@
+%h1.title Update Summary
+
+%p
+  You edited the following information about the #{@hub['City']}, #{@hub['State']} hub leaders:
+
+%br
+
+%table.table.is-striped.is-bordered.is-fullwidth.is-responsive
+  %thead
+    %th Leader
+    %th Field
+    %th Old Value
+    %th New Value
+  %tbody
+    - @diffs.each do |leader, changes|
+      - changes.each do |attr, (old, new)|
+        %tr
+          %td= leader
+          %td= attr
+          %td= old
+          %td= new
+
+%a.button.is-link{href: '/'} Back to Hub Edit Page
