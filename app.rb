@@ -8,6 +8,14 @@ require 'pry'
 require 'rb-readline'
 
 class MapPreview < Sinatra::Base
+  enable :sessions
+
+  before do
+    if session[:hub_id]
+      @hub = Hub.find(session[:hub_id])
+    end
+  end
+
   get '/map' do
     haml :map
   end
@@ -40,6 +48,15 @@ class Hubhub < Sinatra::Base
       haml :hub
     else
       haml :notfound
+    end
+  end
+
+  get('/my_hub_json') do
+    content_type :json
+    if @hub
+      { updated_at: Time.now.to_s, map_data: [@hub.map_entry] }.to_json
+    else
+      {}.to_json
     end
   end
 

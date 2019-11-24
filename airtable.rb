@@ -47,7 +47,7 @@ class Hub < Airrecord::Table
     STATE_ABBR_TO_NAME[self.fields['State']]
   end
 
-  def map_entry(leaders)
+  def map_entry(leads=nil)
     entry = {
       name: self.fields['Name'],
       city: self.fields['City'].strip,
@@ -68,7 +68,11 @@ class Hub < Airrecord::Table
       entry[:email] = nil
       entry[:custom_coord_text] = self.fields['Custom Map Contact Text']
     elsif !entry[:email] || self['Always Show Coordinators?'] == true
-      entry[:leaders] = leaders.map { |l| {
+      leads = self.leaders if leads.nil?
+      leads = leads.select do |l|
+        l['Role'].to_s =~ /coordinator/i && l['Map?'] == true
+      end
+      entry[:leaders] = leads.map { |l| {
         first_name: l['First Name'],
         last_name: l['Last Name'],
         email: l['Email']
@@ -92,9 +96,6 @@ class Hub < Airrecord::Table
       next unless hub.should_appear_on_map?
 
       leaders = (hub.fields['Hub Leaders'] || []).map { |id| leaders_by_id[id] }.compact
-      leaders = leaders.select do |l|
-        l['Role'].to_s =~ /coordinator/i && l['Map?'] == true
-      end
 
       entry = hub.map_entry(leaders)
 

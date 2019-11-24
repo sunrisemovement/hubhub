@@ -1,17 +1,6 @@
 require 'test_helper'
 
 class MagicLinkTest < CapybaraTest
-  def setup
-    super
-    @prev_beta = ENV['HUB_BETA_TESTERS']
-    ENV.delete('HUB_BETA_TESTERS')
-  end
-
-  def teardown
-    super
-    ENV['HUB_BETA_TESTERS'] = @prev_beta
-  end
-
   def test_hubmail_happy_path
     stub_hubs([{
       'Name' => 'Sunrise Hobbiton',

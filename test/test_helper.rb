@@ -98,9 +98,16 @@ class CapybaraTest < Minitest::Test
   include Capybara::DSL
   include Capybara::Minitest::Assertions
 
+  def setup
+    super
+    @prev_beta = ENV['HUB_BETA_TESTERS']
+    ENV.delete('HUB_BETA_TESTERS')
+  end
+
   def teardown
     Capybara.reset_sessions!
     Capybara.use_default_driver
+    ENV['HUB_BETA_TESTERS'] = @prev_beta
   end
 end
 
