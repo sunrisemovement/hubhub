@@ -34,11 +34,6 @@ class Minitest::Test
     Leader.client.connection.app.stubs
   end
 
-  def clear_stubs
-    hub_stubs.instance_variable_set(:@stack, {})
-    ldr_stubs.instance_variable_set(:@stack, {})
-  end
-
   def hub_url
     "/v0/#{ERB::Util.u(Hub.base_key)}/#{ERB::Util.u(Hub.table_name)}"
   end
@@ -98,16 +93,9 @@ class CapybaraTest < Minitest::Test
   include Capybara::DSL
   include Capybara::Minitest::Assertions
 
-  def setup
-    super
-    @prev_beta = ENV['HUB_BETA_TESTERS']
-    ENV.delete('HUB_BETA_TESTERS')
-  end
-
   def teardown
     Capybara.reset_sessions!
     Capybara.use_default_driver
-    ENV['HUB_BETA_TESTERS'] = @prev_beta
   end
 end
 

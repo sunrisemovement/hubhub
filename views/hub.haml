@@ -20,7 +20,7 @@
           .control
             .select
               %select{name: "Activity?"}
-                - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive currently :("]].each do |value,label|
+                - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive, hide us for now :("]].each do |value,label|
                   %option{value: value, selected: @hub.fields["Activity?"]==value}= label
 
         .field
@@ -30,17 +30,17 @@
               %select{name: "Contact Type", id: 'contact-type'}
                 %option{value: 'Hub Email'} Hub email!
                 %option{value: 'Coordinator Emails'} Coordinator emails!
-                %option{value: 'Hub Email + Coordinator Emails'} Both hub *and* coordinator emails!
-                %option{value: 'Custom Text'} Custom text (enter below).
+                %option{value: 'Hub Email + Coordinator Emails'} Both hub and coordinator emails
+                %option{value: 'Custom Text'} Custom text (enter below)
         .field{id: 'cust-contact-text'}
           %label.label Custom contact text
           .control
-            %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text']}
+            %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text'], id: 'cust-contact-input'}
         .field
           %label.label Custom email
           .control
             %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email'], placeholder: @hub['Email']}
-            %p.help By default, we normally display hubs' main contact emails, but if you have a special welcome email for newcomers, we can display that instead.
+            %p.help By default we display hubs' main contact emails, but if you have a welcome email for newcomers, we can display that instead.
 
       .column
         %h2.subtitle Map Links
@@ -84,7 +84,7 @@
   %fieldset
     .columns
       .column
-        %h2.subtitle Manage Leaders
+        %h2.title Manage Leaders
         %p
           In this section, you can manage information for everyone who has filled out the
           %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
@@ -94,13 +94,13 @@
         %p
           For our initial beta-test of this system, we are not yet supporting fully featured editing (e.g. of names, roles, and contact information). If you need to make those kinds of edits, you can either contact us in #hubtalk or you can mark the leader as inactive and have them fill out a second copy of the leader form.
         %br
-        %table.table.is-striped.is-fullwidth.is-responsive
+        %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
           %thead
             %tr
-              %th Leader Name
+              %th Name
               %th Email
               %th Roles
-              %th Activity
+              %th Hub Activity
               %th Map Visibility
           %tbody
             - @hub.leaders.each do |lead|
@@ -130,6 +130,7 @@
   const lngInput = document.getElementById('Longitude');
   const mapIframe = document.getElementById('map-iframe');
   const reloadBtn = document.getElementById('reload-map');
+  const custInput = document.getElementById('cust-contact-input');
   const contType = document.getElementById('contact-type');
   const custText = document.getElementById('cust-contact-text');
 
@@ -142,14 +143,14 @@
   latInput.oninput = resetMap;
   lngInput.oninput = resetMap;
 
-  const showHideCustText = () => {
+  const toggleCustText = () => {
     if (contType.value == 'Custom Text') {
-      custText.classList.remove('hidden');
+      custInput.removeAttribute("disabled");
     } else {
-      custText.classList.add('hidden');
+      custInput.setAttribute("disabled", "disabled");
     }
   };
 
-  contType.onchange = showHideCustText;
-  showHideCustText();
+  contType.onchange = toggleCustText;
+  toggleCustText();
 

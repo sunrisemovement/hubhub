@@ -37,7 +37,7 @@ class MagicLink < Sinatra::Base
     haml :login
   end
 
-  post('/login')  do
+  post('/login') do
     if @hub = Hub.find(params['hub'])
       link = url("/login/#{Keypad.generate_key(@hub)}")
 
@@ -70,7 +70,7 @@ class MagicLink < Sinatra::Base
   end
 
   get('/login/:key') do |key|
-    if login = Keypad.enter_key(key) 
+    if login = Keypad.enter_key(key)
       logger.info "Login successful: Hub #{login[:hub_id]} (#{login[:hub_name]})"
       session[:hub_id] = login[:hub_id]
       redirect '/'

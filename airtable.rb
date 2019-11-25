@@ -1,8 +1,7 @@
 require 'airrecord'
-require 'dotenv'
+require_relative 'environment'
 require_relative 'scripts/state_abbr_to_name'
 
-Dotenv.load
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
 class Leader < Airrecord::Table

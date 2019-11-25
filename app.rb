@@ -4,9 +4,6 @@ require 'haml'
 require_relative 'airtable'
 require_relative 'magic_link'
 
-require 'pry'
-require 'rb-readline'
-
 class MapPreview < Sinatra::Base
   enable :sessions
 
@@ -79,7 +76,7 @@ class Hubhub < Sinatra::Base
             changed = true
           end
         end
-        if changed && ENV['FEATURE_UPDATE']
+        if changed && ENV['APP_ENV'] == 'production'
           #lead.save
         end
         @diffs[lead['Name']] = diff
@@ -102,10 +99,10 @@ class Hubhub < Sinatra::Base
         if @hub[attr] != value
           @diff[attr] = [@hub[attr], value]
           @hub[attr] = value
+          changed = true
         end
       end
-      logger.info "Hub update: #{@hub['Name']} #{@diff}"
-      if ENV['FEATURE_UPDATE']
+      if changed && ENV['APP_ENV'] == 'production'
         #@hub.save
       end
       haml :hub_changes
