@@ -24,6 +24,10 @@ class Hub < Airrecord::Table
     hubs
   end
 
+  def location
+    "#{self['City']}, #{self['State']}"
+  end
+
   def login_email
     self['Email'] || self['Verified Coordinator Emails']
   end

@@ -1,7 +1,7 @@
 %h1.title Update Summary
 
 %p
-  You edited the following information about the #{@hub['City']}, #{@hub['State']} hub leaders:
+  You edited the following information about the #{@hub.location} hub leaders:
 
 %br
 
@@ -17,7 +17,7 @@
         %tr
           %td= leader
           %td= attr
-          %td= old
-          %td= new
+          %td= old || ''
+          %td= new || ''
 
 %a.button.is-link{href: '/'} Back to Hub Edit Page

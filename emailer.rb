@@ -19,13 +19,13 @@ class Emailer
   class << self
     attr_reader :last_email
 
-    def send_email(to, subject, body)
+    def send_email(**kwargs)
       if ENV['APP_ENV'] == 'test'
-        @last_email = { to: to, subject: subject, body: body }
+        @last_email = kwargs
       elsif ENV['APP_ENV'] == 'development'
-        puts to, subject, body
+        puts kwargs
       else
-        Pony.mail(to: to, subject: subject, body: body)
+        Pony.mail(**kwargs)
       end
     end
   end

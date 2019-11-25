@@ -41,21 +41,16 @@ class MagicLink < Sinatra::Base
     if @hub = Hub.find(params['hub'])
       link = url("/login/#{Keypad.generate_key(@hub)}")
 
-      email_lines = [
-        "Hi #{@hub['Name']}!",
-        "",
-        "Here's a magic link for signing into the Sunrise Hubhub beta test, where you can control how your hub appears on the Sunrise hub map: #{link}",
-        "",
-        "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, or if you have any questions, please email paul@sunrisemovement.org or message us in #hubtalk.",
-        "",
-        "Best,",
-        "The Hub Support Team"
-      ]
-
       Emailer.send_email(
-        @hub.login_email,
-        "Sunrise Hubhub login link!",
-        email_lines.join("\n")
+        to: @hub.login_email,
+        subject: "Sunrise Hubhub login link!",
+        body: [
+          "Hi #{@hub['Name']}!", "",
+          "Here's a magic link for signing into the Sunrise Hubhub beta test, where you can control how your hub appears on the Sunrise hub map: #{link}", "",
+          "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, or if you have any questions, please email paul@sunrisemovement.org or message us in #hubtalk.", "",
+          "Best,",
+          "The Hub Support Team"
+        ].join("\n")
       )
 
       haml :email

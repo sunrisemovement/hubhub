@@ -76,11 +76,13 @@ class Hubhub < Sinatra::Base
             changed = true
           end
         end
-        if changed && ENV['APP_ENV'] == 'production'
-          #lead.save
+        if changed
+          # TODO: email about this as well?
+          lead.save if ENV['APP_ENV'] == 'production'
+          @diffs[lead['Name']] = diff
         end
-        @diffs[lead['Name']] = diff
       end
+
       haml :leader_changes
     end
   end
@@ -88,8 +90,9 @@ class Hubhub < Sinatra::Base
   post('/hub') do
     if @hub
       attrs = params.slice(*EDITABLE_HUB_FIELDS)
-      attrs['Latitude'] = attrs['Latitude'].to_f
-      attrs['Longitude'] = attrs['Longitude'].to_f
+      ['Latitude','Longitude'].each do |k|
+        attrs[k] = attrs[k].to_f if attrs[k] != ""
+      end
       attrs.keys.each do |k|
         attrs[k] = nil if attrs[k] == ""
       end
@@ -102,8 +105,21 @@ class Hubhub < Sinatra::Base
           changed = true
         end
       end
-      if changed && ENV['APP_ENV'] == 'production'
-        #@hub.save
+      if changed
+        @hub.save if ENV['APP_ENV'] == 'production'
+        #Emailer.send_email(
+        #  to: @hub.login_email,
+        #  cc: 'paul@sunrisemovement.org',
+        #  subject: "Hub map change summary for #{@hub.location}",
+        #  body: [
+        #    "Hi #{@hub['Name']},", "",
+        #    "This email is just to confirm that you updated the following information about your hub:", "",
+        #    @diff.map{|attr,(old,new)| %(- "#{attr}" changed from "#{old}" to "#{new}") }.join("\n"), "",
+        #    "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please contact us!", "",
+        #    "Best,",
+        #    "The Hub Support Team"
+        #  ].join("\n")
+        #)
       end
       haml :hub_changes
     end
