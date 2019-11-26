@@ -3,4 +3,6 @@
   We sent an email to the address associated with #{@hub['Name']}, which contains a link you can use to sign in!
 %br
 %p
-  If you don't know or can't access this email address, message us in #hubtalk.
+  If you don't know or can't access this email address, contact us
+  at
+  %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']

@@ -79,7 +79,7 @@ class Hubhub < Sinatra::Base
         if changed
           # TODO: email about this as well?
           lead.save if ENV['APP_ENV'] == 'production'
-          @diffs[lead['Name']] = diff
+          @diffs[lead.name] = diff
         end
       end
 
@@ -92,7 +92,7 @@ class Hubhub < Sinatra::Base
             "Hi #{@hub['Name']},", "",
             "This email is just to confirm that you updated the following information about your hub leaders:", "",
             @diffs.flat_map{|name, d| d.map{|attr,(old,new)| %(- #{name}'s "#{attr}" changed from "#{old}" to "#{new}") } }.join("\n"), "",
-            "Some of these changes may update how your card appears on the hub map at https://sunrisemovement.org/hubs. If you did not request these changes, please contact us!", "",
+            "Some of these changes may update how your card appears on the hub map at https://sunrisemovement.org/hubs. If you did not request these changes, please email us back at this address!", "",
             "Best,",
             "The Hub Support Team"
           ].join("\n")
@@ -133,7 +133,7 @@ class Hubhub < Sinatra::Base
               "Hi #{@hub['Name']},", "",
               "This email is just to confirm that you updated the following information about your hub:", "",
               @diff.map{|attr,(old,new)| %(- "#{attr}" changed from "#{old}" to "#{new}") }.join("\n"), "",
-              "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please contact us!", "",
+              "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please email us back at this address!", "",
               "Best,",
               "The Hub Support Team"
             ].join("\n")

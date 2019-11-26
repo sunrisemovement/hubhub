@@ -87,12 +87,18 @@
         %h2.title Manage Leaders
         %p
           In this section, you can manage information for everyone who has filled out the
-          %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
+          %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'}
+          hub leader form
           for #{@hub['Name']}&mdash;in particular, you can confirm leaders' activity in the hub
           and decide who should be shown on the map (if you are not just displaying the hub contact email).
         %br
         %p
-          For our initial beta-test of this system, we are not yet supporting fully featured editing (e.g. of names, roles, and contact information). If you need to make those kinds of edits, you can either contact us in #hubtalk or you can mark the leader as inactive and have them fill out a second copy of the leader form.
+          For our initial beta-test of this system, we are not yet supporting
+          fully featured editing (e.g. of names, roles, and contact
+          information). If you need to make those kinds of edits, you can email
+          us at
+          %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
+          or you can mark the leader as inactive and have them fill out a second copy of the leader form.
         %br
         %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
           %thead
@@ -105,7 +111,7 @@
           %tbody
             - @hub.leaders.each do |lead|
               %tr
-                %td= lead['Name']
+                %td= lead.name
                 %td= lead['Email']
                 %td
                   - (lead['Role'] || []).each do |role|

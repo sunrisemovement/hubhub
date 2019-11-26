@@ -25,13 +25,15 @@ class HubEditingTest < CapybaraTest
 
     stub_leaders([{
       'id' => 'l1',
-      'Name' => 'Arwen',
+      'First Name' => 'Arwen',
+      'Last Name' => 'Peredhel',
       'Email' => 'arwen@dell.com',
       'Map?' => true,
       'Activity?' => true
     }, {
       'id' => 'l2',
-      'Name' => 'Elrond',
+      'First Name' => 'Elrond',
+      'Last Name' => 'Peredhel',
       'Email' => 'l.rond@peredh.el',
       'Map?' => true
     }])
@@ -100,7 +102,7 @@ class HubEditingTest < CapybaraTest
     email = Emailer.last_email
     assert_equal email[:subject], "Sunrise leader info updates for Rivendell, PA"
     body = email[:body]
-    assert body.include? %{Arwen's "Map?" changed from "true" to "false"}
-    assert body.include? %{Elrond's "Activity?" changed from "false" to "true"}
+    assert body.include? %{Arwen Peredhel's "Map?" changed from "true" to "false"}
+    assert body.include? %{Elrond Peredhel's "Activity?" changed from "false" to "true"}
   end
 end

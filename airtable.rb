@@ -7,6 +7,10 @@ Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 class Leader < Airrecord::Table
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hub Leaders'
+
+  def name
+    "#{self['First Name']} #{self['Last Name']}"
+  end
 end
 
 class Hub < Airrecord::Table
