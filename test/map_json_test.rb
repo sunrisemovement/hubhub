@@ -4,7 +4,9 @@ def hubby(kwargs)
   h = { 'City' => 'Boston', 'State' => 'MA',
         'Activity?' => 'Active', 'Map?' => true,
         'Latitude' => 42, 'Longitude' => 42 }
-  h.merge(kwargs)
+  h = h.merge(kwargs)
+  h['State Link Abbrev'] = h['State']
+  h
 end
 
 class MapJSONTest < Minitest::Test
@@ -89,6 +91,41 @@ class MapJSONTest < Minitest::Test
 
     states = json.map { |e| e[:state] }
     assert_equal states[0], 'Massachusetts'
+    assert_equal states[1], 'Massachusetts'
+    assert_equal states[2], 'Pennsylvania'
+  end
+
+  def test_state_link_abbrev
+    stub_hubs([
+      { 'City' => 'Boston', 'State' => 'MA', 'Name' => '1',
+        'Activity?' => 'Active', 'Map?' => true,
+        'Latitude' => 42, 'Longitude' => 42 },
+      { 'City' => 'Philadelphia', 'State Link Abbrev' => 'PA', 'Name' => '2',
+        'Activity?' => 'Active', 'Map?' => true,
+        'Latitude' => 42, 'Longitude' => 42 },
+      { 'City' => 'Washington', 'State Link Abbrev' => ['DC'], 'Name' => '3',
+        'Activity?' => 'Active', 'Map?' => true,
+        'Latitude' => 42, 'Longitude' => 42 },
+    ])
+    stub_leaders([])
+
+    h1, h2, h3 = Hub.all
+
+    assert_equal h1.state_abbrev, 'MA'
+    assert_equal h2.state_abbrev, 'PA'
+    assert_equal h3.state_abbrev, 'DC'
+
+    assert_equal h1.state, 'Massachusetts'
+    assert_equal h2.state, 'Pennsylvania'
+    assert_equal h3.state, 'District of Columbia'
+
+    assert h1.should_appear_on_map?
+    assert h2.should_appear_on_map?
+    assert h3.should_appear_on_map?
+
+    json = Hub.map_json
+    states = json.map { |e| e[:state] }
+    assert_equal states[0], 'District of Columbia'
     assert_equal states[1], 'Massachusetts'
     assert_equal states[2], 'Pennsylvania'
   end

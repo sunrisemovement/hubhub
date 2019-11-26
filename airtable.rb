@@ -17,15 +17,11 @@ class Hub < Airrecord::Table
 
   def self.editable_by_coordinators
     hubs = self.all.select(&:editable_by_coordinators?)
-    hubs = hubs.sort_by { |h| [h['State'], h['Name']] }
+    hubs = hubs.sort_by { |h| [h.state_abbrev, h['Name']] }
     if ENV['HUB_BETA_TESTERS']
       hubs = hubs.select { |h| ENV['HUB_BETA_TESTERS'].include?(h.id) }
     end
     hubs
-  end
-
-  def location
-    "#{self['City']}, #{self['State']}"
   end
 
   def login_email
@@ -42,12 +38,26 @@ class Hub < Airrecord::Table
     return false if self['Activity?'] == 'Inactive'
     return false unless self['Map?'] == true
     return false unless self['Latitude'] && self['Longitude']
-    return false unless self['City'] && self['State'] && self['Name']
+    return false unless self['City'] && state && self['Name']
     true
   end
 
+  def state_abbrev
+    link_abbrev = self['State Link Abbrev']
+    link_abbrev = link_abbrev.first if link_abbrev.is_a?(Array)
+    orig_abbrev = self['State']
+    if link_abbrev && orig_abbrev && link_abbrev != orig_abbrev
+      puts "WARNING: #{self['Name']} has a mismatch between #{link_abbrev} and #{orig_abbrev}"
+    end
+    link_abbrev || orig_abbrev
+  end
+
   def state
-    STATE_ABBR_TO_NAME[self.fields['State']]
+    STATE_ABBR_TO_NAME[state_abbrev]
+  end
+
+  def location
+    "#{self['City']}, #{state_abbrev}"
   end
 
   def map_entry(leads=nil)
