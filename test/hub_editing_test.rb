@@ -8,6 +8,7 @@ class HubEditingTest < CapybaraTest
 
   def teardown
     ENV.delete('FEATURE_EMAIL_AFTER_UPDATE')
+    super
   end
 
   def test_happy_path
