@@ -1,6 +1,15 @@
 require 'test_helper'
 
 class HubEditingTest < CapybaraTest
+  def setup
+    ENV['FEATURE_EMAIL_AFTER_UPDATE'] = '1'
+    super
+  end
+
+  def teardown
+    ENV.delete('FEATURE_EMAIL_AFTER_UPDATE')
+  end
+
   def test_happy_path
     stub_hubs([{
       'Name' => 'Sunrise Rivendell',
@@ -64,11 +73,11 @@ class HubEditingTest < CapybaraTest
     assert_no_content '@elfiestick'
 
     # An email should also get sent (TODO: maybe.)
-    #email = Emailer.last_email
-    #assert_equal email[:subject], "Hub map change summary for Rivendell, PA"
-    #body = email[:body]
-    #assert body =~ /"Name" changed from "Sunrise Rivendell" to "Sunrise LHH"/
-    #assert body =~ /"Twitter Handle" changed from "" to "@riven-la-vida-loca"/
+    email = Emailer.last_email
+    assert_equal email[:subject], "Sunrise hub info updates for Rivendell, PA"
+    body = email[:body]
+    assert body.include? %{"Name" changed from "Sunrise Rivendell" to "Sunrise LHH"}
+    assert body.include? %{"Twitter Handle" changed from "" to "@riven-la-vida-loca"}
 
     # Now edit leaders
     click_link 'Back to Hub Edit Page'
@@ -85,5 +94,12 @@ class HubEditingTest < CapybaraTest
       assert_content 'Map?'
       assert_no_content 'Activity?'
     end
+
+    # An email should also get sent (TODO: maybe.)
+    email = Emailer.last_email
+    assert_equal email[:subject], "Sunrise leader info updates for Rivendell, PA"
+    body = email[:body]
+    assert body.include? %{Arwen's "Map?" changed from "true" to "false"}
+    assert body.include? %{Elrond's "Activity?" changed from "false" to "true"}
   end
 end

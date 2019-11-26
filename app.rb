@@ -71,7 +71,7 @@ class Hubhub < Sinatra::Base
           new_value = attrs[attr]
           new_value = true if new_value == 'on'
           if old_value != new_value
-            diff[attr] = [old_value || false, new_value]
+            diff[attr] = [old_value || false, new_value || false]
             lead[attr] = new_value
             changed = true
           end
@@ -81,6 +81,22 @@ class Hubhub < Sinatra::Base
           lead.save if ENV['APP_ENV'] == 'production'
           @diffs[lead['Name']] = diff
         end
+      end
+
+      if ENV['FEATURE_EMAIL_AFTER_UPDATE']
+        Emailer.send_email(
+          to: @hub.login_email,
+          cc: 'paul@sunrisemovement.org',
+          subject: "Sunrise leader info updates for #{@hub.location}",
+          body: [
+            "Hi #{@hub['Name']},", "",
+            "This email is just to confirm that you updated the following information about your hub leaders:", "",
+            @diffs.flat_map{|name, d| d.map{|attr,(old,new)| %(- #{name}'s "#{attr}" changed from "#{old}" to "#{new}") } }.join("\n"), "",
+            "Some of these changes may update how your card appears on the hub map at https://sunrisemovement.org/hubs. If you did not request these changes, please contact us!", "",
+            "Best,",
+            "The Hub Support Team"
+          ].join("\n")
+        )
       end
 
       haml :leader_changes
@@ -107,19 +123,22 @@ class Hubhub < Sinatra::Base
       end
       if changed
         @hub.save if ENV['APP_ENV'] == 'production'
-        #Emailer.send_email(
-        #  to: @hub.login_email,
-        #  cc: 'paul@sunrisemovement.org',
-        #  subject: "Hub map change summary for #{@hub.location}",
-        #  body: [
-        #    "Hi #{@hub['Name']},", "",
-        #    "This email is just to confirm that you updated the following information about your hub:", "",
-        #    @diff.map{|attr,(old,new)| %(- "#{attr}" changed from "#{old}" to "#{new}") }.join("\n"), "",
-        #    "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please contact us!", "",
-        #    "Best,",
-        #    "The Hub Support Team"
-        #  ].join("\n")
-        #)
+
+        if ENV['FEATURE_EMAIL_AFTER_UPDATE']
+          Emailer.send_email(
+            to: @hub.login_email,
+            cc: 'paul@sunrisemovement.org',
+            subject: "Sunrise hub info updates for #{@hub.location}",
+            body: [
+              "Hi #{@hub['Name']},", "",
+              "This email is just to confirm that you updated the following information about your hub:", "",
+              @diff.map{|attr,(old,new)| %(- "#{attr}" changed from "#{old}" to "#{new}") }.join("\n"), "",
+              "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please contact us!", "",
+              "Best,",
+              "The Hub Support Team"
+            ].join("\n")
+          )
+        end
       end
       haml :hub_changes
     end
