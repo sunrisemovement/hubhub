@@ -41,15 +41,13 @@ class MapJSONTest < Minitest::Test
       'First Name' => 'A',
       'Last Name' => 'B',
       'Email' => 'a@b.com',
-      'Map?' => false,
-      'Role' => ['Hub Coordinator']
+      'Map?' => false
     }, {
       'id' => 'l2',
       'First Name' => 'C',
       'Last Name' => 'D',
       'Email' => 'c@d.com',
-      'Map?' => true,
-      'Role' => ['Team Leader']
+      'Map?' => false
     }, {
       'id' => 'l3',
       'First Name' => 'E',
@@ -145,7 +143,7 @@ class MapJSONTest < Minitest::Test
       hubby({
         'Name': 'Hub3',
         'Email': 'hub3@sunrisemovement.org',
-        'Always Show Coordinators?': true,
+        'Contact Type': 'Hub Email + Coordinator Emails',
         'Hub Leaders': ['l1','l2']
       }),
       hubby({
@@ -155,6 +153,7 @@ class MapJSONTest < Minitest::Test
       hubby({
         'Name': 'Hub5',
         'Hub Leaders': ['l4'],
+        'Contact Type': 'Custom Text',
         'Custom Map Contact Text': 'The Hubbet'
       })
     ])

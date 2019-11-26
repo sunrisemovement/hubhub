@@ -67,8 +67,6 @@ class Hub < Airrecord::Table
       state: self.state,
       latitude: self.fields['Latitude'],
       longitude: self.fields['Longitude'],
-      email: self.fields['Custom Map Email'] || self.fields['Email'],
-      custom_coord_text: nil,
       custom_weblink_text: self.fields['Custom Website Link Text'],
       website: self.fields['Website'],
       instagram: self.fields['Instagram Handle'],
@@ -77,19 +75,34 @@ class Hub < Airrecord::Table
       leaders: []
     }
 
-    if self.fields['Custom Map Contact Text'].to_s.strip.size >= 1
-      entry[:email] = nil
-      entry[:custom_coord_text] = self.fields['Custom Map Contact Text']
-    elsif !entry[:email] || self['Always Show Coordinators?'] == true
-      leads = self.leaders if leads.nil?
-      leads = leads.select do |l|
-        l['Role'].to_s =~ /coordinator/i && l['Map?'] == true
+    # Determine the contact email
+    contact_email = self['Custom Map Email'] || self['Email']
+
+    # Set fallbacks in case the contact email/type aren't present
+    contact_type = self['Contact Type'] || 'Hub Email'
+    if contact_type == 'Hub Email' && contact_email.nil?
+      contact_type = 'Coordinator Emails'
+    end
+
+    if contact_type == 'Custom Text'
+      # Only show custom text if that's what's given
+      entry[:custom_coord_text] = self['Custom Map Contact Text']
+    else
+      # Otherwise show the hub email...
+      if contact_type.include?('Hub Email')
+        entry[:email] = contact_email
       end
-      entry[:leaders] = leads.map { |l| {
-        first_name: l['First Name'],
-        last_name: l['Last Name'],
-        email: l['Email']
-      }}
+      
+      # ...and/or coordinator emails
+      if contact_type.include?('Coordinator Emails')
+        leads = self.leaders if leads.nil?
+        leads = leads.select { |l| l['Map?'] }
+        entry[:leaders] = leads.map { |l| {
+          first_name: l['First Name'],
+          last_name: l['Last Name'],
+          email: l['Email']
+        }}
+      end
     end
 
     entry
