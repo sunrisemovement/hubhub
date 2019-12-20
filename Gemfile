@@ -7,6 +7,7 @@ gem 'sinatra'
 gem 'haml'
 gem 'pony'
 gem 'dotenv'
+gem 'honeybadger'
 
 group :development do
   gem 'rake'

@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'pony'
 require 'haml'
+require 'honeybadger'
 require_relative 'airtable'
 require_relative 'magic_link'
 

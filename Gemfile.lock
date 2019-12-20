@@ -38,6 +38,7 @@ GEM
     haml (5.1.2)
       temple (>= 0.8.0)
       tilt
+    honeybadger (4.5.4)
     jmespath (1.4.0)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
@@ -85,6 +86,7 @@ DEPENDENCIES
   capybara
   dotenv
   haml
+  honeybadger
   minitest
   pony
   pry
