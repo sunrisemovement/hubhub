@@ -56,10 +56,6 @@ class Hubhub < Sinatra::Base
     end
   end
 
-  get('/error_test') do
-    raise "Testing error reporting 1"
-  end
-
   post('/leaders') do
     if @hub
       leaders_by_id = @hub.leaders.each_with_object({}) do |leader, h|
