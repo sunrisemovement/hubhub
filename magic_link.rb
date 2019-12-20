@@ -62,6 +62,10 @@ class MagicLink < Sinatra::Base
     end
   end
 
+  get('/error_test2') do
+    raise "Testing raygun 2"
+  end
+
   get('/logout') do
     session[:hub_id] = nil
     redirect '/login'
