@@ -7,6 +7,7 @@ gem 'sinatra'
 gem 'haml'
 gem 'pony'
 gem 'dotenv'
+gem 'raygun4ruby'
 
 group :development do
   gem 'rake'
