@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require 'pony'
 require 'haml'
-require 'raygun4ruby'
 require_relative 'airtable'
 require_relative 'magic_link'
 
@@ -20,7 +19,6 @@ class MapPreview < Sinatra::Base
 end
 
 class Hubhub < Sinatra::Base
-  use Raygun::Middleware::RackExceptionInterceptor if ENV['RAYGUN_APIKEY']
   use MagicLink
   use MapPreview
   enable :logging
@@ -55,10 +53,6 @@ class Hubhub < Sinatra::Base
     else
       {}.to_json
     end
-  end
-
-  get('/error_test') do
-    raise "Testing raygun 1"
   end
 
   post('/leaders') do

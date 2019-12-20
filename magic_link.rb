@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'raygun4ruby'
 require_relative 'emailer'
 
 class Keypad
@@ -28,8 +27,6 @@ class Keypad
 end
 
 class MagicLink < Sinatra::Base
-  use Raygun::Middleware::RackExceptionInterceptor if ENV['RAYGUN_APIKEY']
-
   enable :logging
   enable :sessions
   set :haml, :format => :html5
@@ -60,10 +57,6 @@ class MagicLink < Sinatra::Base
     else
       redirect '/login'
     end
-  end
-
-  get('/error_test2') do
-    raise "Testing raygun 2"
   end
 
   get('/logout') do
