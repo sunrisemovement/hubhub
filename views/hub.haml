@@ -88,7 +88,8 @@
         %p
           In this section, you can manage information for everyone who has filled out the
           %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
-          for #{@hub['Name']}&mdash;in particular, you can confirm leaders' activity in the hub
+          for #{@hub['Name']}&mdash;in particular, you can confirm leaders' activity in the hub,
+          ensure names and emails are correct,
           and decide who should be shown on the map (if you are not just displaying the hub contact email).
         %br
         %p
@@ -102,7 +103,8 @@
         %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
           %thead
             %tr
-              %th Name
+              %th First Name
+              %th Last Name
               %th Email
               %th Roles
               %th Hub Activity
@@ -110,8 +112,12 @@
           %tbody
             - @hub.leaders.each do |lead|
               %tr
-                %td= lead.name
-                %td= lead['Email']
+                %td
+                  %input.input.is-small{name: "leaders[#{lead.id}][First Name]", value: lead['First Name']}
+                %td
+                  %input.input.is-small{name: "leaders[#{lead.id}][Last Name]", value: lead['Last Name']}
+                %td
+                  %input.input.is-small{name: "leaders[#{lead.id}][Email]", value: lead['Email'], type: 'email'}
                 %td
                   - (lead['Role'] || []).each do |role|
                     %span.tag= role.gsub(' - Self Describe In Next Field', '')

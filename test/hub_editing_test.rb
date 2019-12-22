@@ -55,10 +55,10 @@ class HubEditingTest < CapybaraTest
     assert_checked_field 'leaders[l2][Map?]'
     assert_checked_field 'leaders[l1][Activity?]'
     assert_no_checked_field 'leaders[l2][Activity?]'
-    assert_content 'Arwen'
-    assert_content 'arwen@dell.com'
-    assert_content 'Elrond'
-    assert_content 'l.rond@peredh.el'
+    assert_field 'leaders[l1][First Name]', with: 'Arwen'
+    assert_field 'leaders[l1][Email]', with: 'arwen@dell.com'
+    assert_field 'leaders[l2][First Name]', with: 'Elrond'
+    assert_field 'leaders[l2][Email]', with: 'l.rond@peredh.el'
 
     # Update hub information
     fill_in 'Name', with: 'Sunrise LHH'
@@ -86,23 +86,32 @@ class HubEditingTest < CapybaraTest
     click_link 'Back to Hub Edit Page'
     check 'leaders[l2][Activity?]'
     uncheck 'leaders[l1][Map?]'
+    fill_in 'leaders[l1][Last Name]', with: 'Telcontar'
     click_button 'Update Leader Information'
 
     # After updating leader info, should see a summary of changes
-    within 'tr', text: 'Elrond' do
-      assert_content 'Activity?'
-      assert_no_content 'Map?'
+    within 'tr', text: 'Activity?' do
+      assert_content 'Elrond'
+      assert_content 'false'
+      assert_content 'true'
     end
-    within 'tr', text: 'Arwen' do
-      assert_content 'Map?'
-      assert_no_content 'Activity?'
+    within 'tr', text: 'Map?' do
+      assert_content 'Arwen'
+      assert_content 'true'
+      assert_content 'false'
+    end
+    within 'tr', text: 'Last Name' do
+      assert_content 'Arwen'
+      assert_content 'Peredhel'
+      assert_content 'Telcontar'
     end
 
     # An email should also get sent (TODO: maybe.)
     email = Emailer.last_email
     assert_equal email[:subject], "Sunrise leader info updates for Rivendell, PA"
     body = email[:body]
-    assert body.include? %{Arwen Peredhel's "Map?" changed from "true" to "false"}
+    assert body.include? %{Arwen Telcontar's "Last Name" changed from "Peredhel" to "Telcontar"}
+    assert body.include? %{Arwen Telcontar's "Map?" changed from "true" to "false"}
     assert body.include? %{Elrond Peredhel's "Activity?" changed from "false" to "true"}
   end
 end

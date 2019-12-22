@@ -77,6 +77,15 @@ class Hubhub < Sinatra::Base
             changed = true
           end
         end
+        ['First Name', 'Last Name', 'Email'].each do |attr|
+          old_value = lead[attr]
+          new_value = attrs[attr]
+          if old_value != new_value
+            diff[attr] = [old_value, new_value]
+            lead[attr] = new_value
+            changed = true
+          end
+        end
         if changed
           # TODO: email about this as well?
           lead.save if ENV['APP_ENV'] == 'production'
