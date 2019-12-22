@@ -31,7 +31,7 @@ class MagicLinkTest < CapybaraTest
       'City' => 'Bree',
       'State' => 'NH',
       'Map?' => true,
-      'Verified Coordinator Emails' => [
+      'Map Editor Emails' => [
         'butterbur@hotmail.com',
         'nob@fastmail.fm'
       ]
@@ -129,7 +129,7 @@ class MagicLinkTest < CapybaraTest
       'City' => 'Rohan',
       'State' => 'PA',
       'Email' => nil,
-      'Verified Coordinator Emails' => nil,
+      'Map Editor Emails' => nil,
       'Map?' => true
     }])
 
