@@ -22,35 +22,57 @@
               %select{name: "Activity?"}
                 - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive, hide us for now :("]].each do |value,label|
                   %option{value: value, selected: @hub.fields["Activity?"]==value}= label
+            %p.help If you mark your hub as inactive, we won't show it on the map.
 
         .field
           %label.label What contact info should we show on the map?
           .control
             .select
               %select{name: "Contact Type", id: 'contact-type'}
-                %option{value: 'Hub Email'} Hub email!
-                %option{value: 'Coordinator Emails'} Coordinator emails!
+                %option{value: 'Hub Email'} Hub email
+                %option{value: 'Coordinator Emails'} Coordinator emails
                 %option{value: 'Hub Email + Coordinator Emails'} Both hub and coordinator emails
                 %option{value: 'Custom Text'} Custom text (enter below)
+            %p.help Pick which type of contact information we show on the card.
         .field{id: 'cust-contact-text'}
           %label.label Custom contact text
           .control
             %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text'], id: 'cust-contact-input'}
         .field
-          %label.label Custom email
+          %label.label Hub Email
           .control
-            %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email'], placeholder: @hub['Email']}
+            %input.input{disabled: 'disabled', value: @hub['Email']}
+            %p.help This is the main contact email we have on file for your hub. If you need to change this email, please contact us directly for now!
+        .field
+          %label.label Custom welcome email
+          .control
+            %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email']}
             %p.help By default we display hubs' main contact emails, but if you have a welcome email for newcomers, we can display that instead.
 
       .column
         %h2.subtitle Map Links
         .field
+          %label.label Facebook Link/Handle
+          .control
+            %input.input{name: 'Facebook Handle', value: @hub['Facebook Handle']}
 
-        - ['Facebook Handle', 'Twitter Handle', 'Instagram Handle', 'Website'].each do |field|
-          .field
-            %label.label= field
-            .control
-              %input.input{name: field, value: @hub[field]}
+        .field
+          %label.label Twitter Link/Handle
+          .control
+            %input.input{name: 'Twitter Handle', value: @hub['Twitter Handle']}
+
+        .field
+          %label.label Instagram Link/Handle
+          .control
+            %input.input{name: 'Instagram Handle', value: @hub['Instagram Handle']}
+            %p.help For these social media fields, you can either provide a full link or just the handle (with or without the @ sign).
+
+        .field
+          %label.label Website
+          .control
+            %input.input{name: 'Website', value: @hub['Website']}
+            %p.help
+              Here you can link to a custom hub website or sign up form. Please include http:// or https:// at the beginning!
         .field
           %label.label Website Link Text
           .control
@@ -73,7 +95,7 @@
           %label.label
             Where that is
           .control
-            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 200px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
+            %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 266px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
 
   %br
   %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
@@ -90,15 +112,17 @@
           %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
           for #{@hub['Name']}&mdash;in particular, you can confirm leaders' activity in the hub,
           ensure names and emails are correct,
-          and decide who should be shown on the map (if you are not just displaying the hub contact email).
+          and decide who should be shown on the map (if you are not just displaying the hub contact email). If you need to add someone new, just have them fill out the hub leader form!
         %br
         %p
           For our initial beta-test of this system, we are not yet supporting
-          fully featured editing (e.g. of names, roles, and contact
-          information). If you need to make those kinds of edits, you can email
+          fully featured editing (e.g. of roles and other
+          information we collect in the leader form). However, we are definitely looking for feedback on what kinds of information it would be most useful to be able to view and change here! For now, if you need to make those kinds of edits, you can email
           us at
           %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
-          or you can mark the leader as inactive and have them fill out a second copy of the leader form.
+          or fill out the
+          %a{href: "https://docs.google.com/forms/d/13gqamQs_jPZI6s5dwXUG92R2it13hhHspJsd5ytPAZo/viewform?edit_requested=true", target: "_blank"} change request form
+          like before.
         %br
         %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
           %thead
@@ -128,7 +152,7 @@
                 %td
                   %label.checkbox
                     %input{type: 'checkbox', name: "leaders[#{lead.id}][Map?]", checked: lead['Map?']}
-                    Allow on map
+                    %abbr{title: "Checking this will allow a hub leader's name and email to be displayed on the map, but only if you've selected 'Coordinator emails' above!"} Allow on map
 
   %br
   %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
@@ -156,12 +180,13 @@
 
   const toggleCustText = () => {
     if (contType.value == 'Custom Text') {
+      custText.style.display = 'block';
       custInput.removeAttribute("disabled");
     } else {
+      custText.style.display = 'none';
       custInput.setAttribute("disabled", "disabled");
     }
   };
 
   contType.onchange = toggleCustText;
   toggleCustText();
-
