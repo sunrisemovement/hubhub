@@ -1,9 +1,9 @@
-%article.message.is-warning
-  %p.message-body
-    On this page, you can edit all of the information that appears about your hub on the
-    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
-
 %h1.title Edit Hub Information for #{@hub.location}
+
+%p
+  On this page, you can edit all of the information that appears about your hub on the
+  %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
+%br
 
 %form{action: '/hub', method: 'POST'}
   %fieldset
@@ -72,12 +72,12 @@
           .control
             %input.input{name: 'Website', value: @hub['Website']}
             %p.help
-              Here you can link to a custom hub website or sign up form. Please include http:// or https:// at the beginning!
+              Here you can link to a custom hub website or sign-up form. Please include http:// or https:// at the beginning ._.
         .field
           %label.label Website Link Text
           .control
             %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: 'Hub Website'}
-            %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map.
+            %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map. For example, if your link is a sign-up form, you might enter "Sign Up"!
       .column
         %h2.subtitle Pin Location
         - ['Latitude', 'Longitude'].each do |field|
