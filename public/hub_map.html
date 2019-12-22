@@ -387,6 +387,8 @@ function socialLink(prefix, value, title) {
   let href;
   if (value.search(".com") >= 0) {
     href = value.trim();
+    if (!href.startsWith("http"))
+      href = "https://" + href;
   } else {
     href = prefix + "/" + value.replace("@", "").trim();
   }
@@ -615,6 +617,10 @@ function initMap(hubs) {
         $(this.parentNode).addClass('active');
       });
     }
+  }
+
+  if ($('.marker').length == 1) {
+    $('.marker').click();
   }
 }
 </script>
