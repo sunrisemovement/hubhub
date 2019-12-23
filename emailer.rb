@@ -3,13 +3,13 @@ require 'pony'
 Pony.options = {
   :via => :smtp,
   :via_options => {
-    :address              => 'smtp.gmail.com',
-    :port                 => '587',
+    :address              => 'smtp.sendgrid.net',
+    :port                 => 587,
     :enable_starttls_auto => true,
-    :user_name            => ENV['GMAIL_USER'],
-    :password             => ENV['GMAIL_PASS'],
+    :user_name            => ENV['SENDGRID_USERNAME'],
+    :password             => ENV['SENDGRID_PASSWORD'],
     :authentication       => :plain,
-    :domain               => "localhost.localdomain"
+    :domain               => "sunrise-hubhub.herokuapp.com"
   }
 }
 
@@ -25,7 +25,7 @@ class Emailer
       elsif ENV['APP_ENV'] == 'development'
         puts kwargs
       else
-        Pony.mail(**kwargs)
+        Pony.mail(from: "Sunrise Hubhub <noreply@sunrise-hubhub.herokuapp.com>", **kwargs)
       end
     end
   end
