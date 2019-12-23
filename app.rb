@@ -24,6 +24,10 @@ class Hubhub < Sinatra::Base
   use MapPreview
   enable :logging
 
+  configure :production do
+    set :force_ssl, true
+  end
+
   EDITABLE_HUB_FIELDS = [
     'Name', 'Website', 'Latitude', 'Longitude', 'Activity?',
     'Facebook Handle', 'Twitter Handle', 'Instagram Handle',

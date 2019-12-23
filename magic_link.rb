@@ -31,6 +31,10 @@ class MagicLink < Sinatra::Base
   enable :sessions
   set :haml, :format => :html5
 
+  configure :production do
+    set :force_ssl, true
+  end
+
   get('/login') do
     @hubs = Hub.editable_by_coordinators
     @states = @hubs.map{ |h| h['State'] }.uniq.sort
