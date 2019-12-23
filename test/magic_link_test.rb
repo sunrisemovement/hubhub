@@ -16,7 +16,7 @@ class MagicLinkTest < CapybaraTest
     click_button 'Send Magic Link'
 
     email = Emailer.last_email
-    assert_equal email[:to], 'frodo@bagg.ins'
+    assert_equal email[:to], ['frodo@bagg.ins']
     assert_equal email[:subject], "Sunrise Hubhub login link!"
 
     magic_link = email[:body][/https?:\/\/[\S]+/]
@@ -31,6 +31,7 @@ class MagicLinkTest < CapybaraTest
       'City' => 'Bree',
       'State' => 'NH',
       'Map?' => true,
+      'Email' => 'bree@breemail.com',
       'Map Editor Emails' => [
         'butterbur@hotmail.com',
         'nob@fastmail.fm'
@@ -42,7 +43,8 @@ class MagicLinkTest < CapybaraTest
     click_button 'Send Magic Link'
 
     email = Emailer.last_email
-    e1, e2 = email[:to]
+    e0, e1, e2 = email[:to]
+    assert_equal e0, 'bree@breemail.com'
     assert_equal e1, 'butterbur@hotmail.com'
     assert_equal e2, 'nob@fastmail.fm'
     assert_equal email[:subject], "Sunrise Hubhub login link!"

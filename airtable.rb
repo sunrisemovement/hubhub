@@ -29,12 +29,18 @@ class Hub < Airrecord::Table
   end
 
   def login_email
-    self['Email'] || self['Map Editor Emails']
+    emails = []
+    ([self['Email']] + (self['Map Editor Emails'] || [])).each do |email|
+      unless email.nil?
+        emails << email
+      end
+    end
+    emails
   end
 
   def editable_by_coordinators?
     return false unless self['Map?'] == true
-    return false if self['Email'].nil? && (self['Map Editor Emails'] || []).length == 0
+    return false if login_email.length == 0
     true
   end
 
