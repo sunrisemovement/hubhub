@@ -1,0 +1,27 @@
+%h1.title Sunrise Hubhub
+
+%p
+  Hubhub is an application where you can manage the data your local hub (#{@hub['Name']}) is currently sharing with Sunrise national! Specifically, you can:
+
+%br
+
+.columns
+  .column
+    .box
+      %a{href: '/soth'} View
+      or
+      %a{href: ENV['SOTH_FORM_URL']} submit new
+      "State of the Hub" forms (so we have up-to-date information on the size and activity of local hubs)
+  .column
+    .box
+      %a{href: '/map'} View
+      or
+      %a{href: '/map/edit'} edit
+      your hub's public contact and social media information (so we can keep the Sunrise Movement Hub Map updated)
+  .column
+    .box
+      %a{href: '/leaders'} Manage
+      your current roster of hub leaders (so we know who to contact)
+
+
+

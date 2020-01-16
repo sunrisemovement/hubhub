@@ -1,11 +1,8 @@
 - if @hub
-  %h2.title #{@hub['Name']} Map Preview
+  %h2.title View Hub Map Information
   %p
-    Here you can see a preview of how your hub looks (or will soon look) on the
-    map! The
-    %a{href: 'https://sunrisemovement.org/hubs'} actual hub map
-    might be up to 15 minutes out of date, and there might be minor spacing or
-    font differences.
+    On this page, you can see a preview of how your hub looks (or will soon look) on the
+    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
   %br
   = haml :_hub_card
 - else

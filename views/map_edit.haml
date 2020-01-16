@@ -1,0 +1,147 @@
+%h1.title Edit Hub Map Information
+
+%p
+  On this page, you can edit all of the information that appears about your hub on the
+  %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
+%br
+
+:css
+  .hide-emails .email-only,
+  .hide-custom .custom-only,
+  .hide-leaders .leaders-only {
+    display: none;
+  }
+  #hub-map-form h2.subtitle {
+    margin-bottom: 0.5rem;
+  }
+
+%form{action: '/hub', method: 'POST', id: 'hub-map-form'}
+  %h2.subtitle Basic Info
+  %fieldset.box
+    .field
+      %label.label Hub Name
+      .control
+        %input.input{name: 'Name', value: @hub['Name']}
+    .field
+      %label.label Is your hub active?
+      .control
+        .select
+          %select{name: "Activity?"}
+            - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive, hide us for now :("]].each do |value,label|
+              %option{value: value, selected: @hub.fields["Activity?"]==value}= label
+        %p.help If you mark your hub as inactive, we won't show it on the map.
+  %h2.subtitle Contact Info
+  %fieldset.box
+    .field
+      %label.label What contact info should we show on the map?
+      .control
+        .select
+          %select{name: "Contact Type", id: 'contact-type'}
+            %option{value: "Hub Email"} Hub email  (#{@hub['Email']})
+            %option{value: 'Leader Emails'} Leader emails
+            %option{value: 'Hub Email + Leader Emails'} Both hub and leader emails
+            %option{value: 'Custom Text'} Custom text (enter below)
+    .field.custom-only
+      %label.label Custom contact text
+      .control
+        %input.input{name: 'Custom Map Contact Text', value: @hub['Custom Map Contact Text'], id: 'cust-contact-input'}
+    .field.email-only
+      %label.label Custom welcome email
+      .control
+        %input.input{name: 'Custom Map Email', value: @hub['Custom Map Email']}
+        %p.help By default we'll display your hub's main contact email, but if you have a special welcome email for newcomers, we can display that instead.
+    .field.leaders-only
+      %label.label Which leaders should we show?
+      .control
+        .select.is-multiple
+          %select{multiple: 'multiple'}
+            - @hub.leaders.each do |lead|
+              %option{value: lead.id, selected: lead['Map?']}
+                #{lead.name}: #{lead['Email']}
+        %p.help We'll show these leaders' names and emails on the hub map. Use control-click or command-click to select multiple.
+
+  %h2.subtitle Social Media Links
+  %fieldset.box
+    .field
+      %label.label Facebook Link/Handle
+      .control
+        %input.input{name: 'Facebook Handle', value: @hub['Facebook Handle']}
+
+    .field
+      %label.label Twitter Link/Handle
+      .control
+        %input.input{name: 'Twitter Handle', value: @hub['Twitter Handle']}
+
+    .field
+      %label.label Instagram Link/Handle
+      .control
+        %input.input{name: 'Instagram Handle', value: @hub['Instagram Handle']}
+        %p.help For these social media fields, you can either provide a full link or just the handle (with or without the @ sign).
+
+    .field
+      %label.label Website
+      .control
+        %input.input{name: 'Website', value: @hub['Website']}
+        %p.help
+          Here you can link to a custom hub website or sign-up form. Please include http:// or https:// at the beginning ._.
+    .field
+      %label.label Website Link Text
+      .control
+        %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: 'Hub Website'}
+        %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map. For example, if your link is a sign-up form, you might enter "Sign Up"!
+  %h2.subtitle Pin Location
+  %fieldset.box
+    - ['Latitude', 'Longitude'].each do |field|
+      .field
+        %label.label= field
+        .control
+          %input.input{name: field, placeholder: field, id: field, value: @hub.fields[field]}
+        - if field == 'Longitude'
+          %p.help
+            Google has
+            %a{href: 'https://support.google.com/maps/answer/18539', target: '_blank'}
+              helpful instructions
+            for finding these!
+    .field
+      %label.label
+        Where that is
+      .control
+        %iframe#map-iframe{src: "https://maps.google.com/maps/embed/v1/place?q=#{@hub.fields['Latitude']},#{@hub.fields['Longitude']}&key=#{ENV['GOOGLE_MAPS_API_KEY']}", style: "width: 100%; min-height: 266px", :"data-key" => ENV['GOOGLE_MAPS_API_KEY'] }
+
+  %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
+
+:css
+  .hidden { display: none; }
+
+:javascript
+  const latInput = document.getElementById('Latitude');
+  const lngInput = document.getElementById('Longitude');
+  const mapIframe = document.getElementById('map-iframe');
+  const reloadBtn = document.getElementById('reload-map');
+  const custInput = document.getElementById('cust-contact-input');
+  const contType = document.getElementById('contact-type');
+  const hubForm = document.getElementById('hub-map-form');
+
+  const key = mapIframe.attributes['data-key'].value;
+
+  const resetMap = () => {
+    mapIframe.setAttribute("src", `https://maps.google.com/maps/embed/v1/place?q=${latInput.value},${lngInput.value}&key=${key}`);
+  };
+
+  latInput.oninput = resetMap;
+  lngInput.oninput = resetMap;
+
+  const toggleContactFields = () => {
+    if (contType.value == 'Custom Text') {
+      hubForm.setAttribute('class', 'hide-emails hide-leaders');
+    } else if (contType.value == 'Hub Email') {
+      hubForm.setAttribute('class', 'hide-custom hide-leaders');
+    } else if (contType.value == 'Leader Emails') {
+      hubForm.setAttribute('class', 'hide-custom hide-emails');
+    } else if (contType.value == 'Hub Email + Leader Emails') {
+      hubForm.setAttribute('class', 'hide-custom');
+    }
+  };
+
+  contType.onchange = toggleContactFields;
+  toggleContactFields();

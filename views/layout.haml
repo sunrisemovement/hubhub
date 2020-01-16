@@ -5,7 +5,7 @@
     %meta{charset: 'utf-8'}
     %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
     %link{rel: 'stylesheet', href: "https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" }
-    %link{rel: 'stylesheet', type: 'text/css', href: 'bulma.min.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '/bulma.min.css'}
     :css
       @media screen and (max-width: 600px) {
         .is-responsive td, .is-responsive th {
@@ -20,16 +20,31 @@
         }
       }
 
+      .hub-brand {
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
   %body
     %nav.navbar.is-dark
       .navbar-brand
         %a.navbar-item{href: '/'}
+          - if session[:hub_id]
+            %span.hub-brand #{@hub['Name']}
           %img{src: '/s/map_icon.jpg'}
+
       .navbar-start
         - if session[:hub_id]
-          %a.navbar-item{href: '/'} Edit Hub Info
-        %a.navbar-item{href: '/map'} Map Preview
-        - if session[:hub_id]
+          %a.navbar-item{href: '/soth', class: ('is-active' if request.path_info.start_with?('/soth'))}
+            State of the Hub
+          %a.navbar-item{href: '/map', class: ('is-active' if request.path_info == '/map')}
+            View Map
+          %a.navbar-item{href: '/map/edit', class: ('is-active' if request.path_info == '/map/edit')}
+            Edit Map
+          %a.navbar-item{href: '/leaders', class: ('is-active' if request.path_info.start_with?('/leaders'))}
+            Manage Leaders
+      - if session[:hub_id]
+        .navbar-end
           %a.navbar-item{href: '/logout'} Log Out
     %main
       %section.section
