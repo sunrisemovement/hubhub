@@ -504,7 +504,9 @@ function initMap(hubs) {
 
   map.on('moveend', function() {
     var my = $('#hub-map .mapboxgl-popup')[0];
-    my.style.transform = my.style.transform.replace("-50%", "calc(-50% - 0.5px)");
+    if (typeof my !== "undefined") {
+      my.style.transform = my.style.transform.replace("-50%", "calc(-50% - 0.5px)");
+    }
   });
 
   // This is where your interactions with the symbol layer used to be
@@ -520,11 +522,11 @@ function initMap(hubs) {
         .addTo(map);
 
     el.addEventListener('click', function(e){
-        // 1. Fly to the point
-        flyToStore(marker);
-
-        // 2. Close all other popups and display popup for clicked store
+        // 1. Close all other popups and display popup for clicked store
         createPopUp(marker);
+
+        // 2. Fly to the point
+        flyToStore(marker);
 
         // 3. Highlight listing in sidebar (and remove highlight for all other listings)
         e.stopPropagation();
