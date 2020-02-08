@@ -58,6 +58,11 @@ class Hub < Airrecord::Table
     orig_abbrev = self['State']
     if link_abbrev && orig_abbrev && link_abbrev != orig_abbrev
       puts "WARNING: #{self['Name']} has a mismatch between #{link_abbrev} and #{orig_abbrev}"
+      if STATE_ABBR_TO_NAME.key?(orig_abbrev) && !STATE_ABBR_TO_NAME.key?(link_abbrev)
+        return orig_abbrev
+      elsif STATE_ABBR_TO_NAME.key?(link_abbrev)
+        return link_abbrev
+      end
     end
     link_abbrev || orig_abbrev
   end
