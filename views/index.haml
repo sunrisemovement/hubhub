@@ -1,27 +1,54 @@
-%h1.title Sunrise Hubhub
-
+%h1 Sunrise Hubhub
 %p
-  Hubhub is an application where you can manage the data your local hub (#{@hub['Name']}) is currently sharing with Sunrise national! Specifically, you can:
 
-%br
+%h2 What It Is
+%ul
+  %li A place where you can update your public map card information without having to fill out a request form
+  %li A place where you can see and manage all of your hub status and hub leader information
 
-.columns
-  .column
-    .box
-      %a{href: '/soth'} View
-      or
-      %a{href: ENV['SOTH_FORM_URL']} submit new
-      "State of the Hub" forms (so we have up-to-date information on the size and activity of local hubs)
-  .column
-    .box
-      %a{href: '/map'} View
-      or
-      %a{href: '/map/edit'} edit
-      your hub's public contact and social media information (so we can keep the Sunrise Movement Hub Map updated)
-  .column
-    .box
-      %a{href: '/leaders'} Manage
-      your current roster of hub leaders (so we know who to contact)
+%h2 Why We're Using It
+%ul
+  %li To have a one-stop-shop for all hub and hub leader data updates
+  %li
+    Because having the most up to date data on hubs allows us to
+    %ul
+      %li project our budget
+      %li set smart goals for events
+      %li track the growth of the movement
+      %li display correct info on the map to gain new members
+      %li let us contact the right Hub Leader
+      %li helps us create better systems to support hubs
 
+%h2 How To Use It
+%ul
+  %li
+    Go to 
+    %a{href: '/soth'} State of the Hub
+    to view hub status information, or
+    make an update
+    %a{href: ENV['SOTH_FORM_URL'], target: '_blank'} here!
+  %li
+    Go to 
+    %a{href: '/map'} View Map
+    to see how your map card will look to the public on the main site,
+    and
+    %a{href: '/map/edit'} Edit Map
+    to change it.
+  %li
+    Go to 
+    %a{href: '/leaders'} Manage Leaders
+    to see who's filled out the
+    %a{href: ENV['HUB_LEADER_FORM'], target: '_blank'} hub leader form
 
+%h2 When To Use It
+%ul
+  %li Anytime you need to update Leader info, come here to find the New Leader form 
+  %li Anytime you need to update Hub info that gets shown on the website
+  %li EVERY MONTH to give up the most updated information on your Hub
 
+%h2 Who To Contact For Support
+%ul
+  %li Vianney Martinez for any questions about data we're collecting/forms/general resources
+  %li Paul Campion for questions about becoming a hub
+  %li Andrew Ross for feedback on this system/site
+  %li Jesse for any questions about Role Networks
