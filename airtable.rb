@@ -13,11 +13,17 @@ class Leader < Airrecord::Table
   end
 end
 
+class HubForm < Airrecord::Table
+  self.base_key = ENV['AIRTABLE_APP_KEY']
+  self.table_name = 'State of Hub Forms'
+end
+
 class Hub < Airrecord::Table
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hubs'
 
   has_many :leaders, class: 'Leader', column: 'Hub Leaders'
+  has_many :hub_forms, class: 'HubForm', column: 'State of the Hub Form'
 
   def self.editable_by_coordinators
     hubs = self.all.select(&:editable_by_coordinators?)

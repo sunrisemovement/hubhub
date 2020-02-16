@@ -1,0 +1,13 @@
+%h1.title State of the Hub, #{@soth['Date Completed']}
+
+- @soth.fields.each do |key, val|
+  - next if key.start_with?('Latest')
+  - next if ['Entry', 'Created time', 'Hub Name'].include?(key)
+  - val = val.join(', ') if val.is_a?(Array)
+  .card
+    %header.card-header
+      %p.card-header-title= h key
+    .card-content= h val
+  %br
+
+%a.button.is-link{href: '/soth'} Back
