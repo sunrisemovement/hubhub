@@ -7,6 +7,11 @@
 
 %br
 
+%a.button.is-warning{href: 'https://airtable.com/shregLmNx1yEGfNN1', target: "_blank"} Fill out new State of the Hub form
+
+%br
+%br
+
 %table.table.is-striped.is-bordered
   %thead
     %tr
@@ -14,6 +19,7 @@
       %th # Active Members
       %th # Direct Actions
       %th Email List Size
+      %th Hub Strength
       %th More Info
   %tbody
     - @hub.hub_forms.each do |hf|
@@ -22,8 +28,6 @@
         %td= hf['Active Members']
         %td= hf['Direct Actions']
         %td= hf['Email List Size']
+        %td= hf['Tier - Self Describe']
         %td
           %a.button.is-link{href: "/soth/#{hf.id}"} View
-
-%a.button.is-warning{href: 'https://airtable.com/shregLmNx1yEGfNN1', target: "_blank"} Fill out new State of the Hub form
-
