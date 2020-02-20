@@ -1,27 +1,31 @@
 %h1.title Update Summary
 
-%p
-  You edited the following information about the #{@hub.location} hub leaders:
+- if @removed_leaders.length > 0
+  %p
+    You removed the following leaders from the list:
 
-%br
-
-%table.table.is-striped.is-bordered.is-fullwidth.is-responsive
-  %thead
-    %th Leader
-    %th Field
-    %th Old Value
-    %th New Value
-  %tbody
-    - @diffs.each do |leader, changes|
-      - changes.each do |attr, (old, new)|
+  %table.table.is-striped.is-bordered.is-fullwidth.is-responsive
+    %thead
+      %th First Name
+      %th Last Name
+      %th Email
+      %th Roles
+    %tbody
+      - @removed_leaders.each do |lead|
         %tr
-          %td= leader
-          %td= attr
-          %td= old
-          %td= new
+          %td= lead['First Name']
+          %td= lead['Last Name']
+          %td= lead['Email']
+          %td
+            - (lead['Role'] || []).each do |role|
+              %span.tag= role.gsub(' - Self Describe In Next Field', '')
 
-%p Your edits will look like this on the main site (within ~15 minutes):
-%br
-= haml :_hub_card
+  %p
+    If some of these leaders are still part of the hub, you can have them fill out the
+    %a{href: ENV['LEAD_FORM_URL'], target: '_blank'} hub leader form
+    again!
+- else
+  %p
+    No leaders updated -- to remove leaders from the list, make sure you check the checkboxes on the right hand side of the table!
 
-%a.button.is-link{href: '/'} Back to Hub Edit Page
+%a.button.is-link{href: '/leaders'} Back to Leader Management Page

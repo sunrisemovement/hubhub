@@ -11,6 +11,10 @@ class Leader < Airrecord::Table
   def name
     "#{self['First Name']} #{self['Last Name']}"
   end
+
+  def entry
+    "#{name}: #{self['Email']}"
+  end
 end
 
 class HubForm < Airrecord::Table
@@ -22,8 +26,12 @@ class Hub < Airrecord::Table
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hubs'
 
-  has_many :leaders, class: 'Leader', column: 'Hub Leaders'
+  has_many :hub_leaders, class: 'Leader', column: 'Hub Leaders'
   has_many :hub_forms, class: 'HubForm', column: 'State of the Hub Form'
+
+  def leaders
+    hub_leaders.reject { |lead| lead['Deleted by Hubhub?'] }
+  end
 
   def self.editable_by_coordinators
     hubs = self.all.select(&:editable_by_coordinators?)
@@ -51,7 +59,7 @@ class Hub < Airrecord::Table
   end
 
   def should_appear_on_map?
-    return false if self['Activity?'] == 'Inactive'
+    return false if self['Activity'] == 'Inactive'
     return false unless self['Map?'] == true
     return false unless self['Latitude'] && self['Longitude']
     return false unless self['City'] && state && self['Name']
@@ -81,6 +89,27 @@ class Hub < Airrecord::Table
     "#{self['City']}, #{state_abbrev}"
   end
 
+  def contact_email
+    self['Custom Map Email'] || self['Email']
+  end
+
+  def contact_type
+    type = self['Contact Type'] || 'Hub Email'
+    if type == 'Hub Email' && contact_email.nil?
+      'Leader Emails'
+    else
+      type
+    end
+  end
+
+  def should_show_leader_emails?
+    contact_type.include?('Leader Emails')
+  end
+
+  def should_show_hub_email?
+    contact_type.include?('Hub Email')
+  end
+
   def map_entry(leads=nil)
     entry = {
       name: self.fields['Name'],
@@ -96,28 +125,15 @@ class Hub < Airrecord::Table
       leaders: []
     }
 
-    # Determine the contact email
-    contact_email = self['Custom Map Email'] || self['Email']
-
-    # Set fallbacks in case the contact email/type aren't present
-    contact_type = self['Contact Type'] || 'Hub Email'
-    if contact_type == 'Hub Email' && contact_email.nil?
-      contact_type = 'Coordinator Emails'
-    end
-
     if contact_type == 'Custom Text'
       # Only show custom text if that's what's given
       entry[:custom_coord_text] = self['Custom Map Contact Text']
     else
-      # Otherwise show the hub email...
-      if contact_type.include?('Hub Email')
-        entry[:email] = contact_email
-      end
+      entry[:email] = contact_email if should_show_hub_email?
       
-      # ...and/or coordinator emails
-      if contact_type.include?('Coordinator Emails')
+      if should_show_leader_emails?
         leads = self.leaders if leads.nil?
-        leads = leads.select { |l| l['Map?'] }
+        leads = leads.select { |l| l['Map?'] && !l['Deleted by Hubhub?'] }
         entry[:leaders] = leads.map { |l| {
           first_name: l['First Name'],
           last_name: l['Last Name'],

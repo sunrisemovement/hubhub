@@ -13,7 +13,7 @@
     display: none;
   }
 
-%form{action: '/hub', method: 'POST', id: 'hub-map-form'}
+%form{action: '/map', method: 'POST', id: 'hub-map-form'}
   %h2.subtitle Basic Info
   %fieldset.box
     .field
@@ -24,9 +24,9 @@
       %label.label Is your hub active?
       .control
         .select
-          %select{name: "Activity?"}
+          %select{name: "Activity"}
             - [["Active", "Yes, we're active!"],["Semi-Active","We're semi-active."],["Inactive","We're inactive, hide us for now :("]].each do |value,label|
-              %option{value: value, selected: @hub.fields["Activity?"]==value}= label
+              %option{value: value, selected: @hub.fields["Activity"]==value}= label
         %p.help If you mark your hub as inactive, we won't show it on the map.
   %h2.subtitle Contact Info
   %fieldset.box
@@ -52,7 +52,7 @@
       %label.label Which leaders should we show?
       .control
         .select.is-multiple
-          %select{multiple: 'multiple'}
+          %select{multiple: 'multiple', name: "Map Leaders[]"}
             - @hub.leaders.each do |lead|
               %option{value: lead.id, selected: lead['Map?']}
                 #{lead.name}: #{lead['Email']}

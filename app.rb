@@ -92,24 +92,41 @@ class Hubhub < Sinatra::Base
 
     if changed
       @hub.save if ENV['APP_ENV'] == 'production'
-
-      if ENV['FEATURE_EMAIL_AFTER_UPDATE']
-        Emailer.send_email(
-          to: @hub.login_email,
-          cc: 'paul@sunrisemovement.org',
-          subject: "Sunrise hub info updates for #{@hub.location}",
-          body: [
-            "Hi #{@hub['Name']},", "",
-            "This email is just to confirm that you updated the following information about your hub:", "",
-            @diff.map{|attr,(old,new)| %(- "#{attr}" changed from "#{old}" to "#{new}") }.join("\n"), "",
-            "These changes should take effect at https://sunrisemovement.org/hubs within 10 minutes. If you did not request these changes, please email us back at this address!", "",
-            "Best,",
-            "The Hub Support Team"
-          ].join("\n")
-        )
-      end
     end
-    haml :hub_changes
+
+    leads = nil
+    if @hub.should_show_leader_emails?
+      leads = @hub.leaders
+      leads_by_id = {}
+      leads.each { |lead| leads_by_id[lead.id] = lead }
+      old = leads.select { |lead| lead['Map?'] }
+      new_ids = params["Map Leaders"]
+      old_ids = old.map { |lead| lead.id }
+      new = new_ids.map { |id| leads_by_id[id] }
+
+      old.each do |lead|
+        unless new_ids.include?(lead.id)
+          lead['Map?'] = false
+          lead.save if ENV['APP_ENV'] == 'production'
+        end
+      end
+
+      new.each do |lead|
+        unless old_ids.include?(lead.id)
+          lead['Map?'] = true
+          lead.save if ENV['APP_ENV'] == 'production'
+        end
+      end
+
+      @diff['Map Leader Emails'] = [old.map(&:entry), new.map(&:entry)]
+    end
+
+    @map_entry_json = {
+      updated_at: Time.now.to_s,
+      map_data: [@hub.map_entry(leads)]
+    }.to_json
+
+    haml :map_changes
   end
 
   get('/leaders') do
@@ -123,51 +140,13 @@ class Hubhub < Sinatra::Base
       h[leader.id] = leader
     end
 
-    @diffs = {}
-    params['leaders'].each do |id, attrs|
-      changed = false
-      lead = leaders_by_id[id]
-      diff = {}
-      ['Map?', 'Activity?'].each do |attr|
-        old_value = lead[attr]
-        new_value = attrs[attr]
-        new_value = true if new_value == 'on'
-        if old_value != new_value
-          diff[attr] = [old_value || false, new_value || false]
-          lead[attr] = new_value
-          changed = true
-        end
-      end
-      ['First Name', 'Last Name', 'Email'].each do |attr|
-        old_value = lead[attr]
-        new_value = attrs[attr]
-        if old_value != new_value
-          diff[attr] = [old_value, new_value]
-          lead[attr] = new_value
-          changed = true
-        end
-      end
-      if changed
-        # TODO: email about this as well?
-        lead.save if ENV['APP_ENV'] == 'production'
-        @diffs[lead.name] = diff
-      end
-    end
-
-    if ENV['FEATURE_EMAIL_AFTER_UPDATE']
-      Emailer.send_email(
-        to: @hub.login_email,
-        cc: 'paul@sunrisemovement.org',
-        subject: "Sunrise leader info updates for #{@hub.location}",
-        body: [
-          "Hi #{@hub['Name']},", "",
-          "This email is just to confirm that you updated the following information about your hub leaders:", "",
-          @diffs.flat_map{|name, d| d.map{|attr,(old,new)| %(- #{name}'s "#{attr}" changed from "#{old}" to "#{new}") } }.join("\n"), "",
-          "Some of these changes may update how your card appears on the hub map at https://sunrisemovement.org/hubs. If you did not request these changes, please email us back at this address!", "",
-          "Best,",
-          "The Hub Support Team"
-        ].join("\n")
-      )
+    @removed_leaders = []
+    (params['leaders'] || {}).each do |id, attrs|
+      next unless lead = leaders_by_id[id]
+      next unless attrs['Deleted by Hubhub?'] == 'on'
+      lead['Deleted by Hubhub?'] = true
+      lead.save if ENV['APP_ENV'] == 'production'
+      @removed_leaders << lead
     end
 
     haml :leader_changes
