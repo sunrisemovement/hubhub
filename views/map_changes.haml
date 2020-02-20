@@ -1,6 +1,6 @@
 %h1.title Update Summary
+
 %p You edited the following hub map information:
-%br
 %table.table.is-striped.is-bordered.is-fullwidth.is-responsive
   %thead
     %th Field
@@ -11,14 +11,27 @@
       - @diff.each do |attr, (old, new)|
         %tr
           %td= attr
-          %td= old
-          %td= new
+          %td
+            - if old.is_a?(Array)
+              %ul
+                - old.each do |entry|
+                  %li= entry
+            - else
+              = old
+          %td
+            - if new.is_a?(Array)
+              %ul
+                - new.each do |entry|
+                  %li= entry
+            - else
+              = new
     - else
       %tr
         %td.has-text-centered{colspan: 3} No changes to show
 
 %p Your edits will look like this on the main site (within ~10 minutes):
-%br
 = haml :_hub_card
 
-%a.button.is-link{href: '/'} Back to Hub Edit Page
+%br
+
+%a.button.is-link{href: '/map/edit'} Back to Map Info Edit Page

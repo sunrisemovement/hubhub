@@ -1,10 +1,12 @@
 !!!5
-%html
+%html.has-navbar-fixed-top
   %head
     %title Sunrise Hubhub
     %meta{charset: 'utf-8'}
     %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
     %link{rel: 'stylesheet', type: 'text/css', href: '/sunrisebulma.css'}
+    %link{rel: 'stylesheet', type: 'text/css', href: '/style.css'}
+    %link{rel: 'shortcut icon', type: 'image/x-icon', href: '/favicon.ico'}
     :css
       @media screen and (max-width: 600px) {
         .is-responsive td, .is-responsive th {
@@ -22,15 +24,16 @@
       .hub-brand {
         text-transform: uppercase;
         font-weight: bold;
+        margin-left: 1rem;
       }
 
   %body
-    %nav.navbar.is-dark
+    %nav.navbar.is-dark.is-fixed-top
       .navbar-brand
         %a.navbar-item{href: '/'}
+          %img{src: '/s/map_icon.jpg'}
           - if session[:hub_id]
             %span.hub-brand #{@hub['Name']}
-          %img{src: '/s/map_icon.jpg'}
 
         :erb
           <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu">
@@ -60,17 +63,22 @@
           .content
             = yield
 
-:javascript
-  document.addEventListener('DOMContentLoaded', () => {
-    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-    if ($navbarBurgers.length > 0) {
-      $navbarBurgers.forEach( el => {
-        el.addEventListener('click', () => {
-          const target = el.dataset.target;
-          const $target = document.getElementById(target);
-          el.classList.toggle('is-active');
-          $target.classList.toggle('is-active');
+    %footer.footer
+      .content.has-text-centered
+        %p
+          © #{Date.today.year} Sunrise.
+
+  :javascript
+    document.addEventListener('DOMContentLoaded', () => {
+      const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      if ($navbarBurgers.length > 0) {
+        $navbarBurgers.forEach( el => {
+          el.addEventListener('click', () => {
+            const target = el.dataset.target;
+            const $target = document.getElementById(target);
+            el.classList.toggle('is-active');
+            $target.classList.toggle('is-active');
+          });
         });
-      });
-    }
-  });
+      }
+    });
