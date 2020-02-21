@@ -2,7 +2,7 @@ require 'test_helper'
 
 def hubby(kwargs)
   h = { 'City' => 'Boston', 'State' => 'MA',
-        'Activity?' => 'Active', 'Map?' => true,
+        'Activity' => 'Active', 'Map?' => true,
         'Latitude' => 42, 'Longitude' => 42 }
   h = h.merge(kwargs)
   h['State Link Abbrev'] = h['State']
@@ -13,7 +13,7 @@ class MapJSONTest < Minitest::Test
   def test_hub_inclusion
     stub_hubs([
       hubby({'Name' => 'Hub1'}),
-      hubby({'Name' => 'Hub2', 'Activity?' => 'Inactive'}),
+      hubby({'Name' => 'Hub2', 'Activity' => 'Inactive'}),
       hubby({'Name' => 'Hub3', 'Map?' => false}),
       hubby({'Name' => 'Hub4', 'Latitude' => nil}),
       hubby({'Name' => 'Hub5', 'City' => nil}),
@@ -96,13 +96,13 @@ class MapJSONTest < Minitest::Test
   def test_state_link_abbrev
     stub_hubs([
       { 'City' => 'Boston', 'State' => 'MA', 'Name' => '1',
-        'Activity?' => 'Active', 'Map?' => true,
+        'Activity' => 'Active', 'Map?' => true,
         'Latitude' => 42, 'Longitude' => 42 },
       { 'City' => 'Philadelphia', 'State Link Abbrev' => 'PA', 'Name' => '2',
-        'Activity?' => 'Active', 'Map?' => true,
+        'Activity' => 'Active', 'Map?' => true,
         'Latitude' => 42, 'Longitude' => 42 },
       { 'City' => 'Washington', 'State Link Abbrev' => ['DC'], 'Name' => '3',
-        'Activity?' => 'Active', 'Map?' => true,
+        'Activity' => 'Active', 'Map?' => true,
         'Latitude' => 42, 'Longitude' => 42 },
     ])
     stub_leaders([])
@@ -143,7 +143,7 @@ class MapJSONTest < Minitest::Test
       hubby({
         'Name': 'Hub3',
         'Email': 'hub3@sunrisemovement.org',
-        'Contact Type': 'Hub Email + Coordinator Emails',
+        'Contact Type': 'Hub Email + Leader Emails',
         'Hub Leaders': ['l1','l2']
       }),
       hubby({
@@ -164,35 +164,30 @@ class MapJSONTest < Minitest::Test
       'Last Name' => 'Z',
       'Email' => 'x@z.com',
       'Map?' => true,
-      'Role' => ['Hub Coordinator']
     }, {
       'id' => 'l1',
       'First Name' => 'A',
       'Last Name' => 'B',
       'Email' => 'a@b.com',
       'Map?' => true,
-      'Role' => ['Hub Coordinator']
     }, {
       'id' => 'l2',
       'First Name' => 'C',
       'Last Name' => 'D',
       'Email' => 'c@d.com',
       'Map?' => true,
-      'Role' => ['Hub Coordinator']
     }, {
       'id' => 'l3',
       'First Name' => 'E',
       'Last Name' => 'F',
       'Email' => 'e@f.com',
       'Map?' => true,
-      'Role' => ['Hub Coordinator']
     }, {
       'id' => 'l4',
       'First Name' => 'E',
       'Last Name' => 'F',
       'Email' => 'e@f.com',
       'Map?' => true,
-      'Role' => ['Hub Coordinator']
     }])
 
     hub1, hub2, hub3, hub4, hub5 = Hub.map_json

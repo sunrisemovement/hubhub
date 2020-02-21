@@ -22,7 +22,9 @@ class MagicLinkTest < CapybaraTest
     magic_link = email[:body][/https?:\/\/[\S]+/]
     visit magic_link
 
-    assert_content 'Edit Hub Information for Hobbiton, MA'
+    within '.hub-brand' do
+      assert_content 'Sunrise Hobbiton'
+    end
   end
 
   def test_leader_happy_path
@@ -52,7 +54,9 @@ class MagicLinkTest < CapybaraTest
     magic_link = email[:body][/https?:\/\/[\S]+/]
     visit magic_link
 
-    assert_content 'Edit Hub Information for Bree, NH'
+    within '.hub-brand' do
+      assert_content 'Sunrise Bree'
+    end
   end
 
   def test_link_timeout
@@ -73,7 +77,7 @@ class MagicLinkTest < CapybaraTest
 
     Timecop.freeze(Date.today + 1) do
       visit magic_link
-      assert_no_content 'Edit Hub'
+      assert_no_css '.hub-brand', text: 'Minas Tirith'
     end
   end
 
@@ -101,10 +105,10 @@ class MagicLinkTest < CapybaraTest
     magic_link2 = email[:body][/https?:\/\/[\S]+/]
 
     visit magic_link1
-    assert_no_content 'Edit Hub'
+    assert_no_css '.hub-brand', text: 'Minas Tirith'
 
     visit magic_link2
-    assert_content 'Edit Hub Information for Minas Tirith, GA'
+    assert_css '.hub-brand', text: 'Minas Tirith'
   end
 
   def test_bad_link

@@ -13,6 +13,21 @@ require 'rb-readline'
 require 'timecop'
 
 class Minitest::Test
+  def log_in_as(hub)
+    visit '/'
+    select hub, from: 'hub'
+    click_button 'Send Magic Link'
+    email = Emailer.last_email
+    magic_link = email[:body][/https?:\/\/[\S]+/]
+    visit magic_link
+  end
+
+  def inline_map_json
+    el = find('#map-entry-json')
+    json = JSON.parse(JSON.parse(el[:'data-map-data']))
+    json['map_data'][0]
+  end
+
   def setup
     Hub.base_key = 'foo'
     Leader.base_key = 'foo'
