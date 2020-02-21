@@ -1,9 +1,9 @@
 require 'sinatra/base'
 require 'pony'
 require 'haml'
-require 'honeybadger'
 require_relative 'airtable'
 require_relative 'magic_link'
+require 'honeybadger' if ENV['APP_ENV'] == 'production'
 
 class Hubhub < Sinatra::Base
   use MagicLink
