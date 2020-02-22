@@ -24,7 +24,7 @@ class Minitest::Test
 
   def inline_map_json
     el = find('#map-entry-json')
-    json = JSON.parse(JSON.parse(el[:'data-map-data']))
+    json = JSON.parse(el[:'data-map-data'])
     json['map_data'][0]
   end
 

@@ -37,6 +37,7 @@ class LeadersTest < CapybaraTest
       'State' => 'PA',
       'Email' => 'sunriserivendell@msn.com',
       'Map?' => true,
+      'Contact Type' => 'Leader Emails',
       'Hub Leaders': ['l1', 'l2']
     }])
 
@@ -45,14 +46,18 @@ class LeadersTest < CapybaraTest
       'First Name' => 'Arwen',
       'Last Name' => 'Peredhel',
       'Email' => 'arwen@dell.com',
+      'Map?' => true
     }, {
       'id' => 'l2',
       'First Name' => 'Elrond',
       'Last Name' => 'Peredhel',
       'Email' => 'l.rond@peredh.el',
+      'Map?' => true
     }])
 
     log_in_as 'Sunrise Rivendell'
+    assert inline_map_json['leaders'].length == 2
+
     visit '/leaders'
 
     assert_content 'Arwen'
@@ -69,5 +74,7 @@ class LeadersTest < CapybaraTest
     assert_content 'Update Summary'
     assert_content 'Elrond'
     assert_no_content 'Arwen'
+    assert inline_map_json['leaders'].length == 1
+    assert inline_map_json['leaders'].first['first_name'] == 'Arwen'
   end
 end

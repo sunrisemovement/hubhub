@@ -1,12 +1,6 @@
-- if @hub
-  %h1.title View Hub Map Information
-  %p
-    On this page, you can see a preview of how your hub looks (or will soon look) on the
-    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
-  %br
-  = haml :_hub_card
-- else
-  %h1.title Full Hub Map Preview
-  .wrapper1{style: 'max-width: 1600px; margin: 0 auto; padding: 0 120px;'}
-    .wrapper2{style: 'width: 74.995%; max-width: calc(100% - 1em); margin: 0 auto;'}
-      %iframe{style: 'width: 100%; height: 434px', src: 'hub_map.html'}
+%h1.title View Hub Map Information
+%p
+  On this page, you can see a preview of how your hub looks (or will soon look) on the
+  %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
+%br
+= haml :_hub_card
