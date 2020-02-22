@@ -81,6 +81,34 @@ class MagicLinkTest < CapybaraTest
     end
   end
 
+  def test_session_timeout
+    stub_hubs([{
+      'Name' => 'Sunrise Minas Tirith',
+      'City' => 'Minas Tirith',
+      'State' => 'GA',
+      'Email' => 'f4r4m1r@citadel.org',
+      'Map?' => true
+    }])
+
+    visit '/'
+    select 'Sunrise Minas Tirith', from: 'hub'
+    click_button 'Send Magic Link'
+
+    email = Emailer.last_email
+    magic_link = email[:body][/https?:\/\/[\S]+/]
+
+    visit magic_link
+    assert_css '.hub-brand', text: 'Minas Tirith'
+
+    visit '/'
+    assert_css '.hub-brand', text: 'Minas Tirith'
+
+    Timecop.freeze(Date.today + 2) do
+      visit '/'
+      assert_no_css '.hub-brand', text: 'Minas Tirith'
+    end
+  end
+
   def test_double_link
     stub_hubs([{
       'Name' => 'Sunrise Minas Tirith',

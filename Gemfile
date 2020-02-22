@@ -8,6 +8,7 @@ gem 'haml'
 gem 'pony'
 gem 'dotenv'
 gem 'honeybadger'
+gem 'dalli'
 
 group :development do
   gem 'rake'

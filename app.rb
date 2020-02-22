@@ -3,16 +3,12 @@ require 'pony'
 require 'haml'
 require_relative 'airtable'
 require_relative 'magic_link'
-require 'honeybadger' if ENV['APP_ENV'] == 'production'
+require 'honeybadger' if ENV['HONEYBADGER_API_KEY']
 
 class Hubhub < Sinatra::Base
   use MagicLink
 
   enable :logging
-
-  configure :production do
-    set :force_ssl, true
-  end
 
   helpers do
     def h(text)
