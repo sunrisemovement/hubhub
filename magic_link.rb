@@ -28,11 +28,29 @@ end
 
 class MagicLink < Sinatra::Base
   enable :logging
-  enable :sessions
+
   set :haml, :format => :html5
 
-  configure :production do
-    set :force_ssl, true
+  use Rack::Session::Cookie,
+    :key => 'rack.session',
+    :expire_after => ENV.fetch('SESSION_TIMEOUT', 60*60*24).to_i,
+    :secret => ENV.fetch('SESSION_SECRET') { SecureRandom.hex(20) }
+
+  configure do
+    if ENV['APP_ENV'] == 'production'
+      set :force_ssl, true
+    end
+
+    if ENV['MEMCACHEDCLOUD_SERVERS']
+      require 'dalli'
+      require 'rack/session/dalli'
+      memcached = Dalli::Client.new(
+        ENV["MEMCACHEDCLOUD_SERVERS"].split(','),
+        username: ENV["MEMCACHEDCLOUD_USERNAME"],
+        password: ENV["MEMCACHEDCLOUD_PASSWORD"]
+      )
+      use Rack::Session::Dalli, cache: memcached
+    end
   end
 
   get('/login') do
