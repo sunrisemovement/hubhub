@@ -2,7 +2,7 @@
 
 %p
   In this section, you can manage information for everyone who has filled out the
-  %a{href: "#{ENV['HUB_LEADER_FORM']}", target: '_blank'} hub leader form
+  %a{href: "#{ENV['LEADER_FORM']}", target: '_blank'} hub leader form
   for #{@hub['Name']}.
 %p
   NOTE: For our initial rollout of this system, we are not yet supporting
@@ -11,7 +11,7 @@
   using the controls below. If you run into issues or want to change
   who receives the Hubhub login email, please contact us on Slack.
 
-%a.button.is-warning{href: ENV['HUB_LEADER_FORM']} Add New Leader
+%a.button.is-warning{href: ENV['LEADER_FORM'], target: '_blank'} Add New Leader
 %br
 %br
 
