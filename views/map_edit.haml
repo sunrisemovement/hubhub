@@ -35,10 +35,8 @@
       .control
         .select
           %select{name: "Contact Type", id: 'contact-type'}
-            %option{value: "Hub Email"} Hub email  (#{@hub['Email']})
-            %option{value: 'Leader Emails'} Leader emails
-            %option{value: 'Hub Email + Leader Emails'} Both hub and leader emails
-            %option{value: 'Custom Text'} Custom text (enter below)
+            -[["Hub Email", "Hub email (#{@hub['Email']})"], ["Leader Emails", "Leader emails"], ['Hub Email + Leader Emails', "Both hub and leader emails"], ['Custom Text', 'Custom text (enter below)']].each do |value,label|
+              %option{value: value, selected: @hub["Contact Type"]==value}= label
     .field.custom-only
       %label.label Custom contact text
       .control
