@@ -14,6 +14,12 @@ class Hubhub < Sinatra::Base
     def h(text)
       Rack::Utils.escape_html(text)
     end
+
+    def map_entry
+      return unless @hub
+      leads = instance_variable_defined?(:@leaders) ? @leaders : nil
+      { updated_at: Time.now.to_s, map_data: [@hub.map_entry(leads)] }.to_json
+    end
   end
 
   EDITABLE_HUB_FIELDS = [
@@ -59,7 +65,7 @@ class Hubhub < Sinatra::Base
 
   get '/map/json' do
     content_type :json
-    { updated_at: Time.now.to_s, map_data: [@hub.map_entry] }.to_json
+    map_entry
   end
 
   post '/map' do
@@ -90,12 +96,12 @@ class Hubhub < Sinatra::Base
       @hub.save if ENV['APP_ENV'] == 'production'
     end
 
-    leads = nil
+    @leaders = nil
     if @hub.should_show_leader_emails?
-      leads = @hub.leaders
+      @leaders = @hub.leaders
       leads_by_id = {}
-      leads.each { |lead| leads_by_id[lead.id] = lead }
-      old = leads.select { |lead| lead['Map?'] }
+      @leaders.each { |lead| leads_by_id[lead.id] = lead }
+      old = @leaders.select { |lead| lead['Map?'] }
       new_ids = params["Map Leaders"]
       old_ids = old.map { |lead| lead.id }
       new = new_ids.map { |id| leads_by_id[id] }
@@ -117,11 +123,6 @@ class Hubhub < Sinatra::Base
       @diff['Map Leader Emails'] = [old.map(&:entry), new.map(&:entry)]
     end
 
-    @map_entry_json = {
-      updated_at: Time.now.to_s,
-      map_data: [@hub.map_entry(leads)]
-    }.to_json
-
     haml :map_changes
   end
 
@@ -132,7 +133,9 @@ class Hubhub < Sinatra::Base
   post('/leaders') do
     raise unless @hub
 
-    leaders_by_id = @hub.leaders.each_with_object({}) do |leader, h|
+    @leaders = @hub.leaders
+
+    leaders_by_id = @leaders.each_with_object({}) do |leader, h|
       h[leader.id] = leader
     end
 

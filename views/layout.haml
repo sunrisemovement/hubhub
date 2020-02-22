@@ -49,6 +49,10 @@
         %p
           © #{Date.today.year} Sunrise.
 
+  - if ENV['APP_ENV'] == 'test' && session[:hub_id]
+    -# Always render map entry for non-persistent testing purposes
+    #map-entry-json{:'data-map-data' => map_entry}
+
   :javascript
     document.addEventListener('DOMContentLoaded', () => {
       const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
