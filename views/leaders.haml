@@ -11,9 +11,8 @@
   using the controls below. If you run into issues or want to change
   who receives the Hubhub login email, please contact us on Slack.
 
-%a.button.is-warning{href: ENV['LEADER_FORM'], target: '_blank'} Add New Leader
-%br
-%br
+%p
+  %a.button.is-warning{href: ENV['LEADER_FORM'], target: '_blank'} Add New Leader
 
 %form{action: '/leaders', method: 'POST'}
   %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
