@@ -2,6 +2,6 @@
 %p
   We sent an email to the address associated with #{@hub['Name']}, which contains a link you can use to sign in! If you don't see the email in a few seconds, please check your spam folder.
 %p
-  If you don't know or can't access this email address, contact us
-  at
-  %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
+  If you don't know or can't access this email address, contact us at
+  = succeed '.' do
+    %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']

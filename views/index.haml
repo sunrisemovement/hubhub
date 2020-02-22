@@ -58,7 +58,8 @@
     %a{href: '/soth'} State of the Hub
     to view hub status information, or
     make an update
-    %a{href: ENV['SOTHUB_FORM'], target: '_blank'} here!
+    = succeed '!' do
+      %a{href: ENV['SOTHUB_FORM'], target: '_blank'} here
   %li
     Go to
     %a{href: '/map'} View Map
@@ -70,7 +71,8 @@
     Go to
     %a{href: '/leaders'} Manage Leaders
     to see who's filled out the
-    %a{href: ENV['LEADER_FORM'], target: '_blank'} hub leader form
+    = succeed '.' do
+      %a{href: ENV['LEADER_FORM'], target: '_blank'} hub leader form
   %li
     Contact Vianney or Andrew below if you need to change who receives the login email!
 

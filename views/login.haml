@@ -11,7 +11,8 @@
                 %option{value: h.id}= h['Name']
       %p.help
         Select your hub from the dropdown list, and we'll send a login link to its associated email. If your hub isn't appearing, or you aren't sure about your hub's associated email, contact us at
-        %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
+        = succeed '.' do
+          %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
   .field
     .control
       %input.button.is-warning{type: 'submit', value: 'Send Magic Link'}
