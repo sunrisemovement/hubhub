@@ -328,10 +328,6 @@ h3 {
       <button id="show-list" class="toggle">Show List</button>
     </nav>
     <div id='map' class='map'> </div>
-    <div id='map-style'>
-      <button id='district-map'>Show districts</button>
-      <button id='vanilla-map'>Hide districts</button>
-    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -488,7 +484,6 @@ $(document).ready(function() {
 function initMap(hubs) {
   mapboxgl.accessToken = 'pk.eyJ1IjoiYWxhdXJlbnppIiwiYSI6ImNqdDlna2o5ZTA0M2gzeW8zcWQwN3hnNDAifQ.uAXKXOB2I-G3gBXrkXWOrw';
   var vanillaMapStyle = 'mapbox://styles/mapbox/light-v9';
-  var districtMapStyle = 'mapbox://styles/govtrack/cjom21tbp1lfn2sn9xr2336re';
 
   var map = new mapboxgl.Map({
     container: 'map',
@@ -499,14 +494,6 @@ function initMap(hubs) {
   });
   // Add zoom and rotation controls to the map.
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
-  document.getElementById('vanilla-map').addEventListener('click', function() {
-    map.setStyle(vanillaMapStyle);
-  });
-
-  document.getElementById('district-map').addEventListener('click', function() {
-    map.setStyle(districtMapStyle);
-  });
 
   map.on('load', function (e) {
     map.addSource("places", {
