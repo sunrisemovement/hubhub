@@ -10,7 +10,7 @@
               - @hubs.select { |h| h['State'] == s }.each do |h|
                 %option{value: h.id}= h['Name']
       %p.help
-        Select your hub from the dropdown list, and we'll send a login link to its associated email. If your hub isn't appearing, that's probably because we're doing a limited beta test! If you think it should appear, though, contact us at
+        Select your hub from the dropdown list, and we'll send a login link to its associated email. If your hub isn't appearing, that's probably because we're doing a limited beta test! If you think it should appear, or you aren't sure about your hub's associated email, contact us at
         %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
   .field
     .control

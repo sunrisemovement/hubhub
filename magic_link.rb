@@ -69,7 +69,7 @@ class MagicLink < Sinatra::Base
         body: [
           "Hi #{@hub['Name']}!", "",
           "Here's a magic link for signing into the Sunrise Hubhub beta test, where you can control how your hub appears on the Sunrise hub map: #{link}", "",
-          "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, or if you have any questions, please email us back at this address.", "",
+          "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, or if you have any questions, please email us back at #{ENV['GMAIL_USER']}.", "",
           "Best,",
           "The Hub Support Team"
         ].join("\n")
