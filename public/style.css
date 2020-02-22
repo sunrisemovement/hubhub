@@ -11,6 +11,10 @@
   }
 }
 
+main {
+  min-height: calc(100vh - 3.25rem - 10.5rem);
+}
+
 .hub-brand {
   text-transform: uppercase;
   font-weight: bold;
