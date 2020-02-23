@@ -73,18 +73,23 @@
       .control
         %input.input{name: 'Instagram Handle', value: @hub['Instagram Handle']}
         %p.help For these social media fields, you can either provide a full link or just the handle (with or without the @ sign).
-
+    .field
+      %label.label Signup Link
+      .control
+        %input.input{name: 'Signup Link', value: @hub['Signup Link']}
+        %p.help
+          Here you can link to a signup page or form. Please include the full link with http:// or https:// at the beginning.
     .field
       %label.label Website
       .control
         %input.input{name: 'Website', value: @hub['Website']}
         %p.help
-          Here you can link to a custom hub website or sign-up form. Please include http:// or https:// at the beginning ._.
+          Here you can link to a custom hub website. Please include the full link with http:// or https:// at the beginning.
     .field
       %label.label Website Link Text
       .control
         %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: 'Hub Website'}
-        %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map. For example, if your link is a sign-up form, you might enter "Sign Up"!
+        %p.help If you enter something here, it will show up instead of "Hub Website" as the link text on the map. For example, if your link is actually a linktree, you might enter "Hub Linktree"!
   %h2.subtitle Pin Location
   %fieldset.box
     - ['Latitude', 'Longitude'].each do |field|

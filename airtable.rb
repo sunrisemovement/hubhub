@@ -122,6 +122,7 @@ class Hub < Airrecord::Table
       instagram: self.fields['Instagram Handle'],
       facebook: self.fields['Facebook Handle'],
       twitter: self.fields['Twitter Handle'],
+      signup_link: self.fields['Signup Link'],
       leaders: []
     }
 

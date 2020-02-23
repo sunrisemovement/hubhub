@@ -25,7 +25,7 @@ class Hubhub < Sinatra::Base
   EDITABLE_HUB_FIELDS = [
     'Name', 'Website', 'Latitude', 'Longitude', 'Activity?',
     'Facebook Handle', 'Twitter Handle', 'Instagram Handle',
-    'Custom Website Link Text', 'Contact Type',
+    'Custom Website Link Text', 'Contact Type', 'Signup Link',
     'Custom Map Email', 'Custom Map Contact Text'
   ]
 

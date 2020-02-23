@@ -408,6 +408,9 @@ function hubLinks(hub) {
     var linkText = hub.custom_weblink_text || "Hub Website";
     html += `<p><a href="${linkEscape(hub.website)}" target="_blank" style="text-decoration:underline;">${htmlEscape(linkText)}</a></p>`;
   }
+  if (hub.signup_link) {
+    html += `<p><a href="${linkEscape(hub.signup_link)}" target="_blank" style="text-decoration:underline;">Sign Up</a></p>`;
+  }
   if (hub.custom_coord_text) {
     html += `<strong>Hub Contact:</strong><br>${htmlEscape(hub.custom_coord_text)}`;
   } else if (hub.email && !hub.leaders.length) {
