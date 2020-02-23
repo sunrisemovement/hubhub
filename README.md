@@ -4,7 +4,7 @@ This repository contains code to help integrate Airtable (the current canonical 
 
 ## High-level summary
 
-Using the [Airtable API](https://airtable.com/apptig05QGFvV5GVd/api/docs), Hubhub (hosted on [Heroku](https://www.heroku.com/)) pulls hub data in [`airtable.rb`](./airtable.rb), converts it to a JSON blob, and pushes it to Amazon S3 in [`scripts/upload_hub_json.rb`](./scripts/upload_hub_json.rb), which is run every 10 minutes by a job scheduler. This JSON blob is then loaded by the hub map in [`public/hub_map.html`](./public/hub_map.html). We can summarize all of this with the following diagram:
+Using the [Airtable](https://airtable.com/) API, Hubhub (hosted on [Heroku](https://www.heroku.com/)) pulls hub data in [`airtable.rb`](./airtable.rb), converts it to a JSON blob, and pushes it to Amazon S3 in [`scripts/upload_hub_json.rb`](./scripts/upload_hub_json.rb), which is run every 10 minutes by a job scheduler. This JSON blob is then loaded by the hub map in [`public/hub_map.html`](./public/hub_map.html). We can summarize all of this with the following diagram:
 
 ![diagram](./infra-diagram.png)
 
