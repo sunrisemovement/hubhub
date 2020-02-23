@@ -2,7 +2,8 @@
 
 %p
   On this page, you can edit all of the information that appears about your hub on the
-  %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
+  = succeed '!' do
+    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map
 
 %br
 
@@ -97,12 +98,14 @@
         %label.label= field
         .control
           %input.input{name: field, placeholder: field, id: field, value: @hub.fields[field]}
-        - if field == 'Longitude'
+        - if field == 'Latitude'
           %p.help
-            Google has
+            Use float format rather than degree format (e.g. 42.358940 instead
+            of 42°21'32.2"N). If you don't know your hub's latitude and
+            longitude, Google has
             %a{href: 'https://support.google.com/maps/answer/18539', target: '_blank'}
               helpful instructions
-            for finding these!
+            for finding them!
     .field
       %label.label
         Where that is

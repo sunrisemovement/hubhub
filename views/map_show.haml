@@ -1,6 +1,7 @@
 %h1.title View Hub Map Information
 %p
   On this page, you can see a preview of how your hub looks (or will soon look) on the
-  %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map!
+  = succeed '!' do
+    %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map
 %br
 = haml :_hub_card
