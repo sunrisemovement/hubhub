@@ -19,6 +19,7 @@ Note that currently, some parts of this infrastructure are being run on personal
     - if using mac, likely easiest by installing [rbenv](https://github.com/rbenv/rbenv)
     - if additionally using Homebrew, you can run `brew install rbenv && rbenv init && rbenv install 2.6.3`
 - run `bundle install` to install dependencies
+- ensure `rake test` passes
 - set [environment variables](./.env.example) -- note that this may require requesting access to the production or staging Airtable first.
 - run `./serve` to view the app
 - in development mode, check your logs in the terminal window to find the login link
