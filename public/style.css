@@ -1,3 +1,5 @@
+/* Additional styles for the app, not included in sunrisebulma.css */
+
 @media screen and (max-width: 600px) {
   .is-responsive td, .is-responsive th {
     display: flex;

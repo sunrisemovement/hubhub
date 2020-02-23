@@ -1,5 +1,6 @@
 require 'pony'
 
+# Configure our email library (pony) to use Heroku's Sendgrid addon
 Pony.options = {
   :via => :smtp,
   :via_options => {
@@ -13,6 +14,8 @@ Pony.options = {
   }
 }
 
+# Create a wrapper class for sending emails (mostly for easy development and
+# testing)
 class Emailer
   @last_email = nil
 
