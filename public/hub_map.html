@@ -470,17 +470,12 @@ $(document).ready(function() {
     });
   }
 
-  // Allow custom map data for debugging
-  if (window.__map_data) {
-    onDataLoad(window.__map_data);
-  } else {
-    $.ajax({
-        type: "GET",
-        url: "https://sunrise-hub-json.s3.amazonaws.com/hubs.json",
-        dataType: "json",
-        success: onDataLoad
-     });
-  }
+  $.ajax({
+      type: "GET",
+      url: "https://sunrise-hub-json.s3.amazonaws.com/hubs.json",
+      dataType: "json",
+      success: onDataLoad
+   });
 });
 
 
