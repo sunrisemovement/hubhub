@@ -103,7 +103,7 @@ class Hub < Airrecord::Table
   end
 
   def should_show_leader_emails?
-    contact_type.include?('Leader Emails')
+    contact_type.include?('Leader Emails') || contact_type.include?('Coordinator Emails')
   end
 
   def should_show_hub_email?
