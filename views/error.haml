@@ -1,0 +1,7 @@
+%h1.title 500: Unexpected Error 😓
+
+%article.message.is-warning
+  .message-body
+    Unfortunately, an error occurred when trying to display this webpage. Hopefully someone should already be working on fixing it, but if you need immediate support, you can reach out to
+    = succeed '!' do
+      %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']

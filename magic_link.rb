@@ -36,6 +36,7 @@ class MagicLink < Sinatra::Base
   enable :logging
 
   set :haml, :format => :html5
+  set :show_exceptions, ENV['APP_ENV'] == 'development'
 
   # Ensure cookies expire after 1 day and have a secure session secret key.
   use Rack::Session::Cookie,
@@ -60,6 +61,10 @@ class MagicLink < Sinatra::Base
       )
       use Rack::Session::Dalli, cache: memcached
     end
+  end
+
+  error do
+    haml :error
   end
 
   get('/login') do
