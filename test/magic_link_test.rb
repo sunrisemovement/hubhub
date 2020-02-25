@@ -57,6 +57,12 @@ class MagicLinkTest < CapybaraTest
     within '.hub-brand' do
       assert_content 'Sunrise Bree'
     end
+
+    # Revisiting should work
+    visit magic_link
+    within '.hub-brand' do
+      assert_content 'Sunrise Bree'
+    end
   end
 
   def test_link_timeout
