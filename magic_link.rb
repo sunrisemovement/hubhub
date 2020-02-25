@@ -73,6 +73,7 @@ class MagicLink < Sinatra::Base
   post('/login') do
     # If the user submits a valid hub id
     if @hub = Hub.find(params['hub'])
+      logger.info "Attempting login: Hub #{@hub.id} (#{@hub['Name']})"
       # And that hub is indeed editable in Hubhub
       if @hub.editable_by_coordinators?
         # Generate a new 10-minute one-time login key
@@ -101,6 +102,7 @@ class MagicLink < Sinatra::Base
   end
 
   get('/logout') do
+    logger.info "Logging out: Hub #{session[:hub_id]}"
     session[:hub_id] = nil
     redirect '/login'
   end
@@ -108,7 +110,7 @@ class MagicLink < Sinatra::Base
   get('/login/:key') do |key|
     # Check to ensure the key they submitted is valid
     if login = Keypad.enter_key(key)
-      logger.info "Login successful: Hub #{login[:hub_id]} (#{login[:hub_name]})"
+      logger.info "Login successful: Hub #{login[:hub_id]}"
       session[:hub_id] = login[:hub_id]
       redirect '/'
     else

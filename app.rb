@@ -77,6 +77,8 @@ class Hubhub < Sinatra::Base
 
   # Make edits to the hub's map information
   post '/map' do
+    logger.info "Editing map info: Hub #{@hub.id} (#{@hub['Name']})"
+
     # First, only allow edits to whitelisted fields
     attrs = params.slice(*EDITABLE_HUB_FIELDS)
 
@@ -155,6 +157,8 @@ class Hubhub < Sinatra::Base
   end
 
   post('/leaders') do
+    logger.info "Editing leader info: Hub #{@hub.id} (#{@hub['Name']})"
+
     # Fetch the hub's leaders
     @leaders = @hub.leaders
     leaders_by_id = @leaders.each_with_object({}) do |leader, h|
