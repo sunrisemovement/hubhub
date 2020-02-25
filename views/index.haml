@@ -74,7 +74,14 @@
     = succeed '.' do
       %a{href: ENV['LEADER_FORM'], target: '_blank'} hub leader form
   %li
-    Contact Vianney or Andrew below if you need to change who receives the login email!
+    = succeed '.' do
+      You can log in to this tool using your hub email (#{@hub['Email']}) or designated leader emails 
+      - if (@hub['Map Editor Emails'] || []).compact.length > 0
+        (#{to_sentence(@hub['Map Editor Emails'])})
+      - else
+        (currently none)
+  %li
+    Contact Vianney or Andrew below if you need to change who receives login emails!
 
 %h2
   %span.marker-bullet

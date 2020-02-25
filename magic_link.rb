@@ -85,8 +85,8 @@ class MagicLink < Sinatra::Base
           subject: "Sunrise Hubhub login link!",
           body: [
             "Hi #{@hub['Name']}!", "",
-            "Here's a magic link for signing into the Sunrise Hubhub beta test, where you can control how your hub appears on the Sunrise hub map: #{link}", "",
-            "This link will expire in 10 minutes. If you or one of your other hub coordinators did not request it, you can ignore this email, and if you have any questions, please email us back at #{ENV['GMAIL_USER']}.", "",
+            "Here's a magic link for signing into Sunrise Hubhub, where you can manage information and control how your hub appears on the Sunrise hub map: #{link}", "",
+            "This link will expire in 10 minutes. If you or one of your other hub leaders did not request it, you can ignore this email, and if you have any questions, please email us back at #{ENV['GMAIL_USER']}.", "",
             "Best,",
             "The Hub Support Team"
           ].join("\n")
@@ -115,7 +115,10 @@ class MagicLink < Sinatra::Base
       redirect '/'
     else
       logger.info "Bad login attempt with key: #{key.inspect}"
-      redirect '/login'
+      @error_msg = "It looks like you tried to log in with a link that was invalid, expired, or already used! Please select your hub from the list and try again."
+      @hubs = Hub.editable_by_coordinators
+      @states = @hubs.map{ |h| h['State'] }.uniq.sort
+      haml :login
     end
   end
 end

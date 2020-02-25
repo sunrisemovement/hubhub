@@ -42,6 +42,10 @@
       %section.section
         .container
           .content
+            - if instance_variable_defined?(:@error_msg)
+              - if @error_msg
+                %article.message.is-danger
+                  .message-body= @error_msg
             = yield
 
     %footer.footer

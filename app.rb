@@ -15,6 +15,20 @@ class Hubhub < Sinatra::Base
       Rack::Utils.escape_html(text)
     end
 
+    def to_sentence(a, join='and')
+      arr = a.compact
+      case arr.length
+      when 0
+        ''
+      when 1
+        arr.first
+      when 2
+        "#{arr.first} #{join} #{arr.last}"
+      else
+        "#{arr[0..-2].join(", ")}, #{join} #{arr.last}"
+      end
+    end
+
     # Helper function to output JSON loadable by the hub map but specific to
     # the current hub
     def map_entry
