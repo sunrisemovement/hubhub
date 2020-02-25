@@ -14,7 +14,8 @@
         %a.navbar-item{href: '/'}
           %img{src: '/s/map_icon.jpg'}
           - if session[:hub_id]
-            %span.hub-brand #{@hub['Name']}
+            - if instance_variable_defined?(:@hub)
+              %span.hub-brand #{@hub['Name']}
 
         :erb
           <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu">

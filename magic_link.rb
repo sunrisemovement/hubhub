@@ -109,7 +109,9 @@ class MagicLink < Sinatra::Base
 
   get('/login/:key') do |key|
     # Check to ensure the key they submitted is valid
-    if login = Keypad.enter_key(key)
+    if session[:hub_id]
+      redirect '/'
+    elsif login = Keypad.enter_key(key)
       logger.info "Login successful: Hub #{login[:hub_id]}"
       session[:hub_id] = login[:hub_id]
       redirect '/'
