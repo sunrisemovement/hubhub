@@ -367,8 +367,9 @@ function linkEscape(s) {
     replace(/'/g, "&#x27;");
   if (escaped.match(/^\s*javascript/i))
     return '';
-  else
-    return escaped;
+  if (!escaped.startsWith('http'))
+    return 'http://'+escaped;
+  return escaped;
 }
 
 function emailLink(email) {
