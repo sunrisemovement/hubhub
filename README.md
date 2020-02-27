@@ -1,4 +1,4 @@
-# Hubhub: Sunrise Hub Map + Airtable
+# Hubhub: Sunrise Hub Map + Airtable [![Build Status](https://travis-ci.org/sunrisemovement/hubhub.svg?branch=master)](https://travis-ci.org/sunrisemovement/hubhub)
 
 This repository contains code to help integrate Airtable (the current canonical source of hub data) with the [Sunrise hub map](https://www.sunrisemovement.org/hubs), as well as a web interface to help hubs manage their own data.
 
