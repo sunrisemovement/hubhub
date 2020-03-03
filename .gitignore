@@ -2,3 +2,4 @@
 hubs-from-google.csv
 *.DS_Store
 tmp
+logs
