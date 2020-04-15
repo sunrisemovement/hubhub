@@ -208,4 +208,33 @@ class MapJSONTest < Minitest::Test
     assert_equal hub5[:leaders], []
     assert_equal hub5[:custom_coord_text], 'The Hubbet'
   end
+
+  def test_social_media_link_formatting
+    stub_hubs([
+      hubby({'Name' => 'A', 'Twitter Handle' => '@handle1'}),
+      hubby({'Name' => 'B', 'Instagram Handle' => 'handle2'}),
+      hubby({'Name' => 'C', 'Facebook Handle' => 'facebook.com/handle3',
+                            'Twitter Handle' => 'https://twitter.com/handle4',
+                            'Instagram Handle' => 'www.instagram.com/handle5' })
+    ])
+
+    stub_leaders([])
+
+    json = Hub.map_json
+    assert_equal json.length, 3
+
+    h1, h2, h3 = json
+
+    assert_equal h1[:twitter], 'https://twitter.com/handle1'
+    assert_nil h1[:facebook]
+    assert_nil h1[:instagram]
+
+    assert_nil h2[:twitter]
+    assert_nil h2[:facebook]
+    assert_equal h2[:instagram], 'https://instagram.com/handle2'
+
+    assert_equal h3[:twitter], 'https://twitter.com/handle4'
+    assert_equal h3[:facebook], 'https://facebook.com/handle3'
+    assert_equal h3[:instagram], 'https://www.instagram.com/handle5'
+  end
 end

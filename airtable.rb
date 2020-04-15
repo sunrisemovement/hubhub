@@ -1,4 +1,6 @@
 require 'airrecord'
+require "active_support"
+require "active_support/core_ext/string"
 require_relative 'environment'
 require_relative 'scripts/state_abbr_to_name'
 
@@ -141,10 +143,40 @@ class Hub < Airrecord::Table
     self['Custom Map Email'] || self['Email']
   end
 
+  def url_slug
+    (self['Microsite URL Slug'].presence || self['Name'].sub(/^Sunrise\s/, '')).parameterize
+  end
+
+  def ensure_https_prefixed(domain, handle)
+    return handle if handle.downcase.start_with?("https://#{domain}")
+    return "https://#{handle}" if handle.downcase.start_with?(domain)
+    return "https://#{handle}" if handle.downcase.start_with?("www.#{domain}")
+    "https://#{domain}/#{handle.sub(/^@/, '')}"
+  end
+
+  def facebook_url
+    if s = self['Facebook Handle'].presence
+      ensure_https_prefixed("facebook.com", s.strip)
+    end
+  end
+
+  def twitter_url
+    if s = self['Twitter Handle'].presence
+      ensure_https_prefixed("twitter.com", s.strip)
+    end
+  end
+
+  def instagram_url
+    if s = self['Instagram Handle'].presence
+      ensure_https_prefixed("instagram.com", s.strip)
+    end
+  end
+
   # Combining all of the above functions, we can generate a public map entry
   # that will be used to power the hub map.
   def map_entry(leads=nil)
     entry = {
+      id: self.id,
       name: self.fields['Name'],
       city: self.fields['City'].strip,
       state: self.state,
@@ -152,10 +184,11 @@ class Hub < Airrecord::Table
       longitude: self.fields['Longitude'],
       custom_weblink_text: self.fields['Custom Website Link Text'],
       website: self.fields['Website'],
-      instagram: self.fields['Instagram Handle'],
-      facebook: self.fields['Facebook Handle'],
-      twitter: self.fields['Twitter Handle'],
+      instagram: instagram_url,
+      facebook: facebook_url,
+      twitter: twitter_url,
       signup_link: self.fields['Signup Link'],
+      url_slug: self.url_slug,
       leaders: []
     }
 
@@ -177,6 +210,12 @@ class Hub < Airrecord::Table
         }}
       end
     end
+
+    entry[:hero_image] = self.fields['Hero Image']
+    entry[:logo_image] = self.fields['Logo Image']
+    entry[:documents] = self.fields['Documents']
+    entry[:about] = self.fields['About Section']
+    entry[:donation_link] = self.fields['Donation Link']
 
     entry
   end

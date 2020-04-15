@@ -37,8 +37,8 @@ class HubEditingTest < CapybaraTest
 
     json = inline_map_json
     assert json['email'] == "sunriserivendell@msn.com"
-    assert json['twitter'] == "@riven-la-vida-loca"
-    assert json['instagram'] == "@elfiestick"
+    assert json['twitter'] == "https://twitter.com/riven-la-vida-loca"
+    assert json['instagram'] == "https://instagram.com/elfiestick"
     assert json['latitude'] == -41.056167
     assert json['longitude'] == 175.194522
   end
