@@ -51,13 +51,17 @@ logs.each do |log|
   if entry.include?('Attempting login')
     next unless hub_name = entry[/Hub \w+ \(([^\)]+)\)/, 1]
     ids_to_hub_names[hub_id] = hub_name
-    login_attempts[hub_id] += 1
-  elsif entry.include?('Login successful')
-    login_successes[hub_id] += 1
+    login_attempts[hub_name] += 1
+  else
+    hub_name = ids_to_hub_names[hub_id]
+  end
+
+  if entry.include?('Login successful')
+    login_successes[hub_name] += 1
   elsif entry.include?('Editing map info')
-    map_info_edits[hub_id] += 1
+    map_info_edits[hub_name] += 1
   elsif entry.include?('Editing leader info')
-    leader_edits[hub_id] += 1
+    leader_edits[hub_name] += 1
   end
 end
 
