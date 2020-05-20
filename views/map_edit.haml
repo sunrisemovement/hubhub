@@ -38,6 +38,10 @@
           %select{name: "Contact Type", id: 'contact-type'}
             -[["Hub Email", "Hub email (#{@hub['Email']})"], ["Leader Emails", "Leader emails"], ['Hub Email + Leader Emails', "Both hub and leader emails"], ['Custom Text', 'Custom text (enter below)']].each do |value,label|
               %option{value: value, selected: @hub["Contact Type"]==value}= label
+        %p.help
+          If you need to edit your hub's main contact email, click
+          = succeed '!' do
+            %a{href: '/hub_email'} here
     .field.custom-only
       %label.label Custom contact text
       .control

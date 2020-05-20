@@ -1,0 +1,12 @@
+%h1.title Update Hub Email
+
+%p
+  Please enter the email you'd like to use instead of #{@hub['Email']}, and we'll send an email to that address to verify the change.
+
+%form{action: '/hub_email', method: 'POST'}
+  .field
+    %label.label New email
+    .control
+      %input.input{name: 'email'}
+      
+  %input.button.is-warning{type: 'submit', value: 'Update Hub Email'}
