@@ -196,5 +196,51 @@ class Hubhub < Sinatra::Base
     haml :leader_changes
   end
 
+  get('/hub_email') do
+    haml :hub_email
+  end
+
+  post('/hub_email') do
+    @email = params['email'].to_s.strip
+
+    raise unless @email.length > 0
+    raise unless @email =~ URI::MailTo::EMAIL_REGEXP
+
+    link = url("/hub_email/#{Keypad.generate_key(@hub, @email)}")
+
+    Emailer.send_email(
+      to: @email,
+      subject: "Verifying your new Sunrise Hubhub email",
+      body: [
+        "Hi #{@hub['Name']}!", "",
+        "We got a request to update your login email for Sunrise Hubhub from #{@hub['Email']} to #{@email}. To confirm this update, please click on the following link: #{link}", "",
+        "This link will expire in 10 minutes. If you or one of your other hub leaders did not request it, you can ignore this email, and if you have any questions, please email us back at #{ENV['GMAIL_USER']}.", "",
+        "Best,",
+        "The Hub Support Team"
+      ].join("\n")
+    )
+
+    haml :hub_email_sent
+  rescue
+    @email_error = "We had trouble sending a confirmation email to #{params['email'].to_s.inspect}! This could be because it's an invalid email, or it could be because of an error on our side. If you continue having problems, please email us back at #{ENV['GMAIL_USER']}."
+
+    haml :hub_email_error
+  end
+
+  get('/hub_email/:key') do |key|
+    login = Keypad.enter_key(key)
+    if login && login[:hub_id] == @hub.id && login[:metadata]
+      new_email = login[:metadata]
+      @prev_email = @hub['Email']
+      @hub['Email'] = new_email
+      @hub.save if ENV['APP_ENV'] == 'production'
+      haml :hub_email_updated
+    else
+      logger.info "Bad email update attempt with key: #{key.inspect}"
+      @email_error = "It looks like you tried to update your hub's email with a link that was invalid, expired, or already used! Please go back to the edit page and try again (if you want to update your hub's email from #{@hub['Email']} to something else)."
+      haml :hub_email_error
+    end
+  end
+
   run! if app_file == $0
 end
