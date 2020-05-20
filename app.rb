@@ -234,6 +234,7 @@ class Hubhub < Sinatra::Base
       @prev_email = @hub['Email']
       @hub['Email'] = new_email
       @hub.save if ENV['APP_ENV'] == 'production'
+      logger.info "Updated hub email: Hub #{@hub.id} (#{@hub['Name']}) switched from #{@prev_email} to #{new_email}"
       haml :hub_email_updated
     else
       logger.info "Bad email update attempt with key: #{key.inspect}"
