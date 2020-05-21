@@ -27,7 +27,7 @@ while date < Date.today
       logs += tsv.split("\n").map { |line| line.strip.split("\t") }
     else
       key = "#{path}/#{name}.gz"
-      obj = s3.get_object(bucket: BUCKET, key: key)
+      obj = s3.get_object(bucket: BUCKET, key: key) rescue next
       str = obj.body.string
       tsv = Zlib::GzipReader.new(StringIO.new(str)).read
       File.write("#{LOG_DIR}/#{name}", tsv)
