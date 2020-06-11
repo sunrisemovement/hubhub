@@ -27,6 +27,7 @@ while date < Date.today
       logs += tsv.split("\n").map { |line| line.strip.split("\t") }
     else
       key = "#{path}/#{name}.gz"
+      puts key
       obj = s3.get_object(bucket: BUCKET, key: key) rescue next
       str = obj.body.string
       tsv = Zlib::GzipReader.new(StringIO.new(str)).read
@@ -42,6 +43,7 @@ login_attempts = Hash.new { |h,k| h[k] = 0 }
 login_successes = Hash.new { |h,k| h[k] = 0 }
 map_info_edits = Hash.new { |h,k| h[k] = 0 }
 leader_edits = Hash.new { |h,k| h[k] = 0 }
+email_updates = Hash.new { |h,k| h[k] = 0 }
 
 logs.each do |log|
   entry = log[-1]
@@ -50,10 +52,13 @@ logs.each do |log|
 
   if entry.include?('Attempting login')
     next unless hub_name = entry[/Hub \w+ \(([^\)]+)\)/, 1]
-    ids_to_hub_names[hub_id] = hub_name
+    ids_to_hub_names[hub_id] ||= []
+    unless ids_to_hub_names[hub_id].include?(hub_name)
+      ids_to_hub_names[hub_id] << hub_name
+    end
     login_attempts[hub_name] += 1
   else
-    hub_name = ids_to_hub_names[hub_id]
+    hub_name = (ids_to_hub_names[hub_id] || []).last
   end
 
   if entry.include?('Login successful')
@@ -62,6 +67,8 @@ logs.each do |log|
     map_info_edits[hub_name] += 1
   elsif entry.include?('Editing leader info')
     leader_edits[hub_name] += 1
+  elsif entry.include?('Updated hub email')
+    email_updates[hub_name] += 1
   end
 end
 
