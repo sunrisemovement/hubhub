@@ -5,6 +5,14 @@
   = succeed '!' do
     %a{href: 'https://sunrisemovement.org/hubs', target: '_blank'} Sunrise movement hub map
 
+%p
+  If you'd also like to edit how your hub appears on its
+  = succeed ',' do
+    %a{href: @hub.microsite_url, target: '_blank'} Sunrise movement microsite
+  you can do that
+  = succeed '.' do
+    %a{href: '/microsite/edit'} here
+
 %br
 
 :css

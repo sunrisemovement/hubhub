@@ -1,0 +1,121 @@
+%h1.title Edit Microsite Information
+
+%p
+  On this page, you can edit the information that appears about your hub on its
+  = succeed '!' do
+    %a{href: @hub.microsite_url, target: '_blank'} Sunrise movement microsite
+
+%p
+  Note that edits (including URL changes) will take up to 10 minutes to go live, and some of this information (e.g. social media links, hub name) overlaps with what appears on the
+  = succeed ',' do
+    %a{href: '/map'} map
+  which you can edit
+  = succeed '.' do
+    %a{href: '/map/edit'} here
+
+:css
+  #microsite-form img {
+    max-width: 250px;
+  }
+
+%br
+
+%form{action: '/microsite', method: 'POST', id: 'microsite-form', enctype: "multipart/form-data"}
+  %h2.subtitle Basic Info
+  %fieldset.box
+    .field
+      %label.label Hub Name
+      .control
+        %input.input{name: 'Name', value: @hub['Name']}
+
+    .field
+      %label.label About Section
+      .control
+        %textarea.textarea{name: 'About Section', placeholder: 'Tell us about your hub!'}
+          = @hub['About Section']
+        %p.help This will appear in the About section of your hub's microsite (under the heading "About #{@hub['Name']}").
+
+    .field
+      %label.label Microsite URL Slug
+      .control
+        %input.input{name: 'Microsite URL Slug', value: @hub['Microsite URL Slug'], placeholder: @hub.url_slug}
+        - if @errors['Microsite URL Slug']
+          %p.help.is-danger= @errors['Microsite URL Slug']
+        - else
+          %p.help Modify this to update the path of your hub's microsite (under #{ENV['MICROSITE_BASE_URL']}) from <code>/#{@hub.url_slug}</code> to something else! Note this must be unique across Sunrise, and should consist of lower-case characters, numbers, and dashes.
+
+  %h2.subtitle Images
+  %fieldset.box
+    .field
+      %label.label Hero Image (2880x1800)
+      .control
+        %p.help This will appear as the grayed out background image on your hub microsite! Please make sure it's a high-resolution image (we recommend 2880 by 1800 pixels) so it looks nice :)
+        - if @hub['Hero Image'] && @hub['Hero Image'].length > 0
+          %div Current image:
+          %div
+            %img{src: @hub['Hero Image'][0]['url']}
+          %div Update image:
+        %input{type: 'file', name: 'Update Hero Image', accept: "image/*", onchange: "document.getElementById('hero-preview').src = window.URL.createObjectURL(this.files[0])"}
+        %div
+          %img{id: 'hero-preview'}
+
+    .field
+      %label.label Hub Logo (min. 150x150)
+      .control
+        %p.help Add your hub's logo! Make sure it's square (though it will be displayed as a circle) and at least 150 pixels wide.
+        - if @hub['Logo Image'] && @hub['Logo Image'].length > 0
+          %div Current image:
+          %img{src: @hub['Logo Image'][0]['url']}
+          %div Update image:
+        %input{type: 'file', name: 'Update Logo Image', accept: "image/*", onchange: "document.getElementById('logo-preview').src = window.URL.createObjectURL(this.files[0])"}
+        %div
+          %img{id: 'logo-preview'}
+
+
+  %h2.subtitle Hub Links
+  %fieldset.box
+    .field
+      %label.label Facebook Link/Handle
+      .control
+        %input.input{name: 'Facebook Handle', value: @hub['Facebook Handle']}
+
+    .field
+      %label.label Twitter Link/Handle
+      .control
+        %input.input{name: 'Twitter Handle', value: @hub['Twitter Handle']}
+
+    .field
+      %label.label Instagram Link/Handle
+      .control
+        %input.input{name: 'Instagram Handle', value: @hub['Instagram Handle']}
+        %p.help For these social media fields, you can either provide a full link or just the handle (with or without the @ sign).
+
+    .field
+      %label.label Donation Link
+      .control
+        %input.input{name: 'Donation Link', value: @hub['Donation Link']}
+        %p.help
+          Here you can link to a donation page, which will show up as a big yellow button on the microsite. Please include the full link with http:// or https:// at the beginning.
+
+    .field
+      %label.label Signup Link
+      .control
+        %input.input{name: 'Signup Link', value: @hub['Signup Link']}
+        %p.help
+          Here you can link to a signup page or form. Please include the full link with http:// or https:// at the beginning.
+    .field
+      %label.label Website
+      .control
+        %input.input{name: 'Website', value: @hub['Website']}
+        %p.help
+          Here you can link to a custom hub website. Please include the full link with http:// or https:// at the beginning.
+    .field
+      %label.label Website Link Text
+      .control
+        %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: "Visit #{@hub['Name']}'s Full Website"}
+        %p.help If you enter something here, it will show up instead of "Visit #{@hub['Name']}'s Full Website" as the link text on the microsite. Note this is also what will be displayed on the map. Maybe we should change that and have a second field? Let us know 🤔
+
+  %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
+
+:css
+  .hidden { display: none; }

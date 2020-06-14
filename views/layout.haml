@@ -35,6 +35,8 @@
               Edit Map
             %a.navbar-item{href: '/leaders', class: ('is-active' if request.path_info.start_with?('/leaders'))}
               Manage Leaders
+            %a.navbar-item{href: '/microsite/edit', class: ('is-active' if request.path_info == '/microsite/edit')}
+              Edit Microsite
         - if session[:hub_id]
           .navbar-end
             .navbar-item

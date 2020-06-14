@@ -147,6 +147,10 @@ class Hub < Airrecord::Table
     (self['Microsite URL Slug'].presence || self['Name'].sub(/^Sunrise\s/, '')).parameterize
   end
 
+  def microsite_url
+    "#{ENV['MICROSITE_BASE_URL']}/#{url_slug}"
+  end
+
   def ensure_https_prefixed(domain, handle)
     return handle if handle.downcase.start_with?("http://#{domain}")
     return handle if handle.downcase.start_with?("https://#{domain}")
