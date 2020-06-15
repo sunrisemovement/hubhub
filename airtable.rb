@@ -148,7 +148,10 @@ class Hub < Airrecord::Table
   end
 
   def ensure_https_prefixed(domain, handle)
+    return handle if handle.downcase.start_with?("http://#{domain}")
     return handle if handle.downcase.start_with?("https://#{domain}")
+    return handle if handle.downcase.start_with?("http://www.#{domain}")
+    return handle if handle.downcase.start_with?("https://www.#{domain}")
     return "https://#{handle}" if handle.downcase.start_with?(domain)
     return "https://#{handle}" if handle.downcase.start_with?("www.#{domain}")
     "https://#{domain}/#{handle.sub(/^@/, '')}"
