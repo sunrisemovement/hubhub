@@ -37,6 +37,8 @@
               Manage Leaders
             %a.navbar-item{href: '/microsite/edit', class: ('is-active' if request.path_info == '/microsite/edit')}
               Edit Microsite
+              &nbsp;
+              %span.tag beta!
         - if session[:hub_id]
           .navbar-end
             .navbar-item
