@@ -118,9 +118,9 @@
   %h2.subtitle Hub Events
   %fieldset.box
     %p
-      Here are the
-      %a{href: 'https://www.sunrisemovement.org/events', target: '_blank'} events from the Sunrise event map
-      which we have been able to match to your hub:
+      Here are the upcoming/ongoing events from the
+      %a{href: 'https://www.sunrisemovement.org/events', target: '_blank'} Sunrise event map
+      which we have been able to match to your hub, and which will appear on the microsite:
     %ul#sunrise-events
       %li
         Loading&hellip;
@@ -130,17 +130,24 @@
         $.getJSON(eventsUrl, data => {
           $('#sunrise-events').html(data.map_data.
             filter(el => el.hub_id == "#{@hub.id}").
-            map(el => `<li><a href='${el.registration_link}' target='_blank'>${el.event_title}</a></li>`).
-            join(""));
+            map(el => `<li><a href='${el.registration_link}' target='_blank'>${el.start_date.slice(0,10)}: ${el.event_title}</a></li>`).
+            join("") || '<li>No events found</li>');
         });
       });
 
-    If you've added more events to the event map (look
-    %a{href: 'https://www.sunrisemovement.org/portal', target: '_blank'} here
-    to find out how)
-    and they aren't showing up, make sure you create them on MobilizeAmerica with a contact email associated with your hub (either #{@hub['Email'].inspect} or one of your
-    %a{href: '/leaders'} leader's
-    emails), or set the event's contact name to "#{@hub['Name']}".
+    %p
+      If events you added aren't showing up (look
+      %a{href: 'https://www.sunrisemovement.org/portal', target: '_blank'} here
+      to find out how), make sure you create them with a contact email associated with your hub (either #{@hub['Email'].inspect} or one of your
+      %a{href: '/leaders'} leader's
+      emails), or with "#{@hub['Name']}" as the contact name.
+
+    %p
+      If an event is showing up here which is
+      %em not
+      associated with your hub, please email us at
+      = succeed '.' do
+        %a{href: "mailto:#{ENV['GMAIL_USER']}"}= ENV['GMAIL_USER']
 
   %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
 
