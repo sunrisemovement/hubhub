@@ -115,6 +115,33 @@
         %input.input{name: 'Custom Website Link Text', value: @hub['Custom Website Link Text'], placeholder: "Visit #{@hub['Name']}'s Full Website"}
         %p.help If you enter something here, it will show up instead of "Visit #{@hub['Name']}'s Full Website" as the link text on the microsite. Note this is also what will be displayed on the map. Maybe we should change that and have a second field? Let us know 🤔
 
+  %h2.subtitle Hub Events
+  %fieldset.box
+    %p
+      Here are the
+      %a{href: 'https://www.sunrisemovement.org/events', target: '_blank'} events from the Sunrise event map
+      which we have been able to match to your hub:
+    %ul#sunrise-events
+      %li
+        Loading&hellip;
+    :javascript
+      const eventsUrl = "#{ENV.fetch('EVENTS_JSON_URL', 'https://sunrise-events.s3.amazonaws.com/events.json')}";
+      $(document).ready(() => {
+        $.getJSON(eventsUrl, data => {
+          $('#sunrise-events').html(data.map_data.
+            filter(el => el.hub_id == "#{@hub.id}").
+            map(el => `<li><a href='${el.registration_link}' target='_blank'>${el.event_title}</a></li>`).
+            join(""));
+        });
+      });
+
+    If you've added more events to the event map (look
+    %a{href: 'https://www.sunrisemovement.org/portal', target: '_blank'} here
+    to find out how)
+    and they aren't showing up, make sure you create them on MobilizeAmerica with a contact email associated with your hub (either #{@hub['Email'].inspect} or one of your
+    %a{href: '/leaders'} leader's
+    emails), or set the event's contact name to "#{@hub['Name']}".
+
   %input.button.is-warning{type: 'submit', value: 'Update Hub Information'}
 
 :css
