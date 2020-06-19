@@ -463,7 +463,7 @@ function hubLinks(hub) {
   if (hub.signup_link) {
     html += hubLink(hub.signup_link, "Sign Up");
   }
-  html += hubLink(`https://staging-hubs.sunrisemovement.org/${hub.url_slug}`, 'Hub Microsite', true);
+  html += hubLink(`https://staging-hubs.sunrisemovement.org/${hub.url_slug}`, 'Hub Microsite');
   html += "</div>";
   return html;
 }
