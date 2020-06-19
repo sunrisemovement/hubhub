@@ -312,6 +312,30 @@ h3 {
 #hub-map .coordinators-mobile p:last-of-type {
   margin-bottom: 5px;
 }
+
+#hub-map .hub-map-links {
+  margin-top: 8px;
+  padding: 0 !important;
+}
+#hub-map .hub-map-link {
+  display: inline-block;
+  background: #E3EDDF;
+  padding: 10px;
+  margin-right: 2px;
+  margin-top: 2px;
+  text-align: center;
+  width: calc(50% - 22px);
+}
+#hub-map .hub-map-link:nth-child(2n+1):last-child {
+  width: calc(100% - 22px);
+}
+#hub-map .hub-map-link:hover {
+  opacity: 0.9;
+}
+#hub-map .hub-map-link-primary {
+  background: #8F0D56;
+  color: white !important;
+}
 </style>
 
 <div id="hub-map">
@@ -400,18 +424,17 @@ function socialP(prefix, value, title) {
   }
 }
 
+function hubLink(href, title, primary) {
+  if (!href) return '';
+  let klass = 'hub-map-link';
+  if (primary) {
+    klass += ' hub-map-link-primary';
+  }
+  return `<a class="${klass}" href="${linkEscape(href)}" target="_blank">${htmlEscape(title)}</a>`;
+}
+
 function hubLinks(hub) {
   var html = '';
-  html += socialP("https://facebook.com", hub.facebook, "Facebook Page");
-  html += socialP("https://twitter.com", hub.twitter, "Twitter Page");
-  html += socialP("https://instagram.com", hub.instagram, "Instagram Page");
-  if (hub.website) {
-    var linkText = hub.custom_weblink_text || "Hub Website";
-    html += `<p><a href="${linkEscape(hub.website)}" target="_blank" style="text-decoration:underline;">${htmlEscape(linkText)}</a></p>`;
-  }
-  if (hub.signup_link) {
-    html += `<p><a href="${linkEscape(hub.signup_link)}" target="_blank" style="text-decoration:underline;">Sign Up</a></p>`;
-  }
   if (hub.custom_coord_text) {
     html += `<strong>Hub Contact:</strong><br>${htmlEscape(hub.custom_coord_text)}`;
   } else if (hub.email && !hub.leaders.length) {
@@ -428,6 +451,20 @@ function hubLinks(hub) {
       html += emailLink(lead.email) + "<br>";
     }
   }
+
+  html += "<div class='hub-map-links'>";
+  html += hubLink(hub.facebook, "Facebook");
+  html += hubLink(hub.twitter, "Twitter");
+  html += hubLink(hub.instagram, "Instagram");
+  if (hub.website) {
+    var linkText = hub.custom_weblink_text || "Hub Website";
+    html += hubLink(hub.website, linkText);
+  }
+  if (hub.signup_link) {
+    html += hubLink(hub.signup_link, "Sign Up");
+  }
+  html += hubLink(`https://staging-hubs.sunrisemovement.org/${hub.url_slug}`, 'Hub Microsite', true);
+  html += "</div>";
   return html;
 }
 
