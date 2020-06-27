@@ -121,7 +121,7 @@ class MicrositeTest < CapybaraTest
     log_in_as 'Sunrise Isengard'
     visit '/microsite/edit'
 
-    select 'Private (hide from map)', from: 'Microsite Display Preference'
+    select 'Opt-out (hide from map)', from: 'Microsite Display Preference'
     click_button 'Update Hub Information'
 
     # Microsite link should be absent
