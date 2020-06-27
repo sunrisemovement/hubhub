@@ -460,12 +460,8 @@ function hubLinks(hub) {
     var linkText = hub.custom_weblink_text || "Hub Website";
     html += hubLink(hub.website, linkText);
   }
-  if (hub.signup_link) {
-    html += hubLink(hub.signup_link, "Sign Up");
-  }
-  if (hub.microsite_link) {
-    html += hubLink(hub.microsite_link, 'Hub Microsite');
-  }
+  html += hubLink(hub.signup_link, "Sign Up");
+  html += hubLink(hub.microsite_link, "Hub Microsite");
   html += "</div>";
   return html;
 }
