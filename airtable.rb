@@ -143,14 +143,29 @@ class Hub < Airrecord::Table
     self['Custom Map Email'] || self['Email']
   end
 
+  # The hub's url_slug is a unique, URL-friendly identifier for the hub that is
+  # used to identify the hub on the microsite app.
   def url_slug
     (self['Microsite URL Slug'].presence || self['Name'].sub(/^Sunrise\s/, '')).parameterize
   end
 
+  # The full URL of the hub's microsite.
   def microsite_url
     "#{ENV['MICROSITE_BASE_URL']}/#{url_slug}"
   end
 
+  # Hubs can express a preference about whether they want a link to the
+  # microsite to appear on the hub map; currently we show all microsites unless
+  # hubs opt out, but that could change.
+  def microsite_display_preference
+    self['Microsite Display Preference'] || 'Unspecified'
+  end
+
+  def should_show_microsite?
+    microsite_display_preference != 'Opt-out'
+  end
+
+  # Map social media handles to http(s) URLs.
   def ensure_https_prefixed(domain, handle)
     return handle if handle.downcase.start_with?("http://#{domain}")
     return handle if handle.downcase.start_with?("https://#{domain}")
@@ -195,7 +210,6 @@ class Hub < Airrecord::Table
       facebook: facebook_url,
       twitter: twitter_url,
       signup_link: self.fields['Signup Link'],
-      url_slug: self.url_slug,
       leaders: []
     }
 
@@ -218,6 +232,11 @@ class Hub < Airrecord::Table
       end
     end
 
+    # Add hub microsite information, but only add the full link if applicable.
+    if should_show_microsite?
+      entry[:microsite_link] = self.microsite_url
+    end
+    entry[:url_slug] = self.url_slug
     entry[:hero_image] = self.fields['Hero Image']
     entry[:logo_image] = self.fields['Logo Image']
     entry[:documents] = self.fields['Documents']

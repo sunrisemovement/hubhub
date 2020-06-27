@@ -18,7 +18,7 @@ LOG_DIR = "#{__dir__}/../logs"
 date = Date.new(2020, 2, 24)
 
 logs = []
-while date < Date.today
+while date <= Date.today
   0.upto(23).each do |i|
     name = "#{date}-#{i.to_s.rjust(2, '0')}.tsv"
     path = "#{PATH}/dt=#{date}"
@@ -44,6 +44,7 @@ login_successes = Hash.new { |h,k| h[k] = 0 }
 map_info_edits = Hash.new { |h,k| h[k] = 0 }
 leader_edits = Hash.new { |h,k| h[k] = 0 }
 email_updates = Hash.new { |h,k| h[k] = 0 }
+micro_updates = Hash.new { |h,k| h[k] = 0 }
 
 logs.each do |log|
   entry = log[-1]
@@ -69,6 +70,8 @@ logs.each do |log|
     leader_edits[hub_name] += 1
   elsif entry.include?('Updated hub email')
     email_updates[hub_name] += 1
+  elsif entry.include?('Editing microsite info')
+    micro_updates[hub_name] += 1
   end
 end
 

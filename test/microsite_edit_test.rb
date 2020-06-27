@@ -46,6 +46,10 @@ class MicrositeTest < CapybaraTest
       assert_content 'treegarth'
     end
     assert_css "a[href='#{TMP_BASE_URL}/treegarth']"
+
+    # Microsite link should be present
+    json = inline_map_json
+    assert json['microsite_link'] == 'https://foo.bar/treegarth'
   end
 
   def test_url_slug_uniqueness
@@ -102,5 +106,26 @@ class MicrositeTest < CapybaraTest
     # assert update fails, but changes are preserved
     assert_content "This value must only contain lower-case letters, numbers, and dashes."
     assert_field "Microsite URL Slug", with: 'Drogo Draggins'
+  end
+
+  def test_opting_out
+    stub_hubs([{
+      'Name' => 'Sunrise Isengard',
+      'City' => 'Orthanc',
+      'State' => 'GA',
+      'Email' => 'fangorn_fandom@treemail.com',
+      'Microsite URL Slug' => 'sunrisengard',
+      'Map?' => true
+    }])
+
+    log_in_as 'Sunrise Isengard'
+    visit '/microsite/edit'
+
+    select 'Private (hide from map)', from: 'Microsite Display Preference'
+    click_button 'Update Hub Information'
+
+    # Microsite link should be absent
+    json = inline_map_json
+    assert !json['microsite_link']
   end
 end

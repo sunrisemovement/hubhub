@@ -79,7 +79,8 @@ class Hubhub < Sinatra::Base
     'Custom Website Link Text', 'Signup Link',
     'Donation Link',
     'About Section',
-    'Microsite URL Slug'
+    'Microsite URL Slug',
+    'Microsite Display Preference'
   ]
 
   before do
