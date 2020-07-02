@@ -55,10 +55,10 @@
       .control
         .select
           %select{name: "Microsite Display Preference"}
-            - [["Unspecified", "Unspecified"], ["Opt-in", "Opt-in (show on map)"],["Opt-out","Opt-out (hide from map)"]].each do |value,label|
-              %option{value: value, selected: @hub.microsite_display_preference == value}= label
+            %option{value: "Opt-in", selected: @hub.microsite_display_preference != "Opt-out"} Opt-in (show on map)
+            %option{value: "Opt-out", selected: @hub.microsite_display_preference == "Opt-out"} Opt-out (hide from map)
         %p.help
-          With this dropdown, you can control whether a link to your hub's microsite appears on the hub map or not. Opting in will ensure a link appears. Opting out will ensure a link does <em>not</em> appear. You can also refrain from expressing a preference, in which case, we're not sure yet &mdash; the national web team is still deciding whether this feature will be opt-in or opt-out! We will update this help text after we make that decision, and you should feel free to contact us if you have thoughts one way or the other.
+          With this dropdown, you can control whether a link to your hub's microsite appears on the hub map or not. Opting in will ensure a link appears. Opting out will ensure a link does <em>not</em> appear.
 
   %h2.subtitle Images
   %fieldset.box

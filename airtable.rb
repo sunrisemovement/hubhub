@@ -162,7 +162,7 @@ class Hub < Airrecord::Table
   end
 
   def should_show_microsite?
-    microsite_display_preference != 'Opt-out'
+    microsite_display_preference == 'Opt-in'
   end
 
   # Map social media handles to http(s) URLs.

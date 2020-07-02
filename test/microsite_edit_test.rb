@@ -37,7 +37,7 @@ class MicrositeTest < CapybaraTest
     fill_in 'Microsite URL Slug', with: 'treegarth'
     click_button 'Update Hub Information'
 
-    # After updating hub info, should see a summary of changes
+    # After updating hub info, should see a summary of changes -- including that we've "opted in"
     within 'tr', text: 'About Section' do
       assert_content 'Help us elect Treebeard'
     end
@@ -45,11 +45,55 @@ class MicrositeTest < CapybaraTest
       assert_content 'sunrisengard'
       assert_content 'treegarth'
     end
+    within 'tr', text: 'Display Preference' do
+      assert_content 'Opt-in'
+    end
     assert_css "a[href='#{TMP_BASE_URL}/treegarth']"
 
     # Microsite link should be present
     json = inline_map_json
     assert json['microsite_link'] == 'https://foo.bar/treegarth'
+  end
+
+  def test_already_opted_out
+    stub_hubs([{
+      'Name' => 'Sunrise Isengard',
+      'City' => 'Orthanc',
+      'State' => 'GA',
+      'Email' => 'fangorn_fandom@treemail.com',
+      'Microsite URL Slug' => 'sunrisengard',
+      'Map?' => true,
+      'Microsite Display Preference' => 'Opt-out'
+    }])
+
+    log_in_as 'Sunrise Isengard'
+    visit '/microsite/edit'
+
+    # Page should have hub data populated
+    assert_field 'Name', with: 'Sunrise Isengard'
+    assert_field 'Microsite URL Slug', with: 'sunrisengard'
+    assert_css "a[href='#{TMP_BASE_URL}/sunrisengard']"
+
+    # Update hub information but stay opted out
+    fill_in 'Microsite URL Slug', with: 'treegarth'
+    click_button 'Update Hub Information'
+
+    # Should still see a summary of changes
+    within 'tr', text: 'Slug' do
+      assert_content 'treegarth'
+    end
+
+    # But the link should not be in the JSON
+    json = inline_map_json
+    assert json['microsite_link'].nil?
+
+    # However, should be able to reactivate
+    visit '/microsite/edit'
+    select 'Opt-in (show on map)', from: 'Microsite Display Preference'
+    click_button 'Update Hub Information'
+
+    json = inline_map_json
+    assert json['microsite_link'].present?
   end
 
   def test_url_slug_uniqueness
