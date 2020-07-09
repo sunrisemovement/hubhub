@@ -1,6 +1,5 @@
 require 'json'
 require 'aws-sdk-s3'
-require 'httparty'
 require_relative '../airtable'
 
 # Set up a client that can upload files to Amazon S3 (a file hosting service)
@@ -14,19 +13,6 @@ s3 = Aws::S3::Client.new(
 s3.put_object(
   bucket: ENV['AWS_BUCKET'],
   acl: 'public-read',
-  key: 'hubs.json',
-  body: JSON.dump({
-    updated_at: Time.now.to_s,
-    map_data: Hub.map_json
-  })
+  key: 'hub_map.html',
+  body: File.read('public/hub_map.html')
 )
-
-if token = ENV['MICROSITE_GITHUB_ACCESS_TOKEN']
-  # Deploy microsites
-  HTTParty.post(
-    "https://api.github.com/repos/sunrisemovement/smvmt-microsite/pages/builds",
-    headers: {
-      "Authorization" => "token #{token}"
-    }
-  )
-end

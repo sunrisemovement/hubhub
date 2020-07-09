@@ -10,6 +10,7 @@ gem 'pony'
 gem 'dotenv'
 gem 'honeybadger'
 gem 'dalli'
+gem 'httparty'
 
 group :development do
   gem 'rake'

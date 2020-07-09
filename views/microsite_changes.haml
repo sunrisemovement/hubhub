@@ -1,0 +1,33 @@
+%h1.title Update Summary
+
+%p You edited the following hub microsite information:
+%table.table.is-striped.is-bordered.is-fullwidth.is-responsive
+  %thead
+    %th Field
+    %th Old Value
+    %th New Value
+  %tbody
+    - if @diff.size > 0
+      - @diff.each do |attr, (old, new)|
+        %tr
+          %td= attr
+          - [old, new].each do |value|
+            %td
+              - if attr =~ /Image$/
+                %img{src: value, style: 'max-width: 250px;'}
+              - elsif value.is_a?(Array)
+                %ul
+                  - value.each do |entry|
+                    %li= entry
+              - else
+                = value
+    - else
+      %tr
+        %td.has-text-centered{colspan: 3} No changes to show
+
+%p
+  Your edits will be live on the
+  %a{href: @hub.microsite_url, target: '_blank'} main site
+  soon (within ~10 minutes)!
+
+%a.button.is-link{href: '/microsite/edit'} Back to Microsite Info Edit Page
