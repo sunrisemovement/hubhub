@@ -146,7 +146,7 @@ class Hub < Airrecord::Table
   # The hub's url_slug is a unique, URL-friendly identifier for the hub that is
   # used to identify the hub on the microsite app.
   def url_slug
-    (self['Microsite URL Slug'].presence || self['Name'].sub(/^Sunrise\s/, '')).parameterize
+    (self['Microsite URL Slug'].presence || self['Name'].to_s.sub(/^Sunrise\s/, '')).parameterize
   end
 
   # The full URL of the hub's microsite.
@@ -162,7 +162,7 @@ class Hub < Airrecord::Table
   end
 
   def should_show_microsite?
-    microsite_display_preference == 'Opt-in'
+    microsite_display_preference == 'Opt-in' && url_slug.present?
   end
 
   # Map social media handles to http(s) URLs.
