@@ -59,7 +59,7 @@
         %p
           © #{Date.today.year} Sunrise.
 
-  - if ENV['APP_ENV'] == 'test' && session[:hub_id]
+  - if ENV['APP_ENV'] == 'test' && session[:hub_id] && instance_variable_defined?(:@hub)
     -# Always render map entry for non-persistent testing purposes
     #map-entry-json{:'data-map-data' => map_entry}
 

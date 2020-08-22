@@ -81,9 +81,10 @@ class MagicLinkTest < CapybaraTest
     email = Emailer.last_email
     magic_link = email[:body][/https?:\/\/[\S]+/]
 
-    Timecop.freeze(Date.today + 1) do
+    Timecop.freeze(Time.now + 10*60 + 1) do
       visit magic_link
       assert_no_css '.hub-brand', text: 'Minas Tirith'
+      assert_content 'invalid, expired, or already used'
     end
   end
 
@@ -140,6 +141,7 @@ class MagicLinkTest < CapybaraTest
 
     visit magic_link1
     assert_no_css '.hub-brand', text: 'Minas Tirith'
+    assert_content 'invalid, expired, or already used'
 
     visit magic_link2
     assert_css '.hub-brand', text: 'Minas Tirith'
@@ -149,6 +151,7 @@ class MagicLinkTest < CapybaraTest
     stub_hubs([])
     visit '/login/fgsfgsfgdgdsfdfgsdfg'
     assert_no_content 'Edit Hub'
+    assert_content 'invalid, expired, or already used'
   end
 
   def test_only_verified_hubs_with_emails

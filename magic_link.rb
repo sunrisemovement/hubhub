@@ -98,4 +98,21 @@ class MagicLink < Sinatra::Base
       haml :login
     end
   end
+
+  get('/hub_email/:key') do |key|
+    login = Keypad.enter_key(key)
+    if login && login[:metadata] && hub = Hub.find(login[:hub_id])
+      @new_email = login[:metadata]
+      @prev_email = hub['Email']
+      @hub_name = hub['Name']
+      hub['Email'] = @new_email
+      hub.save if ENV['APP_ENV'] == 'production'
+      logger.info "Updated hub email: Hub #{hub.id} (#{hub['Name']}) switched from #{@prev_email} to #{@new_email}"
+      haml :hub_email_updated
+    else
+      logger.info "Bad email update attempt with key: #{key.inspect}"
+      @email_error = "It looks like you tried to confirm an email update with a link that was invalid, expired, or already used! Please try again, or if you continue to have problems, you can contact us at #{ENV['GMAIL_USER']}."
+      haml :hub_email_error
+    end
+  end
 end

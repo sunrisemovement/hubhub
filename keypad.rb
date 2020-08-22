@@ -10,20 +10,21 @@ class Keypad
     attr_reader :store
 
     # Generated keys are specific to hubs and expire after 10 minutes
-    def generate_key(hub, metadata=nil)
+    # (can be configured to last longer)
+    def generate_key(hub, metadata=nil, timeout=nil)
       old_keys = @store.keys.select{ |k| @store[k][:hub_id] == hub.id }
       old_keys.each do |key|
         @store.delete(key)
       end
       # Use `SecureRandom.urlsafe_base64` to generate the key
       SecureRandom.urlsafe_base64(32).tap do |key|
-        @store[key] = { hub_id: hub.id, time: Time.now, metadata: metadata }
+        @store[key] = { hub_id: hub.id, time: Time.now, metadata: metadata, timeout: timeout }
       end
     end
 
     def enter_key(key)
       # First remove any expired keys
-      @store.each { |k, o| @store.delete(k) if Time.now - o[:time] > TIMEOUT }
+      @store.each { |k, o| @store.delete(k) if (Time.now - o[:time]) > (o[:timeout] || TIMEOUT) }
       # Then simultaneously fetch and delete the specific key (returning nil if
       # it does not exist)
       @store.delete(key)
