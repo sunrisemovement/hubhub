@@ -516,12 +516,30 @@ $(document).ready(function() {
 
 
 function initMap(hubs) {
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYWxhdXJlbnppIiwiYSI6ImNqdDlna2o5ZTA0M2gzeW8zcWQwN3hnNDAifQ.uAXKXOB2I-G3gBXrkXWOrw';
-  var vanillaMapStyle = 'mapbox://styles/mapbox/light-v9';
-
   var map = new mapboxgl.Map({
     container: 'map',
-    style: vanillaMapStyle,
+    style: {
+      version: 8,
+      sources: {
+        'raster-tiles': {
+          type: 'raster',
+          tiles: [
+            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          ],
+          tileSize: 256,
+          attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+        }
+      },
+      layers: [
+        {
+          id: 'simple-tiles',
+          type: 'raster',
+          source: 'raster-tiles',
+          minzoom: 0,
+          maxzoom: 22
+        }
+      ]
+    },
     center: [-112.030293, 39.585733],
     zoom: 2.5
     //scrollZoom: false
