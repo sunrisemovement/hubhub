@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 ruby '2.6.6'
 
 gem 'airrecord'
-gem 'activesupport'
+gem 'activesupport', '>= 4.1.11'
 gem 'aws-sdk-s3'
 gem 'sinatra'
 gem 'haml'
