@@ -67,14 +67,14 @@ class Hubhub < Sinatra::Base
 
   # Create a whitelist of hub fields that can be edited via POST /map
   EDITABLE_MAP_FIELDS = [
-    'Name', 'Website', 'Latitude', 'Longitude', 'Activity?',
+    'Name', 'Website', 'Latitude', 'Longitude', 'Activity',
     'Facebook Handle', 'Twitter Handle', 'Instagram Handle',
     'Custom Website Link Text', 'Contact Type', 'Signup Link',
     'Custom Map Email', 'Custom Map Contact Text'
   ]
 
   EDITABLE_MICROSITE_FIELDS = [
-    'Name', 'Website', 'Activity?',
+    'Name', 'Website', 'Activity',
     'Facebook Handle', 'Twitter Handle', 'Instagram Handle',
     'Custom Website Link Text', 'Signup Link',
     'Donation Link',
@@ -225,6 +225,10 @@ class Hubhub < Sinatra::Base
         @hub[attr] = value
         changed = true
       end
+    end
+
+    if @diff.key?('Activity') && attrs['Activity'] == 'Inactive'
+      logger.info "Setting to inactive: Hub #{@hub.id} (#{@hub['Name']})"
     end
 
     # If there was an actual change, update the hub on Airtable (assuming we're
