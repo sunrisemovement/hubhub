@@ -452,17 +452,23 @@ function hubLinks(hub) {
     }
   }
 
-  html += "<div class='hub-map-links'>";
-  html += hubLink(hub.facebook, "Facebook");
-  html += hubLink(hub.twitter, "Twitter");
-  html += hubLink(hub.instagram, "Instagram");
+  var links = '';
+  links += hubLink(hub.facebook, "Facebook");
+  links += hubLink(hub.twitter, "Twitter");
+  links += hubLink(hub.instagram, "Instagram");
   if (hub.website) {
     var linkText = hub.custom_weblink_text || "Hub Website";
-    html += hubLink(hub.website, linkText);
+    links += hubLink(hub.website, linkText);
   }
-  html += hubLink(hub.signup_link, "Sign Up");
-  html += hubLink(hub.microsite_link, "View Details");
-  html += "</div>";
+  links += hubLink(hub.signup_link, "Sign Up");
+  links += hubLink(hub.microsite_link, "View Details");
+
+  if (links.length) {
+    html += "<div class='hub-map-links'>";
+    html += links;
+    html += "</div>";
+  }
+
   return html;
 }
 
