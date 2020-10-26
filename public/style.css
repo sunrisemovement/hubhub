@@ -17,6 +17,17 @@ main {
   min-height: calc(100vh - 3.25rem - 10.5rem);
 }
 
+.textarea.trumbowyg-textarea {
+  min-height: inherit;
+  max-height: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.trumbowyg-box {
+  border-radius: 4px;
+}
+
 .hub-brand {
   text-transform: uppercase;
   font-weight: bold;
