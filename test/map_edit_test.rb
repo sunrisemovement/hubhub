@@ -80,4 +80,41 @@ class HubEditingTest < CapybaraTest
     assert json['leaders'].length == 1
     assert json['leaders'].first['first_name'] == 'Arwen'
   end
+
+  def test_leader_edge_case
+    stub_hubs([{
+      'Name' => 'Sunrise Rivendell',
+      'City' => 'Rivendell',
+      'State' => 'PA',
+      'Email' => 'sunriserivendell@msn.com',
+      'Contact Type' => 'Hub Email + Leader Emails',
+      'Map?' => true,
+      'Hub Leaders': ['l1', 'l2']
+    }])
+
+    stub_leaders([{
+      'id' => 'l1',
+      'First Name' => 'Arwen',
+      'Last Name' => 'Peredhel',
+      'Email' => 'arwen@dell.com',
+      'Map?' => true,
+    }, {
+      'id' => 'l2',
+      'First Name' => 'Elrond',
+      'Last Name' => 'Peredhel',
+      'Email' => 'l.rond@peredh.el',
+      'Map?' => true
+    }])
+
+    log_in_as 'Sunrise Rivendell'
+    visit '/map/edit'
+    select 'Both hub and leader emails', from: 'contact-type'
+    unselect 'Arwen Peredhel: arwen@dell.com', from: 'Map Leaders[]'
+    unselect 'Elrond Peredhel: l.rond@peredh.el', from: 'Map Leaders[]'
+    click_button 'Update Hub Information'
+
+    json = inline_map_json
+    assert json['email'].present?
+    assert json['leaders'].blank?
+  end
 end

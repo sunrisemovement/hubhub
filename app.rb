@@ -250,7 +250,7 @@ class Hubhub < Sinatra::Base
       # Determine who was previously configured to show up on the hub map vs.
       # who will subsequently show up.
       old = @leaders.select { |lead| lead['Map?'] }
-      new_ids = params["Map Leaders"]
+      new_ids = params["Map Leaders"] || []
       old_ids = old.map { |lead| lead.id }
       new = new_ids.map { |id| leads_by_id[id] }
 
