@@ -3,12 +3,12 @@
   .field
     .control
       %label.label Your hub
-      .select
-        %select{name: 'hub'}
-          - @states.each do |s|
-            %optgroup{label: s}
-              - @hubs.select { |h| h['State'] == s }.each do |h|
-                %option{value: h.id}= h['Name']
+      %select{name: 'hub', id: 'hub-select'}
+        - @states.each do |s|
+          %optgroup{label: s}
+            - @hubs.select { |h| h['State'] == s }.each do |h|
+              %option{value: h.id}= h['Name']
+      %br
       %p.help
         Select your hub from the dropdown list, and we'll send a login link to its associated email. If your hub isn't appearing, or you aren't sure about your hub's associated email, contact us at
         = succeed '.' do
@@ -16,3 +16,8 @@
   .field
     .control
       %input.button.is-warning{type: 'submit', value: 'Send Magic Link'}
+
+%link{rel: 'stylesheet', type: 'text/css', href: '/chosen.min.css'}
+%script{type: 'text/javascript', src: '/chosen.jquery.min.js'}
+%script
+  $(document).ready(() => $('#hub-select').chosen());
