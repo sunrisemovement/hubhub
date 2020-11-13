@@ -246,6 +246,45 @@ class Hub < Airrecord::Table
     end
   end
 
+  def sms_info
+    parts = []
+
+    if sl = self['Signup Link']
+      parts << "You can sign up for #{self['Name']} at #{sl}."
+    elsif sl = self['Website']
+      parts << "You can sign up for #{self['Name']} at #{sl}."
+    elsif sl = contact_text
+      parts << "You can sign up for #{self['Name']} by contacting #{sl}."
+    end
+
+    sm = {}
+    sm['Facebook'] = facebook_url if facebook_url
+    sm['Twitter'] = twitter_url if twitter_url
+    sm['Instagram'] = instagram_url if instagram_url
+
+    if sm.values.size > 0
+      parts << "Also, you can follow #{self['Name']} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} :)"
+    end
+    
+    parts.join(" ")
+  end
+
+  def contact_text
+    if contact_type == 'Custom Text'
+      self['Custom Map Contact Text']
+    elsif should_show_hub_email?
+      contact_email
+    elsif should_show_leader_emails?
+      leads = self.leaders
+      leads = leads.select { |l| l['Map?'] && !l['Deleted by Hubhub?'] }
+      leads.map{|l| l['Email'] }.to_sentence(last_word_connector: ', or ')
+    end
+  end
+
+  def coords
+    [self['Latitude'], self['Longitude']]
+  end
+
   # Combining all of the above functions, we can generate a public map entry
   # that will be used to power the hub map.
   def map_entry(leads=nil)

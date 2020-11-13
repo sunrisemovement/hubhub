@@ -12,6 +12,7 @@ gem 'honeybadger'
 gem 'dalli'
 gem 'httparty'
 gem 'puma'
+gem 'twilio-ruby'
 
 group :development do
   gem 'rake'
