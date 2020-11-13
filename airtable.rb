@@ -263,7 +263,12 @@ class Hub < Airrecord::Table
     sm['Instagram'] = instagram_url if instagram_url
 
     if sm.values.size > 0
-      parts << "Also, you can follow #{self['Name']} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} :)"
+      parts << "Also, you can follow #{self['Name']} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} 🙂"
+    end
+
+    if parts.size == 0
+      parts << "Unfortunately, we can't find any contact or social media information for #{self['Name']} right now 😞"
+      parts << "Try searching for a different hub!"
     end
     
     parts.join(" ")

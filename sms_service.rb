@@ -39,7 +39,7 @@ class SMSService < Sinatra::Base
       state ||= STATE_ABBR_TO_NAME[STATE_ABBR_TO_NAME.keys.detect{|v| sms.include?(v.downcase) }]
     end
 
-    def hubs_near(coords, max=12, min=5, radius=10)
+    def hubs_near(coords, max=99, min=5, radius=10)
       results = []
       active_hubs.sort_by { |hub| distance(coords, hub.coords) }.each do |hub|
         break if results.size >= max
@@ -58,7 +58,7 @@ class SMSService < Sinatra::Base
       hubs.each_with_index do |hub, i|
         string += "\n (#{i+1}) #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
       end
-      string += "\nReply back with 1-#{hubs.size} or a hub name to learn how to join!"
+      string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
       string
     end
 
@@ -67,7 +67,7 @@ class SMSService < Sinatra::Base
       hubs.each_with_index do |hub, i|
         string += "\n (#{i+1}) #{hub['Name']} "
       end
-      string += "\nReply back with 1-#{hubs.size} or a hub name to learn how to join!"
+      string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
       string
     end
 
@@ -84,6 +84,9 @@ class SMSService < Sinatra::Base
 
     def sms_response(sms)
       sms = sms.to_s.strip.downcase
+      session['msg_count'] ||= 0
+      msg_count = session['msg_count']
+      session['msg_count'] += 1
 
       if hub = (hub_choice(sms) || hub_named(sms))
         hub.sms_info
@@ -95,8 +98,10 @@ class SMSService < Sinatra::Base
         hubs = hubs_in(state)
         session['hub_ids'] = hubs.map(&:id)
         state_message(hubs, state)
+      elsif msg_count == 0
+        "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
       else
-        "Sorry, this Sunrise chatbot is very simple and only responds to zip codes, state names, and hub names. Please try replying back with one of those!"
+        "Sorry, I couldn't figure out what you meant! Try replying back with a zip code, state name, or hub name, and if that doesn't work, you can visit https://sunrisemovement.org/hubs to see a full list of hubs."
       end
     end
   end
