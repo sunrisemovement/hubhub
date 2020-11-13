@@ -113,7 +113,7 @@ class SMSService < Sinatra::Base
 
   post '/sms' do
     twiml = Twilio::TwiML::MessagingResponse.new do |r|
-      r.message(sms_response(params["Body"]))
+      r.message(body: sms_response(params["Body"]))
     end
     twiml.to_s
   end
