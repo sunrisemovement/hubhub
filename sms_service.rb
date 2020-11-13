@@ -36,8 +36,8 @@ class SMSService < Sinatra::Base
     end
 
     def us_state(sms)
-      state = STATE_ABBR_TO_NAME.values.detect{|v| sms.include?(v.downcase) }
-      state ||= STATE_ABBR_TO_NAME[STATE_ABBR_TO_NAME.keys.detect{|v| sms.include?(v.downcase) }]
+      state = STATE_ABBR_TO_NAME.values.detect{|v| sms == v.downcase }
+      state ||= STATE_ABBR_TO_NAME[STATE_ABBR_TO_NAME.keys.detect{|v| sms == v.downcase }]
     end
 
     def hubs_near(coords, max=99, min=5, radius=10)
