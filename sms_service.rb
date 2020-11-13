@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'twilio-ruby'
 require_relative 'scripts/state_abbr_to_name'
 
 def distance(geo_a, geo_b, miles=true)
@@ -88,7 +89,7 @@ class SMSService < Sinatra::Base
       msg_count = session['msg_count']
       session['msg_count'] += 1
 
-      if hub = (hub_choice(sms) || hub_named(sms))
+      if sms.present? && hub = (hub_choice(sms) || hub_named(sms))
         hub.sms_info
       elsif coords = zip_coords(sms)
         hubs = hubs_near(coords)
