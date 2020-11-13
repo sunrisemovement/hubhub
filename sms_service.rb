@@ -57,7 +57,7 @@ class SMSService < Sinatra::Base
     def zip_message(hubs, zip, coords)
       string = "Here are the hubs we found closest to #{zip}:"
       hubs.each_with_index do |hub, i|
-        string += "\n (#{i+1}) #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
+        string += "\n #{i+1} - #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
       end
       string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
       string
@@ -66,7 +66,7 @@ class SMSService < Sinatra::Base
     def state_message(hubs, state)
       string = "Here are all the #{state} hubs:"
       hubs.each_with_index do |hub, i|
-        string += "\n (#{i+1}) #{hub['Name']} "
+        string += "\n #{i+1} - #{hub['Name']} "
       end
       string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
       string
