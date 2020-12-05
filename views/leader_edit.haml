@@ -38,3 +38,6 @@
     = haml :multiselect_field, locals: { object: @leader, field: "Economic/Class Background" }
 
   %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
+
+%script
+  $(document).ready(() => $('select[multiple]').chosen());
