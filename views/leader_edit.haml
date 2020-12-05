@@ -1,0 +1,40 @@
+%h1.title Edit Leader Information
+
+%p
+  On this page, you can update the information we have on file for #{@leader.name}. Note that if you're looking to add a new leader, you should fill out
+  %a{href: "#{ENV['LEADER_FORM']}", target: '_blank'} this form
+  instead!
+
+%br
+
+%form{action: "/leaders/#{@leader.id}", method: 'POST'}
+  %h2.subtitle Contact Information
+  %fieldset.box
+    = haml :text_field,   locals: { object: @leader, field: 'First Name' }
+    = haml :text_field,   locals: { object: @leader, field: 'Last Name' }
+    = haml :select_field, locals: { object: @leader, field: 'Pronouns' }
+    = haml :text_field,   locals: { object: @leader, field: 'Self Described Pronoun' }
+    = haml :text_field,   locals: { object: @leader, field: 'Email', type: 'email' }
+    = haml :text_field,   locals: { object: @leader, field: 'Phone' }
+    = haml :text_field,   locals: { object: @leader, field: 'Slack Handle' }
+
+  %h2.subtitle Hub Role
+  %p
+    We know it might be a bit confusing to decide primary vs. secondary vs.
+    other roles, but it helps us solve EveryAction integration issues 😬
+  %fieldset.box
+    = haml :select_field,      locals: { object: @leader, field: 'Primary_Role' }
+    = haml :select_field,      locals: { object: @leader, field: 'Secondary_Role' }
+    = haml :text_field,        locals: { object: @leader, field: 'Role - Self Describe' }
+    = haml :multiselect_field, locals: { object: @leader, field: 'Other_Hub_Role(s)' }
+
+  %h2.subtitle Demographic Information
+  %p This information helps us track the diversity of Sunrise leadership over time!
+  %fieldset.box
+    = haml :multiselect_field, locals: { object: @leader, field: "Gender Identity" }
+    = haml :text_field,        locals: { object: @leader, field: "Self Described Gender" }
+    = haml :multiselect_field, locals: { object: @leader, field: "Race/Ethnicity" }
+    = haml :text_field,        locals: { object: @leader, field: "Self Described Ethnicity" }
+    = haml :multiselect_field, locals: { object: @leader, field: "Economic/Class Background" }
+
+  %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}

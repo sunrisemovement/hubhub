@@ -4,41 +4,31 @@
   In this section, you can manage information for everyone who has filled out the
   %a{href: "#{ENV['LEADER_FORM']}", target: '_blank'} hub leader form
   for #{@hub['Name']}.
-%p
-  NOTE: For our initial rollout of this system, we are not yet supporting
-  fully featured editing. Instead, if you need to make edits,
-  please remove and re-add leaders
-  using the controls below. If you run into issues or want to change
-  who receives the Hubhub login email, please
-  = succeed '.' do
-    %a{href: '/#contacts'} contact us
 
 %p
   %a.button.is-warning{href: ENV['LEADER_FORM'], target: '_blank'} Add New Leader
 
-%form{action: '/leaders', method: 'POST'}
-  %table.table.is-bordered.is-striped.is-fullwidth.is-responsive
-    %thead
+%table.table.is-bordered.is-striped.is-fullwidth.is-responsive
+  %thead
+    %tr
+      %th First Name
+      %th Last Name
+      %th Email
+      %th Phone
+      %th Roles
+      %th Actions
+  %tbody
+    - @hub.leaders.each do |lead|
       %tr
-        %th First Name
-        %th Last Name
-        %th Email
-        %th Phone
-        %th Roles
-        %th Remove?
-    %tbody
-      - @hub.leaders.each do |lead|
-        %tr
-          %td= lead['First Name']
-          %td= lead['Last Name']
-          %td= lead['Email']
-          %td= lead['Phone']
-          %td
-            - lead.roles.each do |role|
-              %span.tag= role
-          %td
-            %label.checkbox
-              %input{type: 'checkbox', name: "leaders[#{lead.id}][Deleted by Hubhub?]", checked: false}
-              Remove from list
+        %td= lead['First Name']
+        %td= lead['Last Name']
+        %td= lead['Email']
+        %td= lead['Phone']
+        %td
+          %small= lead.roles.join(", ")
+        %td.has-text-centered
+          %a.button.is-small.is-warning{href: "/leaders/#{lead.id}"} Edit
 
-  %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
+          %form.button-only{action: "/leaders/#{lead.id}", method: 'POST', onsubmit: "return confirm('Are you sure?');"}
+            %input{name: '_method', type: 'hidden', value: 'DELETE'}
+            %input.button.is-small.is-danger{type: 'submit', value: 'Remove'}

@@ -29,6 +29,7 @@ end
 
 class Hubhub < Sinatra::Base
   use MagicLink
+  use Rack::MethodOverride
 
   enable :logging
 
@@ -81,6 +82,15 @@ class Hubhub < Sinatra::Base
     'About Section',
     'Microsite URL Slug',
     'Microsite Display Preference'
+  ]
+
+  EDITABLE_LEADER_FIELDS = [
+    'First Name', 'Last Name', 'Pronouns', 'Self Described Pronoun',
+    'Email', 'Phone', 'Slack Handle',
+    'Primary_Role', 'Secondary_Role', 'Role - Self Describe', 'Other_Hub_Role(s)',
+    "Gender Identity" "Self Described Gender",
+    "Race/Ethnicity", "Self Described Ethnicity",
+    "Economic/Class Background"
   ]
 
   before do
@@ -283,30 +293,48 @@ class Hubhub < Sinatra::Base
     haml :leaders
   end
 
-  post('/leaders') do
-    logger.info "Editing leader info: Hub #{@hub.id} (#{@hub['Name']})"
-
-    # Fetch the hub's leaders
-    @leaders = @hub.leaders
-    leaders_by_id = @leaders.each_with_object({}) do |leader, h|
-      h[leader.id] = leader
+  get('/leaders/:id') do
+    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
+      haml :leader_edit
+    else
+      redirect '/leaders'
     end
+  end
 
-    # Loop through all of the leaders and determine if any have the removal
-    # checkbox checked
-    @removed_leaders = []
-    (params['leaders'] || {}).each do |id, attrs|
-      next unless lead = leaders_by_id[id]
-      next unless attrs['Deleted by Hubhub?'] == 'on'
-      # If they do have the removal checkbox checked, mark them for soft
-      # deletion on Airtable
-      lead['Deleted by Hubhub?'] = true
-      lead.save if ENV['APP_ENV'] == 'production'
-      @removed_leaders << lead
+  delete('/leaders/:id') do
+    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
+      logger.info "Removing leader #{params[:id]}"
+      @leader['Deleted by Hubhub?'] = true
+      @leader.save if ENV['APP_ENV'] == 'production'
     end
+    redirect '/leaders'
+  end
 
-    # Render a summary of the leaders removed
-    haml :leader_changes
+  post('/leaders/:id') do
+    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
+      logger.info "Updating leader #{params[:id]}"
+
+      attrs = params.slice(*EDITABLE_LEADER_FIELDS)
+      attrs.keys.each { |k| attrs[k] = nil if attrs[k] == "" }
+
+      @diff = {}
+      changed = false
+      attrs.each do |attr, value|
+        if @leader[attr] != value
+          @diff[attr] = [@leader[attr], value]
+          @leader[attr] = value
+          changed = true
+        end
+      end
+
+      actually_update = (ENV['APP_ENV'] == 'production')
+
+      @leader.save if changed && actually_update
+
+      haml :leader_changes
+    else
+      redirect '/leaders'
+    end
   end
 
   get('/hub_email') do

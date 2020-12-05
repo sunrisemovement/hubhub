@@ -1,31 +1,32 @@
 %h1.title Update Summary
 
-- if @removed_leaders.length > 0
-  %p
-    You removed the following leaders from the list:
-
-  %table.table.is-striped.is-bordered.is-fullwidth.is-responsive
-    %thead
-      %th First Name
-      %th Last Name
-      %th Email
-      %th Roles
-    %tbody
-      - @removed_leaders.each do |lead|
+%p You edited the following information for #{@leader.name}:
+%table.table.is-striped.is-bordered.is-fullwidth.is-responsive
+  %thead
+    %th Field
+    %th Old Value
+    %th New Value
+  %tbody
+    - if @diff.size > 0
+      - @diff.each do |attr, (old, new)|
         %tr
-          %td= lead['First Name']
-          %td= lead['Last Name']
-          %td= lead['Email']
+          %td= attr
           %td
-            - (lead['Role'] || []).each do |role|
-              %span.tag= role.gsub(' - Self Describe In Next Field', '')
+            - if old.is_a?(Array)
+              %ul
+                - old.each do |entry|
+                  %li= entry
+            - else
+              = old
+          %td
+            - if new.is_a?(Array)
+              %ul
+                - new.each do |entry|
+                  %li= entry
+            - else
+              = new
+    - else
+      %tr
+        %td.has-text-centered{colspan: 3} No changes to show
 
-  %p
-    If some of these leaders are still part of the hub, you can have them fill out the
-    %a{href: ENV['LEADER_FORM'], target: '_blank'} hub leader form
-    again!
-- else
-  %p
-    No leaders updated -- to remove leaders from the list, make sure you check the checkboxes on the right hand side of the table!
-
-%a.button.is-link{href: '/leaders'} Back to Leader Management Page
+%a.button.is-link{href: '/leaders'} Back to Leaders Page

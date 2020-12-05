@@ -1,0 +1,9 @@
+.field
+  %label.label= defined?(label) ? label : field.gsub("_", " ")
+  .control
+    .select
+      %select{name: field}
+        - (defined?(opts) ? opts : ['']+object.class.const_get(:CONFIG)[field]['choices']).each do |opt|
+          %option{value: opt, selected: object[field]==opt}= opt
+    - if defined?(help)
+      %p.help= help

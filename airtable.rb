@@ -6,8 +6,12 @@ require_relative 'scripts/state_abbr_to_name'
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
+AIRTABLE_CONFIG = JSON.parse(File.read(File.join(__dir__, 'airtable_config.json')))
+
 # Class representing the hub leaders table on Airtable
 class Leader < Airrecord::Table
+  CONFIG = AIRTABLE_CONFIG['Hub Leaders']
+
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hub Leaders'
 
@@ -17,6 +21,10 @@ class Leader < Airrecord::Table
 
   def entry
     "#{name}: #{self['Email']}"
+  end
+
+  def active?
+    !self['Deleted by Hubhub?']
   end
 
   # Helper method for outputting a human-friendly list of roles
@@ -38,6 +46,8 @@ end
 
 # Class representing the hubs table on Airtable
 class Hub < Airrecord::Table
+  CONFIG = AIRTABLE_CONFIG['Hubs']
+
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hubs'
 

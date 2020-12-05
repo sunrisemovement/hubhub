@@ -17,6 +17,14 @@ main {
   min-height: calc(100vh - 3.25rem - 10.5rem);
 }
 
+form.button-only {
+  display: inline;
+}
+
+details summary {
+  cursor: pointer;
+}
+
 .textarea.trumbowyg-textarea {
   min-height: inherit;
   max-height: none;
