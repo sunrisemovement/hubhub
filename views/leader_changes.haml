@@ -10,7 +10,7 @@
     - if @diff.size > 0
       - @diff.each do |attr, (old, new)|
         %tr
-          %td= attr
+          %td= attr.to_s.gsub('_', ' ')
           %td
             - if old.is_a?(Array)
               %ul
