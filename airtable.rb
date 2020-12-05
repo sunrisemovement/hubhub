@@ -8,9 +8,27 @@ Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
 AIRTABLE_CONFIG = JSON.parse(File.read(File.join(__dir__, 'airtable_config.json')))
 
+module HasAirtableConfig
+  def options_for(field)
+    self.class.config[field]['choices']
+  rescue
+    [self[field]]
+  end
+
+  def self.included(base)
+    base.extend ClassMethods
+  end
+
+  module ClassMethods
+    def config
+      AIRTABLE_CONFIG[self.table_name]
+    end
+  end
+end
+
 # Class representing the hub leaders table on Airtable
 class Leader < Airrecord::Table
-  CONFIG = AIRTABLE_CONFIG['Hub Leaders']
+  include HasAirtableConfig
 
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hub Leaders'
@@ -46,7 +64,7 @@ end
 
 # Class representing the hubs table on Airtable
 class Hub < Airrecord::Table
-  CONFIG = AIRTABLE_CONFIG['Hubs']
+  include HasAirtableConfig
 
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hubs'
