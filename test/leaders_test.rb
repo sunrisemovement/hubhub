@@ -56,7 +56,6 @@ class LeadersTest < CapybaraTest
     }])
 
     log_in_as 'Sunrise Rivendell'
-    assert inline_map_json['leaders'].length == 2
 
     visit '/leaders'
 
@@ -66,15 +65,18 @@ class LeadersTest < CapybaraTest
     assert_content 'l.rond@peredh.el'
 
     within 'tr', text: 'Elrond' do
-      check 'Remove from list'
+      click_link 'Edit'
     end
+
+    fill_in 'First Name', with: 'Scooby'
+    fill_in 'Last Name', with: 'Doo'
+    select 'Hub Coordinator', from: 'Primary_Role'
 
     click_button 'Update Leader Information'
 
     assert_content 'Update Summary'
     assert_content 'Elrond'
+    assert_content 'Scooby'
     assert_no_content 'Arwen'
-    assert inline_map_json['leaders'].length == 1
-    assert inline_map_json['leaders'].first['first_name'] == 'Arwen'
   end
 end
