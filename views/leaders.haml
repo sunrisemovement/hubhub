@@ -25,7 +25,10 @@
         %td= lead['Email']
         %td= lead['Phone']
         %td
-          %small= lead.roles.join(", ")
+          - if lead.roles.any?
+            %small= lead.roles.join(", ")
+          - else
+            &nbsp;
         %td.has-text-centered
           %a.button.is-small.is-warning{href: "/leaders/#{lead.id}"} Edit
 
