@@ -425,8 +425,7 @@
         "Professional/managerial-class",
         "Upper/owning-class",
         "Prefer not to say",
-        "Upper Middle Class",
-        "Middle Class"
+        "Upper Middle Class"
       ]
     },
     "Birthday": {
@@ -505,9 +504,7 @@
         "Trans",
         "Non-Binary",
         "Prefer not to say",
-        "Self describe in the next question",
-        "self describe in the next question",
-        "man"
+        "Self describe in the next question"
       ]
     },
     "Would you like to participate in a role network?": {
@@ -655,10 +652,6 @@
       "type": "lookup",
       "choices": null
     },
-    "Leadership Program": {
-      "type": "lookup",
-      "choices": null
-    },
     "Top Leader": {
       "type": "checkbox",
       "choices": null
@@ -787,6 +780,10 @@
         "Trainings Lead",
         "Video Lead"
       ]
+    },
+    "Inactive": {
+      "type": "checkbox",
+      "choices": null
     }
   }
 }
