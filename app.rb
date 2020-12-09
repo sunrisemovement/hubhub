@@ -103,6 +103,16 @@ class Hubhub < Sinatra::Base
         redirect '/login'
       end
     end
+
+    if session[:notice_msg]
+      @notice_msg = session[:notice_msg]
+      session[:notice_msg] = nil
+    end
+
+    if session[:error_msg]
+      @error_msg = session[:error_msg]
+      session[:error_msg] = nil
+    end
   end
 
   get '/' do
@@ -294,24 +304,44 @@ class Hubhub < Sinatra::Base
   end
 
   get('/leaders/:id') do
-    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
       haml :leader_edit
     else
       redirect '/leaders'
     end
   end
 
-  delete('/leaders/:id') do
-    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
-      logger.info "Removing leader #{params[:id]}"
-      @leader['Deleted by Hubhub?'] = true
+  post('/leaders/:id/deactivate') do
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
+      logger.info "Deactivating leader #{params[:id]}"
+      @leader['Inactive'] = true
       @leader.save if ENV['APP_ENV'] == 'production'
+      session[:notice_msg] = "#{@leader.name} has been marked as inactive."
+    end
+    redirect '/leaders'
+  end
+
+  post('/leaders/:id/reactivate') do
+    if @leader = @hub.inactive_leaders.detect { |l| l.id == params[:id] }
+      logger.info "Reactivating leader #{params[:id]}"
+      @leader['Inactive'] = false
+      @leader.save if ENV['APP_ENV'] == 'production'
+      session[:notice_msg] = "#{@leader.name} has been marked as active again! Woo! 🤓"
+    end
+    redirect '/leaders'
+  end
+
+  post('/leaders/:id/delete') do
+    if @leader = @hub.inactive_leaders.detect { |l| l.id == params[:id] }
+      logger.info "Deleting leader #{params[:id]}"
+      @leader.destroy if ENV['APP_ENV'] == 'production'
+      session[:notice_msg] = "#{@leader.name} has been deleted from our system."
     end
     redirect '/leaders'
   end
 
   post('/leaders/:id') do
-    if @leader = @hub.leaders.detect { |l| l.id == params[:id] }
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
       logger.info "Updating leader #{params[:id]}"
 
       attrs = params.slice(*EDITABLE_LEADER_FIELDS)

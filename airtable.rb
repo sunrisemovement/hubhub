@@ -41,8 +41,12 @@ class Leader < Airrecord::Table
     "#{name}: #{self['Email']}"
   end
 
+  def inactive?
+    self['Inactive']
+  end
+
   def active?
-    !self['Deleted by Hubhub?']
+    !inactive?
   end
 
   # Helper method for outputting a human-friendly list of roles
@@ -104,10 +108,18 @@ class Hub < Airrecord::Table
     emails
   end
 
+  def active_leaders
+    hub_leaders.select(&:active?)
+  end
+
+  def inactive_leaders
+    hub_leaders.select(&:inactive?)
+  end
+
   # Ensure that hub.leaders skips leaders that have been soft-deleted on this
   # platform
   def leaders
-    hub_leaders.reject { |lead| lead['Deleted by Hubhub?'] }
+    active_leaders
   end
 
   # A hub only actually appears on the map (even if it's marked as Map?) if
@@ -261,7 +273,7 @@ class Hub < Airrecord::Table
       # ...and/or leader emails 
       if should_show_leader_emails?
         leads = self.leaders if leads.nil?
-        leads = leads.select { |l| l['Map?'] && !l['Deleted by Hubhub?'] }
+        leads = leads.select(&:active?)
         entry[:leaders] = leads.map { |l| {
           first_name: l['First Name'],
           last_name: l['Last Name'],

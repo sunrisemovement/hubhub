@@ -52,6 +52,10 @@
               - if @error_msg
                 %article.message.is-danger
                   .message-body= @error_msg
+            - if instance_variable_defined?(:@notice_msg)
+              - if @notice_msg
+                %article.message.is-info
+                  .message-body= @notice_msg
             = yield
 
     %footer.footer
