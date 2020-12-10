@@ -35,3 +35,9 @@
           %form.button-only{action: "/leaders/#{lead.id}", method: 'POST', onsubmit: "return confirm('Are you sure?');"}
             %input{name: '_method', type: 'hidden', value: 'DELETE'}
             %input.button.is-small.is-danger{type: 'submit', value: 'Remove'}
+
+%p
+  %small
+    Note that removed leaders are not permanently deleted from all our records. If you'd like us to delete all Sunrise data about a leader, please email
+    = succeed '!' do
+      %a{href: 'mailto:privacy@sunrisemovement.org'} privacy@sunrisemovement.org
