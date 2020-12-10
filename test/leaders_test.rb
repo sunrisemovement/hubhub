@@ -78,5 +78,13 @@ class LeadersTest < CapybaraTest
     assert_content 'Elrond'
     assert_content 'Scooby'
     assert_no_content 'Arwen'
+
+    visit '/leaders'
+
+    within 'tr', text: 'Arwen' do
+      click_button 'Remove'
+    end
+
+    assert_content "Arwen Peredhel has been removed."
   end
 end
