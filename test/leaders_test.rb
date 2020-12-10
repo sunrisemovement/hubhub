@@ -15,12 +15,12 @@ class LeadersTest < CapybaraTest
       'id' => 'l1',
       'First Name' => 'Tree',
       'Last Name' => 'Beard',
-      'Deleted by Hubhub?' => false
+      'Inactive' => false
     }, {
       'id' => 'l2',
       'First Name' => 'Beech',
       'Last Name' => 'Bone',
-      'Deleted by Hubhub?' => true
+      'Inactive' => true
     }])
 
     log_in_as 'Sunrise Fangorn'
