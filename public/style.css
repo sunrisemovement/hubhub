@@ -21,16 +21,6 @@ form.button-only {
   display: inline;
 }
 
-details summary {
-  cursor: pointer;
-  background: rgb(250, 250, 250);
-  padding: 5px;
-}
-
-details[open] summary {
-  margin-bottom: 0.5rem;
-}
-
 .textarea.trumbowyg-textarea {
   min-height: inherit;
   max-height: none;
