@@ -273,7 +273,7 @@ class Hub < Airrecord::Table
       # ...and/or leader emails 
       if should_show_leader_emails?
         leads = self.leaders if leads.nil?
-        leads = leads.select(&:active?)
+        leads = leads.select { |l| l.active? && l['Map?'] }
         entry[:leaders] = leads.map { |l| {
           first_name: l['First Name'],
           last_name: l['Last Name'],
