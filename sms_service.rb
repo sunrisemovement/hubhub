@@ -23,7 +23,7 @@ end
 class InMemory
   @cache = Hash.new { |h, k| h[k] = {} }
 
-  class <<-self
+  class << self
     attr_reader :cache
   end
 end
@@ -35,7 +35,8 @@ class SMSService < Sinatra::Base
 
   helpers do
     def user_phone
-      @user_phone ||= params['member']['phoneNumber']
+      puts params
+      @user_phone ||= params.fetch('member', {})['phoneNumber']
     end
 
     def get_session(key)
@@ -131,8 +132,9 @@ class SMSService < Sinatra::Base
   end
 
   post '/sms' do
+    input = JSON.parse(request.env['rack.input'].read)
     {
-      "message": sms_response(params['message'])
+      "message": sms_response(input['message'])
     }.to_json
   end
 end
