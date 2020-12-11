@@ -377,7 +377,7 @@
       "type": "text",
       "choices": null
     },
-    "Race/Ethnicity": {
+    "Race": {
       "type": "multiSelect",
       "choices": [
         "Black/African American",
@@ -412,7 +412,7 @@
       "type": "text",
       "choices": null
     },
-    "Self Described Ethnicity": {
+    "Self Described Race": {
       "type": "text",
       "choices": null
     },

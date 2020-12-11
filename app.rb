@@ -89,7 +89,7 @@ class Hubhub < Sinatra::Base
     'Email', 'Phone', 'Slack Handle',
     'Primary_Role', 'Secondary_Role', 'Role - Self Describe', 'Other_Hub_Role(s)',
     "Gender Identity" "Self Described Gender",
-    "Race/Ethnicity", "Self Described Ethnicity",
+    "Race", "Self Described Race",
     "Economic/Class Background"
   ]
 

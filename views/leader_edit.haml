@@ -33,8 +33,8 @@
   %fieldset.box
     = haml :multiselect_field, locals: { object: @leader, field: "Gender Identity" }
     = haml :text_field,        locals: { object: @leader, field: "Self Described Gender" }
-    = haml :multiselect_field, locals: { object: @leader, field: "Race/Ethnicity" }
-    = haml :text_field,        locals: { object: @leader, field: "Self Described Ethnicity" }
+    = haml :multiselect_field, locals: { object: @leader, field: "Race" }
+    = haml :text_field,        locals: { object: @leader, field: "Self Described Race" }
     = haml :multiselect_field, locals: { object: @leader, field: "Economic/Class Background" }
 
   %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
