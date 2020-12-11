@@ -34,8 +34,8 @@
           %td= lead['Email']
           %td= lead['Phone']
           %td
-            - (lead['Role'] || []).each do |role|
-              %span.tag= role.gsub(' - Self Describe In Next Field', '')
+            - lead.roles.each do |role|
+              %span.tag= role
           %td
             %label.checkbox
               %input{type: 'checkbox', name: "leaders[#{lead.id}][Deleted by Hubhub?]", checked: false}

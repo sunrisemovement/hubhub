@@ -18,6 +18,16 @@ class Leader < Airrecord::Table
   def entry
     "#{name}: #{self['Email']}"
   end
+
+  # Helper method for outputting a human-friendly list of roles
+  def roles
+    roles = [self['Primary_Role'], self['Secondary_Role']] + (self['Other_Hub_Role(s)'] || [])
+    roles.map { |r|
+      r.to_s.
+        gsub(' - Self Describe In Next Field', '').
+        gsub(' (define in field below)', '').strip.presence
+    }.compact.uniq
+  end
 end
 
 # Class representing the state of the hub forms table on Airtable
