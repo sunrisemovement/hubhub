@@ -20,12 +20,32 @@ def distance(geo_a, geo_b, miles=true)
   d = 6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
+class InMemory
+  @cache = Hash.new { |h, k| h[k] = {} }
+
+  class <<-self
+    attr_reader :cache
+  end
+end
+
 class SMSService < Sinatra::Base
   ZIP_COORDS = JSON.parse(File.read(File.join(__dir__, 'zip_codes.json')))
 
   enable :logging
 
   helpers do
+    def user_phone
+      @user_phone ||= params['member']['phoneNumber']
+    end
+
+    def get_session(key)
+      InMemory.cache[user_phone][key]
+    end
+
+    def set_session(key, val)
+      InMemory.cache[user_phone][key] = val
+    end
+
     def active_hubs
       @@active_hubs ||= Hub.all.select(&:should_appear_on_map?)
     end
@@ -73,9 +93,9 @@ class SMSService < Sinatra::Base
     end
 
     def hub_choice(sms)
-      return unless session['hub_ids'].present?
+      return unless get_session('hub_ids').present?
       return unless sms =~ /^\d\d?$/
-      return unless id = session['hub_ids'][sms.to_i - 1]
+      return unless id = get_session('hub_ids')[sms.to_i - 1]
       active_hubs.detect { |h| h.id == id }
     end
 
@@ -85,19 +105,18 @@ class SMSService < Sinatra::Base
 
     def sms_response(sms)
       sms = sms.to_s.strip.downcase
-      session['msg_count'] ||= 0
-      msg_count = session['msg_count']
-      session['msg_count'] += 1
+      msg_count = get_session('msg_count') || 0
+      set_session('msg_count', msg_count + 1)
 
       if sms.present? && hub = (hub_choice(sms) || hub_named(sms))
         hub.sms_info
       elsif coords = zip_coords(sms)
         hubs = hubs_near(coords)
-        session['hub_ids'] = hubs.map(&:id)
+        set_session('hub_ids', hubs.map(&:id))
         zip_message(hubs, sms[/\d{5}/], coords)
       elsif state = us_state(sms)
         hubs = hubs_in(state)
-        session['hub_ids'] = hubs.map(&:id)
+        set_session('hub_ids', hubs.map(&:id))
         state_message(hubs, state)
       elsif msg_count == 0
         "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
@@ -112,9 +131,8 @@ class SMSService < Sinatra::Base
   end
 
   post '/sms' do
-    twiml = Twilio::TwiML::MessagingResponse.new do |r|
-      r.message(body: sms_response(params["Body"]))
-    end
-    twiml.to_s
+    {
+      "message": sms_response(params['message'])
+    }.to_json
   end
 end
