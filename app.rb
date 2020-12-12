@@ -315,7 +315,7 @@ class Hubhub < Sinatra::Base
 
   delete('/leaders/:id') do
     if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
-      logger.info "Deactivating leader #{params[:id]}"
+      logger.info "Deactivating leader #{params[:id]}: Hub #{@hub.id} (#{@hub['Name']})"
       @leader['Inactive'] = true
       @leader.save if ENV['APP_ENV'] == 'production'
       session[:notice_msg] = "#{@leader.name} has been removed."
@@ -325,7 +325,7 @@ class Hubhub < Sinatra::Base
 
   post('/leaders/:id') do
     if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
-      logger.info "Updating leader #{params[:id]}"
+      logger.info "Updating leader #{params[:id]}: Hub #{@hub.id} (#{@hub['Name']})"
 
       attrs = params.slice(*EDITABLE_LEADER_FIELDS)
       attrs.keys.each { |k| attrs[k] = nil if attrs[k] == "" }
