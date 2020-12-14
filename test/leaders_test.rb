@@ -28,6 +28,11 @@ class LeadersTest < CapybaraTest
 
     assert_content 'Tree Beard'
     assert_no_content 'Beech Bone'
+
+    visit '/leaders/l2'
+
+    assert_content "We couldn't find an active Sunrise Fangorn leader with that ID!"
+    assert_equal current_path, "/leaders"
   end
 
   def test_leader_happy_path

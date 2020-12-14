@@ -11,8 +11,6 @@ AIRTABLE_CONFIG = JSON.parse(File.read(File.join(__dir__, 'airtable_config.json'
 module HasAirtableConfig
   def options_for(field)
     self.class.config[field]['choices']
-  rescue
-    [self[field]]
   end
 
   def self.included(base)
@@ -42,11 +40,15 @@ class Leader < Airrecord::Table
   end
 
   def inactive?
-    self['Inactive']
+    self['Inactive'] == true
   end
 
   def active?
     !inactive?
+  end
+
+  def should_appear_on_map?
+    self['Map?'] == true && active?
   end
 
   # Helper method for outputting a human-friendly list of roles
@@ -270,10 +272,10 @@ class Hub < Airrecord::Table
     else
       # Otherwise, include the hub email...
       entry[:email] = contact_email if should_show_hub_email?
-      # ...and/or leader emails 
+      # ...and/or leader emails
       if should_show_leader_emails?
         leads = self.leaders if leads.nil?
-        leads = leads.select { |l| l.active? && l['Map?'] }
+        leads = leads.select(&:should_appear_on_map?)
         entry[:leaders] = leads.map { |l| {
           first_name: l['First Name'],
           last_name: l['Last Name'],
