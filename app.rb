@@ -29,6 +29,7 @@ end
 
 class Hubhub < Sinatra::Base
   use MagicLink
+  use Rack::MethodOverride
 
   enable :logging
 
@@ -63,6 +64,10 @@ class Hubhub < Sinatra::Base
       return [] unless @hub
       Hub.all.select { |h| h.id != @hub.id }
     end
+
+    def production?
+      ENV['APP_ENV'] == 'production'
+    end
   end
 
   # Create a whitelist of hub fields that can be edited via POST /map
@@ -71,7 +76,7 @@ class Hubhub < Sinatra::Base
     'Facebook Handle', 'Twitter Handle', 'Instagram Handle',
     'Custom Website Link Text', 'Contact Type', 'Signup Link',
     'Custom Map Email', 'Custom Map Contact Text'
-  ]
+  ].freeze
 
   EDITABLE_MICROSITE_FIELDS = [
     'Name', 'Website', 'Activity',
@@ -81,7 +86,18 @@ class Hubhub < Sinatra::Base
     'About Section',
     'Microsite URL Slug',
     'Microsite Display Preference'
-  ]
+  ].freeze
+
+  EDITABLE_LEADER_FIELDS = [
+    'First Name', 'Last Name',
+    'Pronouns', 'Self Described Pronoun',
+    'Email', 'Phone', 'Slack Handle',
+    'Primary_Role', 'Secondary_Role',
+    'Role - Self Describe', 'Other_Hub_Role(s)',
+    'Gender Identity', 'Self Described Gender',
+    'Race', 'Self Described Race',
+    'Economic/Class Background'
+  ].freeze
 
   before do
     # To access any of these pages, ensure the user is logged in with a valid
@@ -92,6 +108,18 @@ class Hubhub < Sinatra::Base
       unless @hub = Hub.find(session[:hub_id])
         redirect '/login'
       end
+    end
+
+    # Allow for the presentation of one-time flash messages using session
+    # variables.
+    if session[:notice_msg]
+      @notice_msg = session[:notice_msg]
+      session[:notice_msg] = nil
+    end
+
+    if session[:error_msg]
+      @error_msg = session[:error_msg]
+      session[:error_msg] = nil
     end
   end
 
@@ -136,30 +164,21 @@ class Hubhub < Sinatra::Base
 
     # Make a container for errors
     @errors = {}
-    
+
     # First, only allow edits to whitelisted fields
     attrs = params.slice(*EDITABLE_MICROSITE_FIELDS)
-
-    # Ensure blank values get mapped to nil
-    attrs.keys.each do |k|
-      attrs[k] = nil if attrs[k] == ""
-    end
 
     # Loop through the whitelisted parameters and update the hub accordingly.
     # Keep track of what and whether anything changed.
     @diff = {}
-    changed = false
     attrs.each do |attr, value|
-      if @hub[attr] != value
+      if @hub[attr] != value.presence
         @diff[attr] = [@hub[attr], value]
-        @hub[attr] = value
-        changed = true
+        @hub[attr] = value.presence
       end
     end
 
-    actually_update = (ENV['APP_ENV'] == 'production')
-
-    if actually_update
+    if production?
       if fparams = params["Update Logo Image"]
         old_image = if @hub['Logo Image'] && @hub['Logo Image'].length > 0
           @hub['Logo Image'][0]['url']
@@ -167,7 +186,6 @@ class Hubhub < Sinatra::Base
         new_image = upload_file(@hub, fparams, 'logo')
         @hub['Logo Image'] = [{ url: new_image }]
         @diff['Logo Image'] = [old_image, new_image]
-        changed = true
       end
 
       if fparams = params["Update Hero Image"]
@@ -177,7 +195,6 @@ class Hubhub < Sinatra::Base
         new_image = upload_file(@hub, fparams, 'hero')
         @hub['Hero Image'] = [{ url: new_image }]
         @diff['Hero Image'] = [old_image, new_image]
-        changed = true
       end
     end
 
@@ -192,7 +209,7 @@ class Hubhub < Sinatra::Base
       end
     end
 
-    @hub.save if changed && actually_update
+    @hub.save if @diff.present? && production?
 
     # Finally, render a summary of the changes so it's clear what happened.
     haml :microsite_changes
@@ -210,20 +227,13 @@ class Hubhub < Sinatra::Base
       attrs[k] = attrs[k].to_f if attrs[k] != ""
     end
 
-    # Ensure blank values get mapped to nil
-    attrs.keys.each do |k|
-      attrs[k] = nil if attrs[k] == ""
-    end
-
     # Loop through the whitelisted parameters and update the hub accordingly.
     # Keep track of what and whether anything changed.
     @diff = {}
-    changed = false
     attrs.each do |attr, value|
-      if @hub[attr] != value
+      if @hub[attr] != value.presence
         @diff[attr] = [@hub[attr], value]
-        @hub[attr] = value
-        changed = true
+        @hub[attr] = value.presence
       end
     end
 
@@ -234,16 +244,14 @@ class Hubhub < Sinatra::Base
     # If there was an actual change, update the hub on Airtable (assuming we're
     # in production mode). Otherwise, don't do anything so we can prevent an
     # unnecessary Airtable API request.
-    if changed
-      @hub.save if ENV['APP_ENV'] == 'production'
-    end
+    @hub.save if @diff.present? && production?
 
     # Additionally, process changes to leaders, if the hub has been configured
     # to display leader information on the hub map.
     @leaders = nil
     if @hub.should_show_leader_emails?
       # Get the hub's current leaders and cache them by id
-      @leaders = @hub.leaders
+      @leaders = @hub.active_leaders
       leads_by_id = {}
       @leaders.each { |lead| leads_by_id[lead.id] = lead }
 
@@ -260,14 +268,14 @@ class Hubhub < Sinatra::Base
       old.each do |lead|
         unless new_ids.include?(lead.id)
           lead['Map?'] = false
-          lead.save if ENV['APP_ENV'] == 'production'
+          lead.save if production?
         end
       end
 
       new.each do |lead|
         unless old_ids.include?(lead.id)
           lead['Map?'] = true
-          lead.save if ENV['APP_ENV'] == 'production'
+          lead.save if production?
         end
       end
 
@@ -283,30 +291,49 @@ class Hubhub < Sinatra::Base
     haml :leaders
   end
 
-  post('/leaders') do
-    logger.info "Editing leader info: Hub #{@hub.id} (#{@hub['Name']})"
-
-    # Fetch the hub's leaders
-    @leaders = @hub.leaders
-    leaders_by_id = @leaders.each_with_object({}) do |leader, h|
-      h[leader.id] = leader
+  get('/leaders/:id') do
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
+      haml :leader_edit
+    else
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader was removed from the list?"
+      redirect '/leaders'
     end
+  end
 
-    # Loop through all of the leaders and determine if any have the removal
-    # checkbox checked
-    @removed_leaders = []
-    (params['leaders'] || {}).each do |id, attrs|
-      next unless lead = leaders_by_id[id]
-      next unless attrs['Deleted by Hubhub?'] == 'on'
-      # If they do have the removal checkbox checked, mark them for soft
-      # deletion on Airtable
-      lead['Deleted by Hubhub?'] = true
-      lead.save if ENV['APP_ENV'] == 'production'
-      @removed_leaders << lead
+  delete('/leaders/:id') do
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
+      logger.info "Deactivating leader #{params[:id]}: Hub #{@hub.id} (#{@hub['Name']})"
+      @leader['Inactive'] = true
+      @leader.save if production?
+      session[:notice_msg] = "#{@leader.name} has been removed."
+      redirect '/leaders'
+    else
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader is already removed from the list?"
+      redirect '/leaders'
     end
+  end
 
-    # Render a summary of the leaders removed
-    haml :leader_changes
+  post('/leaders/:id') do
+    if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
+      logger.info "Updating leader #{params[:id]}: Hub #{@hub.id} (#{@hub['Name']})"
+
+      attrs = params.slice(*EDITABLE_LEADER_FIELDS)
+
+      @diff = {}
+      attrs.each do |attr, value|
+        if @leader[attr] != value.presence
+          @diff[attr] = [@leader[attr], value]
+          @leader[attr] = value.presence
+        end
+      end
+
+      @leader.save if @diff.present? && production?
+
+      haml :leader_changes
+    else
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader was removed from the list?"
+      redirect '/leaders'
+    end
   end
 
   get('/hub_email') do

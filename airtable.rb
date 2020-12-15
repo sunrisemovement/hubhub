@@ -6,8 +6,28 @@ require_relative 'scripts/state_abbr_to_name'
 
 Airrecord.api_key = ENV['AIRTABLE_API_KEY']
 
+AIRTABLE_CONFIG = JSON.parse(File.read(File.join(__dir__, 'airtable_config.json')))
+
+module HasAirtableConfig
+  def options_for(field)
+    self.class.config[field]['choices']
+  end
+
+  def self.included(base)
+    base.extend ClassMethods
+  end
+
+  module ClassMethods
+    def config
+      AIRTABLE_CONFIG[self.table_name]
+    end
+  end
+end
+
 # Class representing the hub leaders table on Airtable
 class Leader < Airrecord::Table
+  include HasAirtableConfig
+
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hub Leaders'
 
@@ -17,6 +37,18 @@ class Leader < Airrecord::Table
 
   def entry
     "#{name}: #{self['Email']}"
+  end
+
+  def inactive?
+    self['Inactive'] == true
+  end
+
+  def active?
+    !inactive?
+  end
+
+  def should_appear_on_map?
+    self['Map?'] == true && active?
   end
 
   # Helper method for outputting a human-friendly list of roles
@@ -38,6 +70,8 @@ end
 
 # Class representing the hubs table on Airtable
 class Hub < Airrecord::Table
+  include HasAirtableConfig
+
   self.base_key = ENV['AIRTABLE_APP_KEY']
   self.table_name = 'Hubs'
 
@@ -76,10 +110,18 @@ class Hub < Airrecord::Table
     emails
   end
 
+  def active_leaders
+    hub_leaders.select(&:active?)
+  end
+
+  def inactive_leaders
+    hub_leaders.select(&:inactive?)
+  end
+
   # Ensure that hub.leaders skips leaders that have been soft-deleted on this
   # platform
   def leaders
-    hub_leaders.reject { |lead| lead['Deleted by Hubhub?'] }
+    active_leaders
   end
 
   # A hub only actually appears on the map (even if it's marked as Map?) if
@@ -230,10 +272,10 @@ class Hub < Airrecord::Table
     else
       # Otherwise, include the hub email...
       entry[:email] = contact_email if should_show_hub_email?
-      # ...and/or leader emails 
+      # ...and/or leader emails
       if should_show_leader_emails?
         leads = self.leaders if leads.nil?
-        leads = leads.select { |l| l['Map?'] && !l['Deleted by Hubhub?'] }
+        leads = leads.select(&:should_appear_on_map?)
         entry[:leaders] = leads.map { |l| {
           first_name: l['First Name'],
           last_name: l['Last Name'],

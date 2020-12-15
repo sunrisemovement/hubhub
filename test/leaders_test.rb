@@ -15,12 +15,12 @@ class LeadersTest < CapybaraTest
       'id' => 'l1',
       'First Name' => 'Tree',
       'Last Name' => 'Beard',
-      'Deleted by Hubhub?' => false
+      'Inactive' => false
     }, {
       'id' => 'l2',
       'First Name' => 'Beech',
       'Last Name' => 'Bone',
-      'Deleted by Hubhub?' => true
+      'Inactive' => true
     }])
 
     log_in_as 'Sunrise Fangorn'
@@ -28,6 +28,11 @@ class LeadersTest < CapybaraTest
 
     assert_content 'Tree Beard'
     assert_no_content 'Beech Bone'
+
+    visit '/leaders/l2'
+
+    assert_content "We couldn't find an active Sunrise Fangorn leader with that ID!"
+    assert_equal current_path, "/leaders"
   end
 
   def test_leader_happy_path
@@ -56,7 +61,6 @@ class LeadersTest < CapybaraTest
     }])
 
     log_in_as 'Sunrise Rivendell'
-    assert inline_map_json['leaders'].length == 2
 
     visit '/leaders'
 
@@ -66,15 +70,26 @@ class LeadersTest < CapybaraTest
     assert_content 'l.rond@peredh.el'
 
     within 'tr', text: 'Elrond' do
-      check 'Remove from list'
+      click_link 'Edit'
     end
+
+    fill_in 'First Name', with: 'Scooby'
+    fill_in 'Last Name', with: 'Doo'
+    select 'Hub Coordinator', from: 'Primary_Role'
 
     click_button 'Update Leader Information'
 
     assert_content 'Update Summary'
     assert_content 'Elrond'
+    assert_content 'Scooby'
     assert_no_content 'Arwen'
-    assert inline_map_json['leaders'].length == 1
-    assert inline_map_json['leaders'].first['first_name'] == 'Arwen'
+
+    visit '/leaders'
+
+    within 'tr', text: 'Arwen' do
+      click_button 'Remove'
+    end
+
+    assert_content "Arwen Peredhel has been removed."
   end
 end

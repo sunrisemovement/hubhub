@@ -1,0 +1,6 @@
+.field
+  %label.label= defined?(label) ? label : field.gsub("_", " ")
+  .control
+    %input.input{name: field, value: object[field], type: defined?(type) ? type : 'text'}
+    - if defined?(help)
+      %p.help= help

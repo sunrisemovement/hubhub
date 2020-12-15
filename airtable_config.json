@@ -1,0 +1,789 @@
+{
+  "Hubs": {
+    "Name": {
+      "type": "text",
+      "choices": null
+    },
+    "City": {
+      "type": "text",
+      "choices": null
+    },
+    "Hub Leaders": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "State": {
+      "type": "select",
+      "choices": [
+        "AK",
+        "AL",
+        "AR",
+        "AZ",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "IA",
+        "ID",
+        "IL",
+        "IN",
+        "KS",
+        "KY",
+        "LA",
+        "MA",
+        "MD",
+        "ME",
+        "MI",
+        "MN",
+        "MO",
+        "MS",
+        "MT",
+        "NC",
+        "ND",
+        "NE",
+        "NH",
+        "NJ",
+        "NM",
+        "NV",
+        "NY",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "PR",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VA",
+        "VT",
+        "WA",
+        "WI",
+        "WV",
+        "WY"
+      ]
+    },
+    "Launch Date": {
+      "type": "date",
+      "choices": null
+    },
+    "Type of Hub": {
+      "type": "select",
+      "choices": [
+        "High School",
+        "College",
+        "Regional",
+        "State",
+        "City"
+      ]
+    },
+    "Email": {
+      "type": "text",
+      "choices": null
+    },
+    "Website": {
+      "type": "text",
+      "choices": null
+    },
+    "Instagram Handle": {
+      "type": "text",
+      "choices": null
+    },
+    "Twitter Handle": {
+      "type": "text",
+      "choices": null
+    },
+    "Facebook Handle": {
+      "type": "text",
+      "choices": null
+    },
+    "Activity": {
+      "type": "select",
+      "choices": [
+        "Active",
+        "Semi-Active",
+        "Inactive"
+      ]
+    },
+    "Date Created": {
+      "type": "formula",
+      "choices": null
+    },
+    "Leader Emails": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Latitude": {
+      "type": "number",
+      "choices": null
+    },
+    "Longitude": {
+      "type": "number",
+      "choices": null
+    },
+    "Map?": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Map Email": {
+      "type": "formula",
+      "choices": null
+    },
+    "Custom Map Contact Text": {
+      "type": "text",
+      "choices": null
+    },
+    "Custom Website Link Text": {
+      "type": "text",
+      "choices": null
+    },
+    "Custom Map Email": {
+      "type": "text",
+      "choices": null
+    },
+    "Tier": {
+      "type": "select",
+      "choices": [
+        "Forming",
+        "Emerging",
+        "Strong"
+      ]
+    },
+    "State of the Hub Form": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Congressional District": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Number of Hub Leaders": {
+      "type": "rollup",
+      "choices": null
+    },
+    "Contact Type": {
+      "type": "select",
+      "choices": [
+        "Hub Email",
+        "Coordinator Emails",
+        "Hub Email + Coordinator Emails",
+        "Custom Text",
+        "Leader Emails",
+        "Hub Email + Leader Emails"
+      ]
+    },
+    "Region": {
+      "type": "lookup",
+      "choices": null
+    },
+    "State Link": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Direct Actions": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Arrestable Actions": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Email List Size": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Active Members": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Team Leads": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Last Modified": {
+      "type": "formula",
+      "choices": null
+    },
+    "Counts As Active": {
+      "type": "formula",
+      "choices": null
+    },
+    "State Link Abbrev": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Added to Map": {
+      "type": "formula",
+      "choices": null
+    },
+    "Battleground": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Map Editor Emails": {
+      "type": "rollup",
+      "choices": null
+    },
+    "Is Emerging": {
+      "type": "formula",
+      "choices": null
+    },
+    "Number of SoH Forms": {
+      "type": "count",
+      "choices": null
+    },
+    "Latest SoH Form Created Time": {
+      "type": "rollup",
+      "choices": null
+    },
+    "Self-Reported Tier": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Self-Reported Hub Type": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Signup Link": {
+      "type": "text",
+      "choices": null
+    },
+    "Added to EA custom field dropdown": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "RO": {
+      "type": "lookup",
+      "choices": null
+    },
+    "RO Email": {
+      "type": "lookup",
+      "choices": null
+    },
+    "In EveryAction": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "MobilizeAmerica": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "# Days Since Reg": {
+      "type": "formula",
+      "choices": null
+    },
+    "email last updated": {
+      "type": "formula",
+      "choices": null
+    },
+    "Email Subdomains": {
+      "type": "text",
+      "choices": null
+    },
+    "Synced to Civis At": {
+      "type": "date",
+      "choices": null
+    },
+    "HRD": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "hub name last updated": {
+      "type": "formula",
+      "choices": null
+    },
+    "days since email was changed": {
+      "type": "formula",
+      "choices": null
+    },
+    "days since name changed": {
+      "type": "formula",
+      "choices": null
+    },
+    "Microsite URL Slug": {
+      "type": "text",
+      "choices": null
+    },
+    "Hero Image": {
+      "type": "multipleAttachment",
+      "choices": null
+    },
+    "Logo Image": {
+      "type": "multipleAttachment",
+      "choices": null
+    },
+    "Donation Link": {
+      "type": "text",
+      "choices": null
+    },
+    "About Section": {
+      "type": "multilineText",
+      "choices": null
+    },
+    "Documents": {
+      "type": "multipleAttachment",
+      "choices": null
+    },
+    "Microsite Display Preference": {
+      "type": "select",
+      "choices": [
+        "Unspecified",
+        "Opt-in",
+        "Opt-out"
+      ]
+    },
+    "High Priority Colleges": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Hub Leaders copy": {
+      "type": "text",
+      "choices": null
+    },
+    "Leadership Program": {
+      "type": "select",
+      "choices": [
+        "High School / Middle School Wide Awake Leadership Program",
+        "Somos Sunrise Latinx Leadership Program",
+        "Black Sunrise Leadership Program",
+        "Campus Corps Leadership Program"
+      ]
+    }
+  },
+  "Hub Leaders": {
+    "Name": {
+      "type": "formula",
+      "choices": null
+    },
+    "Hub": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Last Name": {
+      "type": "text",
+      "choices": null
+    },
+    "Phone": {
+      "type": "phone",
+      "choices": null
+    },
+    "Email": {
+      "type": "text",
+      "choices": null
+    },
+    "Race": {
+      "type": "multiSelect",
+      "choices": [
+        "Black/African American",
+        "Latina/Latino/Latinx",
+        "Middle Eastern",
+        "Native American/First Nations/Alaska Native",
+        "Asian/Asian American",
+        "White",
+        "Prefer not to say",
+        "Self Described in next question",
+        "Pacific Islander",
+        "Native Hawaiian"
+      ]
+    },
+    "Notes": {
+      "type": "multilineText",
+      "choices": null
+    },
+    "First Name": {
+      "type": "text",
+      "choices": null
+    },
+    "Hometown": {
+      "type": "text",
+      "choices": null
+    },
+    "Self Described Pronoun": {
+      "type": "text",
+      "choices": null
+    },
+    "Self Described Gender": {
+      "type": "text",
+      "choices": null
+    },
+    "Self Described Race": {
+      "type": "text",
+      "choices": null
+    },
+    "Economic/Class Background": {
+      "type": "multiSelect",
+      "choices": [
+        "Poor and working-poor",
+        "Working Class / Lower Middle Class",
+        "Middle-class",
+        "Professional/managerial-class",
+        "Upper/owning-class",
+        "Prefer not to say",
+        "Upper Middle Class"
+      ]
+    },
+    "Birthday": {
+      "type": "date",
+      "choices": null
+    },
+    "Team Lead": {
+      "type": "multilineText",
+      "choices": null
+    },
+    "Slack Handle": {
+      "type": "text",
+      "choices": null
+    },
+    "Type of Hub": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Hub State": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Activity": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Map?": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Role - Self Describe": {
+      "type": "multilineText",
+      "choices": null
+    },
+    "State of Hub Form": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Created At": {
+      "type": "formula",
+      "choices": null
+    },
+    "As a Sunrise Hub Coordinator, I will do my best to...": {
+      "type": "multiSelect",
+      "choices": [
+        "Attend Movement Leaders Calls",
+        "Be responsive & communicative with the Sunrise Hub Support Team",
+        "Promote an equitable, welcoming, and inclusive movement culture",
+        "Utilize the Sunrise Hub Coordinators Slack channel if I need support",
+        "Uphold and live the Sunrise Principles ",
+        "Believe in my ability to be an awesome Hub Coordinator! "
+      ]
+    },
+    "I participated in...": {
+      "type": "multiSelect",
+      "choices": [
+        "A New Hubs Orientation",
+        "High School / Middle School Wide Awake Leadership Program",
+        "Campus Corps Leadership Program",
+        "Somos Sunrise Latinx Leadership Program",
+        "Black Sunrise Leadership Program",
+        "The Strike Circle Program",
+        "Movement Building 101 in Sunrise School",
+        "None of the above, but someone else in my hub did do one of these"
+      ]
+    },
+    "Hub Tier": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Gender Identity": {
+      "type": "multiSelect",
+      "choices": [
+        "Woman",
+        "Man",
+        "Trans",
+        "Non-Binary",
+        "Prefer not to say",
+        "Self describe in the next question"
+      ]
+    },
+    "Would you like to participate in a role network?": {
+      "type": "select",
+      "choices": [
+        "Yes",
+        "No",
+        "I would like to join one!"
+      ]
+    },
+    "How long have you been involved with Sunrise?": {
+      "type": "select",
+      "choices": [
+        "1-3 Months",
+        "3-6 Months",
+        "6-12 Months",
+        "1 or more years"
+      ]
+    },
+    "Have you participated in a Sunrise training before?": {
+      "type": "select",
+      "choices": [
+        "Yes",
+        "No"
+      ]
+    },
+    "If you've participated in a training, which training was it?": {
+      "type": "text",
+      "choices": null
+    },
+    "Last Modified": {
+      "type": "formula",
+      "choices": null
+    },
+    "Region": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Reach out": {
+      "type": "text",
+      "choices": null
+    },
+    "Map Edit Access?": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Map Edit Email": {
+      "type": "formula",
+      "choices": null
+    },
+    "Deleted by Hubhub?": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "birthyear": {
+      "type": "formula",
+      "choices": null
+    },
+    "Hub Name for Sync": {
+      "type": "formula",
+      "choices": null
+    },
+    "State for AN": {
+      "type": "formula",
+      "choices": null
+    },
+    "Common accessibility needs": {
+      "type": "multiSelect",
+      "choices": [
+        "access to a quiet space",
+        "all content digitally available",
+        "ASL",
+        "communication access (real-time transcription)",
+        "fragrance free space",
+        "large print",
+        "reduced lighting",
+        "wheelchair accessibility",
+        "prefer not to say",
+        "self describe in the next question",
+        "No"
+      ]
+    },
+    "Tell us more about your accessibility needs!": {
+      "type": "multilineText",
+      "choices": null
+    },
+    "DO NOT REMOVE CONCATENATE FUNCTION": {
+      "type": "formula",
+      "choices": null
+    },
+    "Slack": {
+      "type": "multiSelect",
+      "choices": [
+        "I have read the Online Spaces Culture Guidelines",
+        "I have read the Sunrise Slack Guidelines",
+        "I would like to be added to the Sunrise Slack",
+        "I am already on the Sunrise Slack!"
+      ]
+    },
+    "State of Hub Forms copy": {
+      "type": "text",
+      "choices": null
+    },
+    "States": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "MobilizeAmerica": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "Synced to Civis At": {
+      "type": "date",
+      "choices": null
+    },
+    "Hub on Map?": {
+      "type": "lookup",
+      "choices": null
+    },
+    "HRD": {
+      "type": "foreignKey",
+      "choices": null
+    },
+    "High Priority Colleges (from Hubs)": {
+      "type": "lookup",
+      "choices": null
+    },
+    "hub_list_size": {
+      "type": "lookup",
+      "choices": null
+    },
+    "hub_activity": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Hub On Map": {
+      "type": "lookup",
+      "choices": null
+    },
+    "hub launch date": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Program": {
+      "type": "lookup",
+      "choices": null
+    },
+    "Top Leader": {
+      "type": "checkbox",
+      "choices": null
+    },
+    "Leader Level": {
+      "type": "select",
+      "choices": [
+        "Top Leader",
+        "Leader",
+        "Member"
+      ]
+    },
+    "Pronouns": {
+      "type": "select",
+      "choices": [
+        "They/Them/Theirs",
+        "He/Him/His",
+        "He/Them/Theirs",
+        "She/Her/Hers",
+        "She/Them/Theirs",
+        "Zie/Zim/Zis",
+        "(F)ae/(F)aer/(F)aers",
+        "E/Em/Eirs",
+        "Ey/Em/Eirs",
+        "Per/Per/Pers",
+        "Sie/Sie/Hirs",
+        "Tey/Ter/Ters",
+        "Ve/Ver/Vers",
+        "Ve/Ver/Vis",
+        "Xe/Xem/Xyrs",
+        "Ze/Hir/Hirs",
+        "Self describe in next question",
+        "Prefer not to say",
+        "No preference"
+      ]
+    },
+    "Primary_Role": {
+      "type": "select",
+      "choices": [
+        "Action Lead",
+        "Art Action Lead",
+        "Communications Lead",
+        "Data Lead",
+        "Electoral Lead",
+        "Fundraising + Finance Lead",
+        "General member",
+        "Graphic Design Lead",
+        "Hub Coordinator",
+        "Hub Delegate",
+        "JEAO Coordinator",
+        "Other (define in field below)",
+        "Partnerships Lead",
+        "Photography Lead",
+        "Political Lead",
+        "Press + Media Lead",
+        "Recruitment Lead",
+        "Social Media Lead",
+        "Spokesperson",
+        "Team Lead",
+        "Trainings Lead",
+        "Video Lead"
+      ]
+    },
+    "Secondary_Role": {
+      "type": "select",
+      "choices": [
+        "Action Lead",
+        "Art Action Lead",
+        "Communications Lead",
+        "Data Lead",
+        "Electoral Lead",
+        "Fundraising + Finance Lead",
+        "General member",
+        "Graphic Design Lead",
+        "Hub Coordinator",
+        "Hub Delegate",
+        "JEAO Coordinator",
+        "Other (define in field below)",
+        "Partnerships Lead",
+        "Photography Lead",
+        "Political Lead",
+        "Press + Media Lead",
+        "Recruitment Lead",
+        "Social Media Lead",
+        "Spokesperson",
+        "Team Lead",
+        "Trainings Lead",
+        "Video Lead"
+      ]
+    },
+    "zipcode": {
+      "type": "text",
+      "choices": null
+    },
+    "All Hub Roles": {
+      "type": "formula",
+      "choices": null
+    },
+    "ID": {
+      "type": "autoNumber",
+      "choices": null
+    },
+    "Other_Hub_Role(s)": {
+      "type": "multiSelect",
+      "choices": [
+        "Action Lead",
+        "Art Action Lead",
+        "Communications Lead",
+        "Data Lead",
+        "Electoral Lead",
+        "Fundraising + Finance Lead",
+        "General member",
+        "Graphic Design Lead",
+        "Hub Coordinator",
+        "Hub Delegate",
+        "JEAO Coordinator",
+        "Other (define in field below)",
+        "Partnerships Lead",
+        "Photography Lead",
+        "Political Lead",
+        "Press + Media Lead",
+        "Recruitment Lead",
+        "Social Media Lead",
+        "Spokesperson",
+        "Team Lead",
+        "Trainings Lead",
+        "Video Lead"
+      ]
+    },
+    "Inactive": {
+      "type": "checkbox",
+      "choices": null
+    }
+  }
+}

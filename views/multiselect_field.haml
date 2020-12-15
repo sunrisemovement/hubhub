@@ -1,0 +1,9 @@
+.field
+  %label.label= defined?(label) ? label : field.gsub("_", " ")
+  .control
+    .select.is-multiple
+      %select{multiple: 'multiple', name: "#{field}[]"}
+        - object.options_for(field).each do |opt|
+          %option{value: opt, selected: (object[field]||[]).include?(opt)}= opt
+      - if defined?(help)
+        %p.help= help
