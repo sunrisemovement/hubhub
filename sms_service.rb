@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'twilio-ruby'
 require_relative 'scripts/state_abbr_to_name'
 
 def distance(geo_a, geo_b, miles=true)
