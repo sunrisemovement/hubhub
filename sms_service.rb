@@ -40,11 +40,13 @@ class SMSService < Sinatra::Base
       Hub.cached_visible
     end
 
-    def hubs_near(coords, max=99, min=5, radius=10)
+    def hubs_near(coords, max=99, min=5, radius=10, max_dist=50)
       results = []
       active_hubs.sort_by { |hub| distance(coords, hub.coords) }.each do |hub|
+        dist = distance(coords, hub.coords)
         break if results.size >= max
-        break if results.size >= min && distance(coords, hub.coords) >= radius
+        break if results.size >= min && dist >= radius
+        break if dist >= max_dist
         results << hub
       end
       results
@@ -55,21 +57,42 @@ class SMSService < Sinatra::Base
     end
 
     def zip_message(hubs, zip, coords)
-      string = "Here are the hubs we found closest to #{zip}:"
-      hubs.each_with_index do |hub, i|
-        string += "\n #{i+1} - #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
+      if hubs.length == 0
+        "Sorry, we couldn't find any active Sunrise hubs within 50 miles of #{zip} 😞\n\nTry searching elsewhere, or consider starting your own: http://smvmt.org/start-hub"
+      elsif hubs.length == 1
+        hub = hubs.first
+        string = "Currently, the only hub within 50 miles of #{zip} is #{hub.name} "
+        string += "(~#{distance(coords, hub.coords).round(1)} miles).\n\n"
+        string += hub.sms_info
+        string += "\n\nIf #{hub.name} is far away, you can also consider starting your own hub: http://smvmt.org/start-hub"
+        string
+      else
+        string = "Here are the hubs we found closest to #{zip}:\n"
+        hubs.each_with_index do |hub, i|
+          string += "\n#{i+1} - #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
+        end
+        string += "\n\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
+        string
       end
-      string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
-      string
     end
 
     def state_message(hubs, state)
-      string = "Here are all the #{state} hubs:"
-      hubs.each_with_index do |hub, i|
-        string += "\n #{i+1} - #{hub['Name']} "
+      if hubs.length == 0
+        "Sorry, we couldn't find any active Sunrise hubs in #{state} 😞\n\nTry searching elsewhere, or consider starting your own hub: http://smvmt.org/start-hub"
+      elsif hubs.length == 1
+        hub = hubs.first
+        string = "Currently, the only hub in #{state} is #{hub.name}.\n\n"
+        string += hub.sms_info
+        string += "\n\nIf #{hub.name} is far away, you can also consider starting your own hub: http://smvmt.org/start-hub"
+        string
+      else
+        string = "Here are all the #{state} hubs:\n"
+        hubs.each_with_index do |hub, i|
+          string += "\n#{i+1} - #{hub['Name']} "
+        end
+        string += "\n\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
+        string
       end
-      string += "\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
-      string
     end
 
     def hub_choice(sms, data)
