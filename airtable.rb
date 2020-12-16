@@ -78,15 +78,20 @@ class Hub < Airrecord::Table
   has_many :hub_leaders, class: 'Leader', column: 'Hub Leaders'
   has_many :hub_forms, class: 'HubForm', column: 'State of the Hub Form'
 
-  # Generate a list of hubs that can be edited in Hubhub (for use in the login
-  # dropdown list)
-  def self.editable_by_coordinators
-    hubs = self.all.select(&:editable_by_coordinators?)
-    hubs = hubs.sort_by { |h| [h.state_abbrev, h['Name']] }
-    if ENV['HUB_BETA_TESTERS']
-      hubs = hubs.select { |h| ENV['HUB_BETA_TESTERS'].include?(h.id) }
+  def self.cached(timeout=60)
+    if @cached_hubs.nil? || @cached_at.nil? || Time.now - @cached_at > timeout
+      @cached_hubs = self.all.sort_by { |h| [h.state_abbrev||'_', h['Name']] }
+      @cached_at = Time.now
     end
-    hubs
+    @cached_hubs
+  end
+
+  def self.cached_visible(timeout=10*60)
+    self.cached(timeout).select(&:should_appear_on_map?)
+  end
+
+  def self.cached_editable(timeout=1*60)
+    self.cached(timeout).select(&:editable_by_coordinators?)
   end
 
   # A hub is editable in Hubhub if it's been marked as potentially visible on
@@ -166,6 +171,10 @@ class Hub < Airrecord::Table
 
   def location
     "#{self['City']}, #{state_abbrev}"
+  end
+
+  def name
+    self['Name']
   end
 
   # Hubs can select a "contact type" that determines which information gets

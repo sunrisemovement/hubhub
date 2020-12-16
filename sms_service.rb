@@ -20,37 +20,12 @@ def distance(geo_a, geo_b, miles=true)
   d = 6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
-class InMemory
-  @cache = Hash.new { |h, k| h[k] = {} }
-
-  class << self
-    attr_reader :cache
-  end
-end
-
 class SMSService < Sinatra::Base
   ZIP_COORDS = JSON.parse(File.read(File.join(__dir__, 'zip_codes.json')))
 
   enable :logging
 
   helpers do
-    def user_phone
-      puts params
-      @user_phone ||= params.fetch('member', {})['phoneNumber']
-    end
-
-    def get_session(key)
-      InMemory.cache[user_phone][key]
-    end
-
-    def set_session(key, val)
-      InMemory.cache[user_phone][key] = val
-    end
-
-    def active_hubs
-      @@active_hubs ||= Hub.all.select(&:should_appear_on_map?)
-    end
-
     def zip_coords(sms)
       zip = sms[/\d{5}/]
       zip && ZIP_COORDS[zip]
@@ -59,6 +34,10 @@ class SMSService < Sinatra::Base
     def us_state(sms)
       state = STATE_ABBR_TO_NAME.values.detect{|v| sms == v.downcase }
       state ||= STATE_ABBR_TO_NAME[STATE_ABBR_TO_NAME.keys.detect{|v| sms == v.downcase }]
+    end
+
+    def active_hubs
+      Hub.cached_visible
     end
 
     def hubs_near(coords, max=99, min=5, radius=10)
@@ -93,48 +72,58 @@ class SMSService < Sinatra::Base
       string
     end
 
-    def hub_choice(sms)
-      return unless get_session('hub_ids').present?
+    def hub_choice(sms, data)
+      return unless data['hubsearch_hubs'].present?
       return unless sms =~ /^\d\d?$/
-      return unless id = get_session('hub_ids')[sms.to_i - 1]
-      active_hubs.detect { |h| h.id == id }
+      return unless name = data['hubsearch_hubs'][sms.to_i - 1]
+      active_hubs.detect { |h| h.name == name }
     end
 
     def hub_named(sms)
-      active_hubs.detect { |h| h['Name'].strip.downcase == sms }
+      active_hubs.detect { |h| h.name.to_s.strip.downcase == sms }
     end
 
-    def sms_response(sms)
-      sms = sms.to_s.strip.downcase
-      msg_count = get_session('msg_count') || 0
-      set_session('msg_count', msg_count + 1)
+    def sms_response(input)
+      sms = input['message'].to_s.strip.downcase
+      data = input.fetch('member', {}).fetch('custom', {})
+      msg_count = data.fetch('hubsearch_msgs', 0)
 
-      if sms.present? && hub = (hub_choice(sms) || hub_named(sms))
-        hub.sms_info
+      res = {
+        continue: true,
+        member: {
+          custom: {
+            hubsearch_msgs: msg_count + 1
+          }
+        }
+      }
+
+      if sms.present? && hub = (hub_choice(sms, data) || hub_named(sms))
+        res[:message] = hub.sms_info
       elsif coords = zip_coords(sms)
         hubs = hubs_near(coords)
-        set_session('hub_ids', hubs.map(&:id))
-        zip_message(hubs, sms[/\d{5}/], coords)
+        res[:message] = zip_message(hubs, sms[/\d{5}/], coords)
+        res[:member][:custom][:hubsearch_hubs] = hubs.map(&:name)
       elsif state = us_state(sms)
         hubs = hubs_in(state)
-        set_session('hub_ids', hubs.map(&:id))
-        state_message(hubs, state)
+        res[:message] = state_message(hubs, state)
+        res[:member][:custom][:hubsearch_hubs] = hubs.map(&:name)
       elsif msg_count == 0
-        "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
+        res[:message] = "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
       else
-        "Sorry, I couldn't figure out what you meant! Try replying back with a zip code, state name, or hub name, and if that doesn't work, you can visit https://sunrisemovement.org/hubs to see a full list of hubs."
+        res[:message] = "Sorry, I couldn't figure out what you meant! Try replying back with a zip code, state name, or hub name, and if that doesn't work, you can visit https://sunrisemovement.org/hubs to see a full list of hubs."
       end
+
+      res
     end
   end
 
   get '/sms' do
-    sms_response(params['q'])
+    sms_response(params).to_json
   end
 
   post '/sms' do
     input = JSON.parse(request.env['rack.input'].read)
-    {
-      "message": sms_response(input['message'])
-    }.to_json
+    logger.info input
+    sms_response(input).to_json
   end
 end
