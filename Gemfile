@@ -18,6 +18,7 @@ group :development do
   gem 'minitest'
   gem 'capybara'
   gem 'timecop'
+  gem 'rack-test'
   gem 'pry'
   gem 'rb-readline'
 end
