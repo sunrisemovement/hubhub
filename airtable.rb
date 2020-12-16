@@ -174,7 +174,7 @@ class Hub < Airrecord::Table
   end
 
   def name
-    self['Name']
+    self['Name'].to_s.strip
   end
 
   # Hubs can select a "contact type" that determines which information gets
@@ -259,11 +259,11 @@ class Hub < Airrecord::Table
     parts = []
 
     if sl = self['Signup Link']
-      parts << "You can sign up for #{self['Name']} at #{sl}."
+      parts << "You can sign up for #{name} at #{sl}."
     elsif sl = self['Website']
-      parts << "You can sign up for #{self['Name']} at #{sl}."
+      parts << "You can sign up for #{name} at #{sl}."
     elsif sl = contact_text
-      parts << "You can sign up for #{self['Name']} by contacting #{sl}."
+      parts << "You can sign up for #{name} by contacting #{sl}."
     end
 
     sm = {}
@@ -272,11 +272,11 @@ class Hub < Airrecord::Table
     sm['Instagram'] = instagram_url if instagram_url
 
     if sm.values.size > 0
-      parts << "Also, you can follow #{self['Name']} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} 🙂"
+      parts << "Also, you can follow #{name} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} 🙂"
     end
 
     if parts.size == 0
-      parts << "Unfortunately, we can't find any contact or social media information for #{self['Name']} right now 😞"
+      parts << "Unfortunately, we can't find any contact or social media information for #{name} right now 😞"
       parts << "Try searching for a different hub!"
     end
     
@@ -304,7 +304,7 @@ class Hub < Airrecord::Table
   def map_entry(leads=nil)
     entry = {
       id: self.id,
-      name: self.fields['Name'],
+      name: name,
       city: self.fields['City'].strip,
       state: self.state,
       latitude: self.fields['Latitude'],
