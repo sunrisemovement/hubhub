@@ -33,6 +33,8 @@ class Minitest::Test
     Leader.base_key = 'foo'
     Airrecord.api_key = 'foo'
 
+    Hub.instance_variable_set(:@cached_at, nil)
+
     Hub.client.connection = Faraday.new { |builder|
       builder.adapter :test, Faraday::Adapter::Test::Stubs.new
     }
