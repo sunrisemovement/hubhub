@@ -63,7 +63,7 @@ class HubMessage
 
   def signup_message
     if link = hub['Signup Link'] || hub['Website']
-      "at #{link}."
+      "at #{link}"
     elsif whom = contact_text
       "by contacting #{whom}"
     end
