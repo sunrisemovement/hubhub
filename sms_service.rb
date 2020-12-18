@@ -1,7 +1,10 @@
 require 'sinatra/base'
 require_relative 'scripts/state_abbr_to_name'
 
-def distance(geo_a, geo_b, miles=true)
+# Compute the great circle distance between two sets of [lat,lng] coordinates,
+# which approximates the true distance between them. For more details, see
+# https://en.wikipedia.org/wiki/Haversine_formula
+def haversine_distance(geo_a, geo_b, miles=true)
   lat1, lon1 = geo_a
   lat2, lon2 = geo_b
 
@@ -19,90 +22,135 @@ def distance(geo_a, geo_b, miles=true)
   d = 6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
-class SMSService < Sinatra::Base
+# Wrapper class for parsing hub search parameters, searching for appropriate
+# hubs, and printing out a result message
+class HubSearch
   ZIP_COORDS = JSON.parse(File.read(File.join(__dir__, 'zip_codes.json')))
+  STATE_DICT = STATE_ABBR_TO_NAME
+  MIN_HUBS = 5
+  MAX_HUBS = 99
+  MIN_MILES = 10
+  MAX_MILES = 50
+  START_HUB = 'http://smvmt.org/start-hub'
 
+  attr_reader :state, :zip
+
+  def initialize(state: nil, zip: nil)
+    raise ArgumentError.new("must pass state or zip") unless state || zip
+    @state = state
+    @zip = zip
+  end
+
+  def self.parse(sms)
+    if zip = sms[/\d{5}/]
+      new(zip: zip) if ZIP_COORDS.key?(zip)
+    elsif state = STATE_DICT.values.detect{|v| sms.downcase == v.downcase }
+      new(state: state)
+    elsif state = STATE_DICT[STATE_DICT.keys.detect{|v| sms.downcase == v.downcase }]
+      new(state: state)
+    end
+  end
+
+  def hubs
+    @hubs ||= begin
+      if state
+        Hub.cached_visible.select { |hub| hub.state == state }
+      else
+        res = []
+        Hub.cached_visible.sort_by { |hub| miles_to[hub] }.each do |hub|
+          break if res.size >= MIN_HUBS && miles_to[hub] >= MIN_MILES
+          break if res.size >= MAX_HUBS || miles_to[hub] >= MAX_MILES
+          res << hub
+        end
+        res
+      end
+    end
+  end
+
+  def message
+    case hubs.length
+    when 0
+      no_hubs_message
+    when 1
+      one_hub_message
+    else
+      many_hubs_message
+    end
+  end
+
+  private
+
+  def coords
+    @coords ||= ZIP_COORDS[zip]
+  end
+
+  def miles_to
+    @miles_to ||= Hub.cached_visible.each_with_object({}) do |hub, h|
+      h[hub] = haversine_distance(coords, hub.coords, miles=true)
+    end
+  end
+
+  def in_location
+    if state
+      "in #{state}"
+    else
+      "within #{MAX_MILES} miles of #{zip}"
+    end
+  end
+
+  def hub_result(hub)
+    if state
+      hub.name
+    else
+      "#{hub.name} (~#{miles_to[hub].round(1)} miles)"
+    end
+  end
+
+  def no_hubs_message
+    <<-MSG.strip_heredoc.strip
+      Sorry, we couldn't find any active Sunrise hubs #{in_location} 😞
+
+      Try searching elsewhere, or consider starting your own: #{START_HUB}
+    MSG
+  end
+
+  def one_hub_message
+    <<-MSG.strip_heredoc.strip
+      Currently, the only hub #{in_location} is #{hub_result(hubs.first)}.
+
+      #{hubs.first.sms_info}
+
+      If #{hubs.first.name} is far away, you can also consider starting your own hub: #{START_HUB}
+    MSG
+  end
+
+  def many_hubs_message
+    if state
+      msg = "Here are all the #{state} hubs:\n"
+    else
+      msg = "Here are the hubs we found closest to #{zip}:\n"
+    end
+    hubs.each_with_index do |hub, i|
+     msg += "\n#{i+1} - #{hub_result(hub)}"
+    end
+    msg += "\n\nReply back with 1-#{hubs.size} to learn how to join!"
+    msg
+  end
+end
+
+class SMSService < Sinatra::Base
   enable :logging
 
   helpers do
-    def zip_coords(sms)
-      zip = sms[/\d{5}/]
-      zip && ZIP_COORDS[zip]
-    end
-
-    def us_state(sms)
-      state = STATE_ABBR_TO_NAME.values.detect{|v| sms == v.downcase }
-      state ||= STATE_ABBR_TO_NAME[STATE_ABBR_TO_NAME.keys.detect{|v| sms == v.downcase }]
-    end
-
-    def active_hubs
-      Hub.cached_visible
-    end
-
-    def hubs_near(coords, max=99, min=5, radius=10, max_dist=50)
-      results = []
-      active_hubs.sort_by { |hub| distance(coords, hub.coords) }.each do |hub|
-        dist = distance(coords, hub.coords)
-        break if results.size >= max
-        break if results.size >= min && dist >= radius
-        break if dist >= max_dist
-        results << hub
-      end
-      results
-    end
-
-    def hubs_in(state)
-      active_hubs.select { |hub| hub.state == state }
-    end
-
-    def zip_message(hubs, zip, coords)
-      if hubs.length == 0
-        "Sorry, we couldn't find any active Sunrise hubs within 50 miles of #{zip} 😞\n\nTry searching elsewhere, or consider starting your own: http://smvmt.org/start-hub"
-      elsif hubs.length == 1
-        hub = hubs.first
-        string = "Currently, the only hub within 50 miles of #{zip} is #{hub.name} "
-        string += "(~#{distance(coords, hub.coords).round(1)} miles).\n\n"
-        string += hub.sms_info
-        string += "\n\nIf #{hub.name} is far away, you can also consider starting your own hub: http://smvmt.org/start-hub"
-        string
-      else
-        string = "Here are the hubs we found closest to #{zip}:\n"
-        hubs.each_with_index do |hub, i|
-          string += "\n#{i+1} - #{hub['Name']} (~#{distance(coords, hub.coords).round(1)} miles) "
-        end
-        string += "\n\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
-        string
-      end
-    end
-
-    def state_message(hubs, state)
-      if hubs.length == 0
-        "Sorry, we couldn't find any active Sunrise hubs in #{state} 😞\n\nTry searching elsewhere, or consider starting your own hub: http://smvmt.org/start-hub"
-      elsif hubs.length == 1
-        hub = hubs.first
-        string = "Currently, the only hub in #{state} is #{hub.name}.\n\n"
-        string += hub.sms_info
-        string += "\n\nIf #{hub.name} is far away, you can also consider starting your own hub: http://smvmt.org/start-hub"
-        string
-      else
-        string = "Here are all the #{state} hubs:\n"
-        hubs.each_with_index do |hub, i|
-          string += "\n#{i+1} - #{hub['Name']} "
-        end
-        string += "\n\nReply back with 1#{'-'+hubs.size.to_s if hubs.size > 1} or a hub name to learn how to join!"
-        string
-      end
-    end
-
     def hub_choice(sms, data)
       return unless data['hubsearch_hubs'].present?
       return unless sms =~ /^\d\d?$/
       return unless name = data['hubsearch_hubs'][sms.to_i - 1]
-      active_hubs.detect { |h| h.name == name }
+      Hub.cached_visible.detect { |h| h.name == name }
     end
 
     def hub_named(sms)
-      active_hubs.detect { |h| h.name.to_s.strip.downcase == sms }
+      Hub.cached_visible.detect { |h| h.name.to_s.strip.downcase == sms }
     end
 
     def sms_response(input)
@@ -121,14 +169,9 @@ class SMSService < Sinatra::Base
 
       if sms.present? && hub = (hub_choice(sms, data) || hub_named(sms))
         res[:message] = hub.sms_info
-      elsif coords = zip_coords(sms)
-        hubs = hubs_near(coords)
-        res[:message] = zip_message(hubs, sms[/\d{5}/], coords)
-        res[:member][:custom][:hubsearch_hubs] = hubs.map(&:name)
-      elsif state = us_state(sms)
-        hubs = hubs_in(state)
-        res[:message] = state_message(hubs, state)
-        res[:member][:custom][:hubsearch_hubs] = hubs.map(&:name)
+      elsif search = HubSearch.parse(sms)
+        res[:message] = search.message
+        res[:member][:custom][:hubsearch_hubs] = search.hubs.map(&:name)
       elsif msg_count == 0
         res[:message] = "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
       else
@@ -137,15 +180,21 @@ class SMSService < Sinatra::Base
 
       res
     end
+
+    def search_params
+      if params && params['message']
+        params
+      else
+        JSON.parse(request.env['rack.input'].read) rescue {}
+      end
+    end
   end
 
   get '/sms' do
-    sms_response(params).to_json
+    sms_response(search_params).to_json
   end
 
   post '/sms' do
-    input = JSON.parse(request.env['rack.input'].read)
-    logger.info input
-    sms_response(input).to_json
+    sms_response(search_params).to_json
   end
 end
