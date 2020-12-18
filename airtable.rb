@@ -35,8 +35,12 @@ class Leader < Airrecord::Table
     "#{self['First Name']} #{self['Last Name']}"
   end
 
+  def email
+    self['Email'].to_s.strip.presence
+  end
+
   def entry
-    "#{name}: #{self['Email']}"
+    "#{name}: #{email}"
   end
 
   def inactive?
@@ -136,7 +140,7 @@ class Hub < Airrecord::Table
     return false if self['Activity'] == 'Inactive'
     return false unless self['Map?'] == true
     return false unless self['Latitude'] && self['Longitude']
-    return false unless self['City'] && state && self['Name']
+    return false unless self['City'] && state && name
     true
   end
 
@@ -174,7 +178,7 @@ class Hub < Airrecord::Table
   end
 
   def name
-    self['Name'].to_s.strip
+    self['Name'].to_s.strip.presence
   end
 
   # Hubs can select a "contact type" that determines which information gets
@@ -252,46 +256,6 @@ class Hub < Airrecord::Table
   def instagram_url
     if s = self['Instagram Handle'].presence
       ensure_https_prefixed("instagram.com", s.strip)
-    end
-  end
-
-  def sms_info
-    parts = []
-
-    if sl = self['Signup Link']
-      parts << "You can sign up for #{name} at #{sl}."
-    elsif sl = self['Website']
-      parts << "You can sign up for #{name} at #{sl}."
-    elsif sl = contact_text
-      parts << "You can sign up for #{name} by contacting #{sl}."
-    end
-
-    sm = {}
-    sm['Facebook'] = facebook_url if facebook_url
-    sm['Twitter'] = twitter_url if twitter_url
-    sm['Instagram'] = instagram_url if instagram_url
-
-    if sm.values.size > 0
-      parts << "Also, you can follow #{name} on #{sm.map{|k,v| "#{k} at #{v.sub(/\?.*$/, '')}" }.to_sentence} 🙂"
-    end
-
-    if parts.size == 0
-      parts << "Unfortunately, we can't find any contact or social media information for #{name} right now 😞"
-      parts << "Try searching for a different hub!"
-    end
-    
-    parts.join(" ")
-  end
-
-  def contact_text
-    if contact_type == 'Custom Text'
-      self['Custom Map Contact Text']
-    elsif should_show_hub_email?
-      contact_email
-    elsif should_show_leader_emails?
-      leads = self.leaders
-      leads = leads.select { |l| l['Map?'] && !l['Deleted by Hubhub?'] }
-      leads.map{|l| l['Email'] }.to_sentence(last_word_connector: ', or ')
     end
   end
 

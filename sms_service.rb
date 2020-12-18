@@ -22,6 +22,64 @@ def haversine_distance(geo_a, geo_b, miles=true)
   d = 6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
+class HubMessage
+  attr_reader :hub
+
+  def initialize(hub)
+    @hub = hub
+  end
+
+  def message
+    by_signup = signup_message
+    on_social = social_message
+
+    if by_signup && on_social
+      "You can sign up for #{hub.name} #{by_signup}. "\
+      "Also, you can follow #{hub.name} #{on_social} 🙂"
+    elsif by_signup
+      "You can sign up for #{hub.name} #{by_signup}."
+    elsif on_social
+      "You can follow #{hub.name} #{on_social}."
+    else
+      # NOTE: should probably never reach this line, but want to handle it just
+      # in case of data issues
+      "Unfortunately, #{hub.name} isn't listing any contact or social media "\
+      "information right now 😞 Try searching for a different hub!"
+    end
+  end
+
+  private
+
+  def contact_text
+    if hub.contact_type == 'Custom Text'
+      hub['Custom Map Contact Text']
+    elsif hub.should_show_hub_email?
+      hub.contact_email
+    elsif hub.should_show_leader_emails?
+      emails = hub.leaders.select(&:should_appear_on_map?).map(&:email)
+      emails.to_sentence(last_word_connector: ', or ')
+    end
+  end
+
+  def signup_message
+    if link = hub['Signup Link'] || hub['Website']
+      "at #{link}."
+    elsif whom = contact_text
+      "by contacting #{whom}"
+    end
+  end
+
+  def social_message
+    media = {}
+    ['twitter', 'facebook', 'instagram'].each do |platform|
+      if url = hub.send("#{platform}_url").presence
+        media[platform.capitalize] = url.sub(/\?.*$/, '')
+      end
+    end
+    media.map{|platform, url| "#{platform} at #{url}" }.to_sentence.presence
+  end
+end
+
 # Wrapper class for parsing hub search parameters, searching for appropriate
 # hubs, and printing out a result message
 class HubSearch
@@ -31,7 +89,7 @@ class HubSearch
   MAX_HUBS = 99
   MIN_MILES = 10
   MAX_MILES = 50
-  START_HUB = 'http://smvmt.org/start-hub'
+  START_HUB_URL = 'http://smvmt.org/start-hub'
 
   attr_reader :state, :zip
 
@@ -58,6 +116,10 @@ class HubSearch
       else
         res = []
         Hub.cached_visible.sort_by { |hub| miles_to[hub] }.each do |hub|
+          # To start, show all hubs within MIN_MILES miles, unless there are
+          # more than MAX_HUBS.  Then, if we haven't yet shown MIN_HUBS hubs,
+          # we expand the search radius to MAX_MILES until we have at least
+          # MIN_HUBS.
           break if res.size >= MIN_HUBS && miles_to[hub] >= MIN_MILES
           break if res.size >= MAX_HUBS || miles_to[hub] >= MAX_MILES
           res << hub
@@ -106,11 +168,15 @@ class HubSearch
     end
   end
 
+  def hub_message(hub)
+    HubMessage.new(hub).message
+  end
+
   def no_hubs_message
     <<-MSG.strip_heredoc.strip
       Sorry, we couldn't find any active Sunrise hubs #{in_location} 😞
 
-      Try searching elsewhere, or consider starting your own: #{START_HUB}
+      Try searching elsewhere, or consider starting your own: #{START_HUB_URL}
     MSG
   end
 
@@ -118,9 +184,9 @@ class HubSearch
     <<-MSG.strip_heredoc.strip
       Currently, the only hub #{in_location} is #{hub_result(hubs.first)}.
 
-      #{hubs.first.sms_info}
+      #{hub_message(hubs.first)}
 
-      If #{hubs.first.name} is far away, you can also consider starting your own hub: #{START_HUB}
+      If #{hubs.first.name} is far away, you can also consider starting your own hub: #{START_HUB_URL}
     MSG
   end
 
@@ -139,6 +205,8 @@ class HubSearch
 end
 
 class SMSService < Sinatra::Base
+  HUB_MAP_URL = 'https://sunrisemovement.org/hubs'
+
   enable :logging
 
   helpers do
@@ -150,7 +218,7 @@ class SMSService < Sinatra::Base
     end
 
     def hub_named(sms)
-      Hub.cached_visible.detect { |h| h.name.to_s.strip.downcase == sms }
+      Hub.cached_visible.detect { |h| h.name.downcase == sms.downcase }
     end
 
     def sms_response(input)
@@ -168,14 +236,20 @@ class SMSService < Sinatra::Base
       }
 
       if sms.present? && hub = (hub_choice(sms, data) || hub_named(sms))
-        res[:message] = hub.sms_info
+        res[:message] = HubMessage.new(hub).message
       elsif search = HubSearch.parse(sms)
         res[:message] = search.message
         res[:member][:custom][:hubsearch_hubs] = search.hubs.map(&:name)
       elsif msg_count == 0
-        res[:message] = "Welcome to the Sunrise Movement hub finder chatbot! Try messaging me with a zip code, state name, or hub name to learn more about Sunrise hubs in your region. (You can also find a full list at https://sunrisemovement.org/hubs 😃)"
+        res[:message] = "Welcome to the Sunrise Movement hub finder chatbot! "\
+                        "Try messaging me with a zip code, state name, or hub "\
+                        "name to learn more about Sunrise hubs in your region. "\
+                        "(You can also find a full list at #{HUB_MAP_URL} 😃)"
       else
-        res[:message] = "Sorry, I couldn't figure out what you meant! Try replying back with a zip code, state name, or hub name, and if that doesn't work, you can visit https://sunrisemovement.org/hubs to see a full list of hubs."
+        res[:message] = "Sorry, I couldn't figure out what you meant! "\
+                        "Try replying back with a zip code, state name, "\
+                        "or hub name, and if that doesn't work, "\
+                        "you can visit #{HUB_MAP_URL} to see a full list of hubs."
       end
 
       res
