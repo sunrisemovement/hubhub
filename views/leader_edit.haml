@@ -35,7 +35,7 @@
     = haml :text_field,        locals: { object: @leader, field: "Self Described Gender" }
     = haml :multiselect_field, locals: { object: @leader, field: "Race" }
     = haml :text_field,        locals: { object: @leader, field: "Self Described Race" }
-    = haml :multiselect_field, locals: { object: @leader, field: "Economic/Class Background" }
+    = haml :select_field,      locals: { object: @leader, field: "Economic/Class Background" }
 
   %input.button.is-warning{type: 'submit', value: 'Update Leader Information'}
 

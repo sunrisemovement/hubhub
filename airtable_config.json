@@ -417,15 +417,14 @@
       "choices": null
     },
     "Economic/Class Background": {
-      "type": "multiSelect",
+      "type": "select",
       "choices": [
         "Poor and working-poor",
         "Working Class / Lower Middle Class",
         "Middle-class",
         "Professional/managerial-class",
         "Upper/owning-class",
-        "Prefer not to say",
-        "Upper Middle Class"
+        "Prefer not to say"
       ]
     },
     "Birthday": {
