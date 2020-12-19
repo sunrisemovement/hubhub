@@ -316,18 +316,20 @@ h3 {
 #hub-map .hub-map-links {
   margin-top: 8px;
   padding: 0 !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 #hub-map .hub-map-link {
-  display: inline-block;
+  display: flex;
   background: #E3EDDF;
   padding: 10px;
   margin-right: 2px;
   margin-top: 2px;
   text-align: center;
-  width: calc(50% - 22px);
-}
-#hub-map .hub-map-link:nth-child(2n+1):last-child {
-  width: calc(100% - 22px);
+  flex: 1 calc(50% - 22px);
+  justify-content: center;
+  align-items: center;
 }
 #hub-map .hub-map-link:hover {
   opacity: 0.9;
