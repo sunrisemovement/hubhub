@@ -42,7 +42,8 @@ ids_to_hub_names = {}
 login_attempts = Hash.new { |h,k| h[k] = 0 }
 login_successes = Hash.new { |h,k| h[k] = 0 }
 map_info_edits = Hash.new { |h,k| h[k] = 0 }
-leader_edits = Hash.new { |h,k| h[k] = 0 }
+leader_removals = Hash.new { |h,k| h[k] = 0 }
+leader_updates = Hash.new { |h,k| h[k] = 0 }
 email_updates = Hash.new { |h,k| h[k] = 0 }
 micro_updates = Hash.new { |h,k| h[k] = 0 }
 
@@ -76,9 +77,12 @@ logs.each do |log|
   elsif entry.include?('Editing map info')
     map_info_edits[hub_name] += 1
     events << { hub_id: hub_id, type: 'map-edit', entry: entry, date: log[1], ip: log[5] }
-  elsif entry.include?('Editing leader info')
-    leader_edits[hub_name] += 1
-    events << { hub_id: hub_id, type: 'leader-edit', entry: entry, date: log[1], ip: log[5] }
+  elsif entry.include?('Editing leader info') || entry.include?("Deactivating leader")
+    leader_removals[hub_name] += 1
+    events << { hub_id: hub_id, type: 'leader-removal', entry: entry, date: log[1], ip: log[5] }
+  elsif entry.include?("Updating leader")
+    leader_updates[hub_name] += 1
+    events << { hub_id: hub_id, type: 'leader-update', entry: entry, date: log[1], ip: log[5] }
   elsif entry.include?('Updated hub email')
     email_updates[hub_name] += 1
     events << { hub_id: hub_id, type: 'email-edit', entry: entry, date: log[1], ip: log[5] }
