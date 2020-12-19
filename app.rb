@@ -123,6 +123,10 @@ class Hubhub < Sinatra::Base
     end
   end
 
+  error do
+    haml :error
+  end
+
   get '/' do
     haml :index
   end
