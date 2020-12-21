@@ -56,15 +56,15 @@ class HubMessage
     elsif hub.should_show_hub_email?
       hub.contact_email
     elsif hub.should_show_leader_emails?
-      emails = hub.leaders.select(&:should_appear_on_map?).map(&:email)
+      emails = hub.leaders.select(&:should_appear_on_map?).map(&:email).compact
       emails.to_sentence(last_word_connector: ', or ')
     end
   end
 
   def signup_message
-    if link = hub['Signup Link'] || hub['Website']
+    if link = (hub['Signup Link'] || hub['Website']).presence
       "at #{link}"
-    elsif whom = contact_text
+    elsif whom = contact_text.presence
       "by contacting #{whom}"
     end
   end
