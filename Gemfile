@@ -11,6 +11,7 @@ gem 'dotenv'
 gem 'honeybadger'
 gem 'dalli'
 gem 'httparty'
+gem 'puma'
 
 group :development do
   gem 'rake'
