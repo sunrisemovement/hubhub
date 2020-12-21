@@ -22,11 +22,28 @@ def haversine_distance(geo_a, geo_b, miles=true)
   d = 6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
-class HubMessage
+class HubChoice
   attr_reader :hub
 
   def initialize(hub)
     @hub = hub
+  end
+
+  def self.parse(sms, data)
+    return unless sms.present?
+
+    hubs = Hub.cached_visible
+
+    if hub = hubs.detect { |h| h.name.downcase == sms.downcase }
+      new(hub)
+    else
+      return unless data['hubsearch_hubs'].present?
+      return unless sms =~ /^\d\d?$/
+      return unless name = data['hubsearch_hubs'][sms.to_i - 1]
+      if hub = hubs.detect { |h| h.name == name }
+        new(hub)
+      end
+    end
   end
 
   def message
@@ -169,7 +186,7 @@ class HubSearch
   end
 
   def hub_message(hub)
-    HubMessage.new(hub).message
+    HubChoice.new(hub).message
   end
 
   def no_hubs_message
@@ -181,12 +198,14 @@ class HubSearch
   end
 
   def one_hub_message
+    hub = hubs.first
+
     <<-MSG.strip_heredoc.strip
-      Currently, the only hub #{in_location} is #{hub_result(hubs.first)}.
+      Currently, the only hub #{in_location} is #{hub_result(hub)}.
 
-      #{hub_message(hubs.first)}
+      #{hub_message(hub)}
 
-      If #{hubs.first.name} is far away, you can also consider starting your own hub: #{START_HUB_URL}
+      If #{hub.name} is far away, you can also consider starting your own hub: #{START_HUB_URL}
     MSG
   end
 
@@ -210,17 +229,6 @@ class SMSService < Sinatra::Base
   enable :logging
 
   helpers do
-    def hub_choice(sms, data)
-      return unless data['hubsearch_hubs'].present?
-      return unless sms =~ /^\d\d?$/
-      return unless name = data['hubsearch_hubs'][sms.to_i - 1]
-      Hub.cached_visible.detect { |h| h.name == name }
-    end
-
-    def hub_named(sms)
-      Hub.cached_visible.detect { |h| h.name.downcase == sms.downcase }
-    end
-
     def sms_response(input)
       sms = input['message'].to_s.strip.downcase
       data = input.fetch('member', {}).fetch('custom', {})
@@ -235,8 +243,8 @@ class SMSService < Sinatra::Base
         }
       }
 
-      if sms.present? && hub = (hub_choice(sms, data) || hub_named(sms))
-        res[:message] = HubMessage.new(hub).message
+      if choice = HubChoice.parse(sms, data)
+        res[:message] = choice.message
       elsif search = HubSearch.parse(sms)
         res[:message] = search.message
         res[:member][:custom][:hubsearch_hubs] = search.hubs.map(&:name)
