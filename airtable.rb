@@ -82,20 +82,20 @@ class Hub < Airrecord::Table
   has_many :hub_leaders, class: 'Leader', column: 'Hub Leaders'
   has_many :hub_forms, class: 'HubForm', column: 'State of the Hub Form'
 
-  def self.cached(timeout=60)
-    if @cached_hubs.nil? || @cached_at.nil? || Time.now - @cached_at > timeout
+  def self.cached(max_staleness=60)
+    if @cached_hubs.nil? || @cached_at.nil? || Time.now - @cached_at > max_staleness
       @cached_hubs = self.all.sort_by { |h| [h.state_abbrev||'_', h['Name']] }
       @cached_at = Time.now
     end
     @cached_hubs
   end
 
-  def self.cached_visible(timeout=10*60)
-    self.cached(timeout).select(&:should_appear_on_map?)
+  def self.visible(max_staleness=10*60)
+    self.cached(max_staleness).select(&:should_appear_on_map?)
   end
 
-  def self.cached_editable(timeout=1*60)
-    self.cached(timeout).select(&:editable_by_coordinators?)
+  def self.editable(max_staleness=1*60)
+    self.cached(max_staleness).select(&:editable_by_coordinators?)
   end
 
   # A hub is editable in Hubhub if it's been marked as potentially visible on

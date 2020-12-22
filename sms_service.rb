@@ -19,7 +19,7 @@ def haversine_distance(geo_a, geo_b, miles=true)
 
   c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 
-  d = 6371 * c * (miles ? 1 / 1.60934 : 1)
+  6371 * c * (miles ? 1 / 1.60934 : 1)
 end
 
 class HubChoice
@@ -32,7 +32,7 @@ class HubChoice
   def self.parse(sms, data)
     return unless sms.present?
 
-    hubs = Hub.cached_visible
+    hubs = Hub.visible
 
     if hub = hubs.detect { |h| h.name.downcase == sms.downcase }
       new(hub)
@@ -129,10 +129,10 @@ class HubSearch
   def hubs
     @hubs ||= begin
       if state
-        Hub.cached_visible.select { |hub| hub.state == state }
+        Hub.visible.select { |hub| hub.state == state }
       else
         res = []
-        Hub.cached_visible.sort_by { |hub| miles_to[hub] }.each do |hub|
+        Hub.visible.sort_by { |hub| miles_to[hub] }.each do |hub|
           # To start, show all hubs within MIN_MILES miles, unless there are
           # more than MAX_HUBS.  Then, if we haven't yet shown MIN_HUBS hubs,
           # we expand the search radius to MAX_MILES until we have at least
@@ -164,7 +164,7 @@ class HubSearch
   end
 
   def miles_to
-    @miles_to ||= Hub.cached_visible.each_with_object({}) do |hub, h|
+    @miles_to ||= Hub.visible.each_with_object({}) do |hub, h|
       h[hub] = haversine_distance(coords, hub.coords, miles=true)
     end
   end
