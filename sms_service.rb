@@ -205,7 +205,7 @@ class HubSearch
 
       #{hub_message(hub)}
 
-      If #{hub.name} is far away, you can also consider starting your own hub: #{START_HUB_URL}
+      If #{hub.name} is too far away, you can also consider starting your own hub: #{START_HUB_URL}
     MSG
   end
 
@@ -229,9 +229,10 @@ class SMSService < Sinatra::Base
   enable :logging
 
   helpers do
-    def sms_response(input)
-      sms = input['message'].to_s.strip.downcase
-      data = input.fetch('member', {}).fetch('custom', {})
+    def sms_response
+      sp = search_params
+      sms = sp['message'].to_s.strip.downcase
+      data = sp.fetch('member', {}).fetch('custom', {})
       msg_count = data.fetch('hubsearch_msgs', 0)
 
       res = {
@@ -266,17 +267,22 @@ class SMSService < Sinatra::Base
     def search_params
       if params && params['message']
         params
+      elsif input = request.env['rack.input'].read.presence
+        h = JSON.parse(input)
+        h.is_a?(Hash) ? h : {}
       else
-        JSON.parse(request.env['rack.input'].read) rescue {}
+        {}
       end
+    rescue JSON::ParserError
+      {}
     end
   end
 
   get '/sms' do
-    sms_response(search_params).to_json
+    sms_response.to_json
   end
 
   post '/sms' do
-    sms_response(search_params).to_json
+    sms_response.to_json
   end
 end
