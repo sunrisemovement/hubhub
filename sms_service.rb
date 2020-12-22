@@ -54,9 +54,9 @@ class HubChoice
       "You can sign up for #{hub.name} #{by_signup}. "\
       "Also, you can follow #{hub.name} #{on_social} 🙂"
     elsif by_signup
-      "You can sign up for #{hub.name} #{by_signup}."
+      "You can sign up for #{hub.name} #{by_signup} 🙂"
     elsif on_social
-      "You can follow #{hub.name} #{on_social}."
+      "You can follow #{hub.name} #{on_social} 🙂"
     else
       # NOTE: should probably never reach this line, but want to handle it just
       # in case of data issues
