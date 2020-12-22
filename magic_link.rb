@@ -40,7 +40,7 @@ class MagicLink < Sinatra::Base
   get('/login') do
     # When rendering the login page, fetch a list of editable hubs so we can
     # show a dropdown
-    @hubs = Hub.editable_by_coordinators
+    @hubs = Hub.editable
     @states = @hubs.map{ |h| h['State'] }.uniq.sort
     haml :login
   end
@@ -93,7 +93,7 @@ class MagicLink < Sinatra::Base
     else
       logger.info "Bad login attempt with key: #{key.inspect}"
       @error_msg = "It looks like you tried to log in with a link that was invalid, expired, or already used! Please select your hub from the list and try again."
-      @hubs = Hub.editable_by_coordinators
+      @hubs = Hub.editable
       @states = @hubs.map{ |h| h['State'] }.uniq.sort
       haml :login
     end

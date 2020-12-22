@@ -118,6 +118,7 @@ DEPENDENCIES
   pony
   pry
   puma
+  rack-test
   rake
   rb-readline
   sinatra

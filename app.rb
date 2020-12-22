@@ -3,6 +3,7 @@ require 'pony'
 require 'haml'
 require_relative 'airtable'
 require_relative 'magic_link'
+require_relative 'sms_service'
 require 'honeybadger' if ENV['HONEYBADGER_API_KEY']
 require 'aws-sdk-s3'
 
@@ -29,6 +30,7 @@ end
 
 class Hubhub < Sinatra::Base
   use MagicLink
+  use SMSService
   use Rack::MethodOverride
 
   enable :logging

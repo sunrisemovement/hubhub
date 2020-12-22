@@ -35,8 +35,12 @@ class Leader < Airrecord::Table
     "#{self['First Name']} #{self['Last Name']}"
   end
 
+  def email
+    self['Email'].to_s.strip.presence
+  end
+
   def entry
-    "#{name}: #{self['Email']}"
+    "#{name}: #{email}"
   end
 
   def inactive?
@@ -78,15 +82,20 @@ class Hub < Airrecord::Table
   has_many :hub_leaders, class: 'Leader', column: 'Hub Leaders'
   has_many :hub_forms, class: 'HubForm', column: 'State of the Hub Form'
 
-  # Generate a list of hubs that can be edited in Hubhub (for use in the login
-  # dropdown list)
-  def self.editable_by_coordinators
-    hubs = self.all.select(&:editable_by_coordinators?)
-    hubs = hubs.sort_by { |h| [h.state_abbrev, h['Name']] }
-    if ENV['HUB_BETA_TESTERS']
-      hubs = hubs.select { |h| ENV['HUB_BETA_TESTERS'].include?(h.id) }
+  def self.cached(max_staleness=60)
+    if @cached_hubs.nil? || @cached_at.nil? || Time.now - @cached_at > max_staleness
+      @cached_hubs = self.all.sort_by { |h| [h.state_abbrev||'_', h['Name']] }
+      @cached_at = Time.now
     end
-    hubs
+    @cached_hubs
+  end
+
+  def self.visible(max_staleness=10*60)
+    self.cached(max_staleness).select(&:should_appear_on_map?)
+  end
+
+  def self.editable(max_staleness=1*60)
+    self.cached(max_staleness).select(&:editable_by_coordinators?)
   end
 
   # A hub is editable in Hubhub if it's been marked as potentially visible on
@@ -131,7 +140,7 @@ class Hub < Airrecord::Table
     return false if self['Activity'] == 'Inactive'
     return false unless self['Map?'] == true
     return false unless self['Latitude'] && self['Longitude']
-    return false unless self['City'] && state && self['Name']
+    return false unless self['City'] && state && name
     true
   end
 
@@ -166,6 +175,10 @@ class Hub < Airrecord::Table
 
   def location
     "#{self['City']}, #{state_abbrev}"
+  end
+
+  def name
+    self['Name'].to_s.strip.presence
   end
 
   # Hubs can select a "contact type" that determines which information gets
@@ -246,12 +259,16 @@ class Hub < Airrecord::Table
     end
   end
 
+  def coords
+    [self['Latitude'], self['Longitude']]
+  end
+
   # Combining all of the above functions, we can generate a public map entry
   # that will be used to power the hub map.
   def map_entry(leads=nil)
     entry = {
       id: self.id,
-      name: self.fields['Name'],
+      name: name,
       city: self.fields['City'].strip,
       state: self.state,
       latitude: self.fields['Latitude'],
