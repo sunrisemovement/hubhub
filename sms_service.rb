@@ -87,13 +87,15 @@ class HubChoice
   end
 
   def social_message
-    media = {}
+    social_media_urls = []
     ['twitter', 'facebook', 'instagram'].each do |platform|
       if url = hub.send("#{platform}_url").presence
-        media[platform.capitalize] = url.sub(/\?.*$/, '')
+        social_media_urls << url.sub(/\?.*$/, '')
       end
     end
-    media.map{|platform, url| "#{platform} at #{url}" }.to_sentence.presence
+    if social_media_urls.present?
+      "at #{social_media_urls.to_sentence(last_word_connector: ', or ')}"
+    end
   end
 end
 
