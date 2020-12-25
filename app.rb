@@ -40,20 +40,6 @@ class Hubhub < Sinatra::Base
       Rack::Utils.escape_html(text)
     end
 
-    def to_sentence(a, join='and')
-      arr = a.compact
-      case arr.length
-      when 0
-        ''
-      when 1
-        arr.first
-      when 2
-        "#{arr.first} #{join} #{arr.last}"
-      else
-        "#{arr[0..-2].join(", ")}, #{join} #{arr.last}"
-      end
-    end
-
     # Helper function to output JSON loadable by the hub map but specific to
     # the current hub
     def map_entry
@@ -301,7 +287,9 @@ class Hubhub < Sinatra::Base
     if @leader = @hub.active_leaders.detect { |l| l.id == params[:id] }
       haml :leader_edit
     else
-      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader was removed from the list?"
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader"\
+                            " with that ID! Perhaps the URL is incorrect, or"\
+                            " the leader was removed from the list?"
       redirect '/leaders'
     end
   end
@@ -314,7 +302,9 @@ class Hubhub < Sinatra::Base
       session[:notice_msg] = "#{@leader.name} has been removed."
       redirect '/leaders'
     else
-      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader is already removed from the list?"
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader"\
+                            " with that ID! Perhaps the URL is incorrect, or"\
+                            " the leader is already removed from the list?"
       redirect '/leaders'
     end
   end
@@ -337,7 +327,9 @@ class Hubhub < Sinatra::Base
 
       haml :leader_changes
     else
-      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader with that ID! Perhaps the URL is incorrect, or the leader was removed from the list?"
+      session[:error_msg] = "We couldn't find an active #{@hub['Name']} leader"\
+                            " with that ID! Perhaps the URL is incorrect, or"\
+                            " the leader was removed from the list?"
       redirect '/leaders'
     end
   end
@@ -358,9 +350,16 @@ class Hubhub < Sinatra::Base
       to: @email,
       subject: "Verifying your new Sunrise Hubhub email",
       body: [
-        "Hi #{@hub['Name']}!", "",
-        "We got a request to update your login email for Sunrise Hubhub from #{@hub['Email']} to #{@email}. To confirm this update, please click on the following link: #{link}", "",
-        "This link will expire in 2 hours. If you or one of your other hub leaders did not request it, you can ignore this email, and if you have any questions, please email us back at #{ENV['GMAIL_USER']}.", "",
+        "Hi #{@hub['Name']}!",
+        "",
+        "We got a request to update your login email for Sunrise Hubhub from"\
+        " #{@hub['Email']} to #{@email}. To confirm this update, please click"\
+        " on the following link: #{link}",
+        "",
+        "This link will expire in 2 hours. If you or one of your other hub"\
+        " leaders did not request it, you can ignore this email, and if you"\
+        " have any questions, please email us back at #{ENV['GMAIL_USER']}.",
+        "",
         "Best,",
         "The Hub Support Team"
       ].join("\n")
@@ -368,7 +367,11 @@ class Hubhub < Sinatra::Base
 
     haml :hub_email_sent
   rescue
-    @email_error = "We had trouble sending a confirmation email to #{params['email'].to_s.inspect}! This could be because it's an invalid email, or it could be because of an error on our side. If you continue having problems, please email us back at #{ENV['GMAIL_USER']}."
+    @email_error = "We had trouble sending a confirmation email to"\
+                   " #{params['email'].to_s.inspect}! This could be because"\
+                   " it's an invalid email, or it could be because of an"\
+                   " error on our side. If you continue having problems,"\
+                   " please email us back at #{ENV['GMAIL_USER']}."
 
     haml :hub_email_error
   end

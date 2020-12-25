@@ -77,7 +77,7 @@
     = succeed '.' do
       You can log in to this tool using your hub email (#{@hub['Email']}) or designated leader emails 
       - if (@hub['Map Editor Emails'] || []).compact.length > 0
-        (#{to_sentence(@hub['Map Editor Emails'])})
+        (#{@hub['Map Editor Emails'].to_sentence})
       - else
         (currently none)
   %li
