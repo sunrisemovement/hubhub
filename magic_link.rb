@@ -1,5 +1,7 @@
 require 'sinatra/base'
+require 'rack/session/dalli'
 require_relative 'emailer'
+require_relative 'cache'
 require_relative 'keypad'
 
 class MagicLink < Sinatra::Base
@@ -19,18 +21,7 @@ class MagicLink < Sinatra::Base
       set :force_ssl, true
     end
 
-    # If running on Heroku, use Memcached for a persistent cookie storage so
-    # that people are not logged out when the app dyno restarts.
-    if ENV['MEMCACHEDCLOUD_SERVERS']
-      require 'dalli'
-      require 'rack/session/dalli'
-      memcached = Dalli::Client.new(
-        ENV["MEMCACHEDCLOUD_SERVERS"].split(','),
-        username: ENV["MEMCACHEDCLOUD_USERNAME"],
-        password: ENV["MEMCACHEDCLOUD_PASSWORD"]
-      )
-      use Rack::Session::Dalli, cache: memcached
-    end
+    use Rack::Session::Dalli, cache: CACHE
   end
 
   error do
