@@ -41,6 +41,8 @@ class Minitest::Test
     Leader.client.connection = Faraday.new { |builder|
       builder.adapter :test, Faraday::Adapter::Test::Stubs.new
     }
+
+    CACHE.flush_all
   end
 
   def hub_stubs

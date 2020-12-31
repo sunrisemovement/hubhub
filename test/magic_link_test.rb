@@ -88,7 +88,7 @@ class MagicLinkTest < CapybaraTest
     end
   end
 
-  def test_session_timeout
+  def test_used_link
     stub_hubs([{
       'Name' => 'Sunrise Minas Tirith',
       'City' => 'Minas Tirith',
@@ -103,48 +103,15 @@ class MagicLinkTest < CapybaraTest
 
     email = Emailer.last_email
     magic_link = email[:body][/https?:\/\/[\S]+/]
-
     visit magic_link
     assert_css '.hub-brand', text: 'Minas Tirith'
 
-    visit '/'
-    assert_css '.hub-brand', text: 'Minas Tirith'
+    click_link 'Log Out'
+    assert_no_css '.hub-brand', text: 'Minas Tirith'
 
-    Timecop.freeze(Date.today + 2) do
-      visit '/'
-      assert_no_css '.hub-brand', text: 'Minas Tirith'
-    end
-  end
-
-  def test_double_link
-    stub_hubs([{
-      'Name' => 'Sunrise Minas Tirith',
-      'City' => 'Minas Tirith',
-      'State' => 'GA',
-      'Email' => 'f4r4m1r@citadel.org',
-      'Map?' => true
-    }])
-
-    visit '/'
-    select 'Sunrise Minas Tirith', from: 'hub'
-    click_button 'Send Magic Link'
-
-    email = Emailer.last_email
-    magic_link1 = email[:body][/https?:\/\/[\S]+/]
-
-    visit '/'
-    select 'Sunrise Minas Tirith', from: 'hub'
-    click_button 'Send Magic Link'
-
-    email = Emailer.last_email
-    magic_link2 = email[:body][/https?:\/\/[\S]+/]
-
-    visit magic_link1
+    visit magic_link
     assert_no_css '.hub-brand', text: 'Minas Tirith'
     assert_content 'invalid, expired, or already used'
-
-    visit magic_link2
-    assert_css '.hub-brand', text: 'Minas Tirith'
   end
 
   def test_bad_link
