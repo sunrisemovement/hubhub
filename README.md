@@ -19,7 +19,9 @@ Finally, Hubhub surfaces a web interface, built with [Sinatra](http://sinatrarb.
 - download Ruby 2.6.6
     - if using mac, likely easiest by installing [rbenv](https://github.com/rbenv/rbenv)
     - if additionally using Homebrew, you can run `brew install rbenv && rbenv init && rbenv install 2.6.6 && gem install bundler`
-- run `bundle install` to install dependencies
+- download and run [memcached](https://memcached.org)
+    - if using mac with [Homebrew](https://brew.sh/), can run `brew install memcached` and then `brew services start memcached`
+- run `bundle install` to install Ruby dependencies
 - ensure `rake test` passes
 - set [environment variables](./.env.example) -- note that this may require requesting access to the production or staging Airtable first.
 - run `./serve` to view the app
