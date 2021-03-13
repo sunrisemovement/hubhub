@@ -84,7 +84,7 @@ class Hub < Airrecord::Table
 
   def self.cached(max_staleness=60)
     if @cached_hubs.nil? || @cached_at.nil? || Time.now - @cached_at > max_staleness
-      @cached_hubs = self.all.sort_by { |h| [h.state_abbrev||'_', h['Name']] }
+      @cached_hubs = self.all.sort_by { |h| [h.state_abbrev||'_', h['Name'], 'zzz'].compact }
       @cached_at = Time.now
     end
     @cached_hubs
