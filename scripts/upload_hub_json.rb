@@ -24,7 +24,10 @@ s3.put_object(
 if token = ENV['MICROSITE_GITHUB_ACCESS_TOKEN']
   # Deploy microsites
   HTTParty.post(
-    "https://api.github.com/repos/sunrisemovement/smvmt-microsite/pages/builds",
+    "https://api.github.com/repos/sunrisemovement/smvmt-microsite/dispatches",
+    body: {
+      event_type: 'deploy',
+    },
     headers: {
       "Authorization" => "token #{token}"
     }
