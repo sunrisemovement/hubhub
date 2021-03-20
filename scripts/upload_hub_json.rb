@@ -26,8 +26,8 @@ if token = ENV['MICROSITE_GITHUB_ACCESS_TOKEN']
   HTTParty.post(
     "https://api.github.com/repos/sunrisemovement/smvmt-microsite/dispatches",
     body: {
-      event_type: 'deploy',
-    },
+      event_type: 'deploy'
+    }.to_json,
     headers: {
       "Authorization" => "token #{token}"
     }
